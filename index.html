@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FY BSC IT (Sem II) - Attendance System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            /* Modern Palette & Glows */
+            --primary-bg: #0f172a;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #8b5cf6;
+            
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.8);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --shadow-glow: 0 0 15px rgba(99, 102, 241, 0.4);
+            
+            /* Status Colors */
+            --success-bg: rgba(22, 163, 74, 0.15);
+            --success-text: #166534;
+            --danger-bg: rgba(220, 38, 38, 0.15);
+            --danger-text: #991b1b;
+            --danger-row-bg: rgba(254, 226, 226, 0.6);
+            
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        /* Animated Mesh Gradient Background */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(-45deg, #c7d2fe, #fbcfe8, #bfdbfe, #ddd6fe);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Glass Header */
+        header {
+            margin: 15px 15px 8px 15px;
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        header:hover {
+            transform: translateY(-2px);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            /* Gradient Text Effect */
+            background: linear-gradient(to right, #a5b4fc, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 2px 10px rgba(165, 180, 252, 0.2);
+        }
+
+        .subtitle {
+            font-weight: 500;
+            font-size: 0.92em;
+            -webkit-text-fill-color: #94a3b8;
+        }
+
+        .admin-badge {
+            font-size: 0.87rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 8px 18px;
+            border-radius: 9999px;
+            border: 1px solid rgba(255,255,255,0.2);
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 10px rgba(99, 102, 241, 0.4); }
+            to { box-shadow: 0 0 20px rgba(139, 92, 246, 0.6); }
+        }
+
+        .container {
+            max-width: 1420px;
+            margin: 0 auto;
+            padding: 0 15px 15px 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Glassmorphism Controls */
+        .controls {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: var(--glass-border);
+            padding: 16px 20px;
+            border-radius: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-glass);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .input-group { 
+            display: flex; 
+            gap: 12px; 
+            flex-wrap: wrap; 
+            flex: 1; 
+            align-items: center; 
+        }
+
+        .subject-select, .search-input {
+            padding: 13px 18px;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-main);
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .subject-select { cursor: pointer; min-width: 360px; }
+        .search-input { flex-grow: 1; max-width: 420px; }
+
+        .subject-select:focus, .search-input:focus {
+            background: white;
+            border-color: var(--accent);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-1px);
+        }
+
+        /* Sleek Total Lectures Widget */
+        .total-lectures {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            padding: 8px 16px;
+            border-radius: 18px;
+            box-shadow: inset 0 2px 5px rgba(255,255,255,0.5), 0 4px 10px rgba(0,0,0,0.03);
+            white-space: nowrap;
+        }
+        
+        .total-lectures span {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .total-lectures input {
+            width: 70px;
+            padding: 8px 12px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-align: center;
+            background: white;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .total-lectures input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+            outline: none;
+            transform: scale(1.05);
+        }
+
+        .total-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white !important;
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+            min-width: 110px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        /* Modern 3D Buttons with Hover Effects */
+        .btn {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* Shine effect on buttons */
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            z-index: -1;
+            transition: all 0.7s ease;
+        }
+
+        .btn:hover::after { left: 200%; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .btn:active { transform: translateY(1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+        .btn-add { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; }
+        .btn-restore { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);}
+        .btn-reset { background: rgba(255,255,255,0.8); color: var(--danger-text); border: 1px solid #fecaca; backdrop-filter: blur(5px); }
+        .btn-reset:hover { background: #fee2e2; border-color: #f87171; }
+        .btn-export { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);}
+        .btn-cancel { background: #e2e8f0; color: #475569; }
+
+        /* Glass Table Container */
+        .table-container {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 20px;
+            overflow: auto;
+            box-shadow: var(--shadow-glass);
+            border: var(--glass-border);
+            flex-grow: 1;
+            margin-top: 4px;
+            position: relative;
+        }
+
+        /* Custom Sleek Scrollbar */
+        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: transparent; }
+        .table-container::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.5); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.8); border: 0; }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+        /* Sticky Glass Header for Table */
+        th {
+            position: sticky;
+            top: 0;
+            background: rgba(248, 250, 252, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            padding: 20px 24px;
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary-dark);
+            border-bottom: 2px solid rgba(226, 232, 240, 0.8);
+        }
+
+        /* Row Animations & Hover Interactions */
+        tbody tr {
+            animation: slideIn 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stagger effect for initial rows */
+        tbody tr:nth-child(1) { animation-delay: 0.05s; }
+        tbody tr:nth-child(2) { animation-delay: 0.1s; }
+        tbody tr:nth-child(3) { animation-delay: 0.15s; }
+        tbody tr:nth-child(4) { animation-delay: 0.2s; }
+        tbody tr:nth-child(5) { animation-delay: 0.25s; }
+        tbody tr:nth-child(n+6) { animation-delay: 0.3s; }
+
+        td { 
+            padding: 16px 24px; 
+            border-bottom: 1px solid rgba(241, 245, 249, 0.6); 
+            font-size: 0.98rem; 
+            vertical-align: middle;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Row Hover Magic */
+        tr:hover td { 
+            background: rgba(255, 255, 255, 0.95);
+        }
+        tr:hover {
+            transform: scale(1.002) translateX(4px);
+            box-shadow: -4px 4px 15px rgba(0,0,0,0.03);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Defaulter Highlight Redesign */
+        tr.row-defaulter { background-color: var(--danger-row-bg); }
+        tr.row-defaulter td { border-bottom-color: rgba(254, 202, 202, 0.5); }
+        tr.row-defaulter:hover { background-color: rgba(254, 226, 226, 0.9); transform: scale(1.002) translateX(4px); }
+        tr.row-defaulter .student-name { color: var(--danger-text); font-weight: 800; }
+        
+        /* Modern Pill Badges */
+        .badge {
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .badge-green { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: var(--success-text); border: 1px solid rgba(22, 163, 74, 0.2); }
+        
+        /* Pulsing Alert for Defaulters */
+        .badge-red { 
+            background: linear-gradient(135deg, #fee2e2, #fecaca); 
+            color: var(--danger-text); 
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            animation: warningPulse 2s infinite;
+        }
+
+        @keyframes warningPulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Upgraded Quick Action Buttons */
+        .action-btns { display: flex; gap: 10px; }
+        .mark-btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.85rem;
+            flex: 1;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mark-p { background: #f0fdf4; color: #15803d; box-shadow: inset 0 0 0 1px #bbf7d0; }
+        .mark-p:hover { background: #22c55e; color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
+        .mark-p:active { transform: translateY(0); }
+
+        .mark-a { background: #fef2f2; color: #b91c1c; box-shadow: inset 0 0 0 1px #fecaca; }
+        .mark-a:hover { background: #ef4444; color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); }
+        .mark-a:active { transform: translateY(0); }
+
+        /* Mini Icon Buttons */
+        .mini-btn {
+            background: rgba(255,255,255,0.8);
+            border: 1px solid #e2e8f0;
+            width: 38px; height: 38px;
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .mini-btn:hover { 
+            background: white;
+            border-color: var(--primary); 
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 5px 12px rgba(99, 102, 241, 0.2);
+            z-index: 10;
+        }
+
+        /* Refined Sandbox Warning */
+        .sandbox-warning {
+            background: linear-gradient(to right, #fef3c7, #fde68a);
+            color: #92400e;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 3px solid #f59e0b;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+        }
+
+        /* Enhanced Modal UI */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 35px;
+            border-radius: 28px;
+            z-index: 101;
+            width: 420px;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 40px rgba(99, 102, 241, 0.1);
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .modal h3 { margin-top: 0; color: var(--text-main); font-weight: 800; font-size: 1.5rem; }
+        .modal-desc { color: #64748b; font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5; }
+        
+        .modal-input {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 24px;
+            box-sizing: border-box;
+            outline: none;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+        
+        .modal-input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-actions .btn { flex: 1; justify-content: center; padding: 14px; font-size: 1rem; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { 
+            from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } 
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
+        }
+    </style>
+</head>
+<body>
+
+<div id="sandboxWarning" class="sandbox-warning">
+    ⚠️ <strong>Storage Disabled</strong> — Data will reset on refresh (sandboxed environment). Open this file directly in Chrome/Firefox for full save support.
+</div>
+
+<header>
+    <div class="header-content">
+        <h1>🎓 Attendify <span class="subtitle">| FY BSC IT (Sem II)</span></h1>
+    </div>
+    <div class="admin-badge">Made By Harsh Dubey</div>
+</header>
+
+<div class="container">
+    <div class="controls">
+        <div class="input-group">
+            <select id="subjectSelect" class="subject-select" onchange="handleSubjectChange()">
+                <optgroup label="📘 Theory Subjects">
+                    <option value="Psychology">Psychology of Adjustment</option>
+                    <option value="Capital_Market">Introduction to Capital Market of India</option>
+                    <option value="Env_Mgmt">Environmental Management & Sustainability Development II</option>
+                    <option value="Hindi">हिन्दी भाषा : कौशल के आधार</option>
+                    <option value="CC">CC (Co-Circular)</option>
+                    <option value="OOP_CPP">Object Oriented Programming using C++</option>
+                    <option value="Web_Designing">Web Designing</option>
+                </optgroup>
+                <optgroup label="💻 Practical Subjects">
+                    <option value="OOP_CPP">Object Oriented Programming using C++</option>
+                    <option value="Web_Designing">Web Designing</option>
+                    <option value="Assembly">Assembly Language Programming</option>
+                    <option value="PLSQL">PL/SQL</option>
+                    <option value="FPP">Fundamentals of Python Programming (FPP)</option>
+                </optgroup>
+            </select>
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍  Search student..." onkeyup="renderTable()">
+        </div>
+
+        <div class="total-lectures">
+            <span>📅 Total Lectures</span>
+            <input type="number" id="totalLecturesInput" min="1" value="20">
+            <button onclick="setTotalLectures()" class="btn btn-primary">Save</button>
+            <div id="totalDisplay" class="total-badge">— lectures set</div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="markAllPresent()">✅ All Present</button>
+            <button class="btn btn-add" onclick="toggleModal(true)"><span>+</span> Add</button>
+            <button class="btn btn-restore" onclick="restoreMissing()" title="Restore from Jan 2026 Master List">♻️ Restore</button>
+            <button class="btn btn-reset" onclick="resetMonth()">📅 Archive Month</button>
+            <button class="btn btn-export" onclick="exportToCSV()">📊 Export</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">ID</th>
+                    <th>Student Name (Jan 2026 Roster)</th>
+                    <th style="width: 160px;">Attendance</th>
+                    <th style="width: 120px;">Agg. %</th>
+                    <th style="width: 200px;">Quick Action</th>
+                    <th style="width: 100px; text-align: center;">Manage</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-overlay" id="overlay" onclick="toggleModal(false)"></div>
+<div class="modal" id="addForm">
+    <h3>New Enrollment</h3>
+    <p class="modal-desc">Add a new student to the database.</p>
+    <input type="text" id="newName" class="modal-input" placeholder="Enter Full Name">
+    <div class="modal-actions">
+        <button class="btn btn-cancel" onclick="toggleModal(false)">Cancel</button>
+        <button class="btn btn-add" onclick="addStudent()">Save Student</button>
+    </div>
+</div>
+
+<script>
+    // === SAFE STORAGE WRAPPER ===
+    let useLocalStorage = true;
+    let students = [];
+    let subjectTotals = {};
+
+    const SafeStorage = {
+        get(key, defaultVal) {
+            try {
+                const item = localStorage.getItem(key);
+                return item !== null ? JSON.parse(item) : defaultVal;
+            } catch (e) {
+                useLocalStorage = false;
+                return defaultVal;
+            }
+        },
+        set(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+                return true;
+            } catch (e) {
+                useLocalStorage = false;
+                return false;
+            }
+        }
+    };
+
+    // MASTER LIST (exact from PDF)
+    const MASTER_LIST = [
+        {id: 1, name: "Andre Harshad Balu"},
+        {id: 2, name: "Ansari Farman Lukman"},
+        {id: 3, name: "Behera Shubham Binod"},
+        {id: 4, name: "Chaurasiya Shivanshu Ashok"},
+        {id: 5, name: "Chendvankar Tanishta Abhijit"},
+        {id: 6, name: "Choursia Shraddha Maheshkumar"},
+        {id: 7, name: "Dudave Shubham Pandurang"},
+        {id: 8, name: "Gupta Himanshu Laxmikant"},
+        {id: 9, name: "Gupta Nikhil Ganesh"},
+        {id: 10, name: "Gupta Raj Omprakash"},
+        {id: 11, name: "Gurav Shreya Prakash"},
+        {id: 12, name: "Jaiswal Khushi Dashrath"},
+        {id: 13, name: "Jaiswal Prince Dharmendra"},
+        {id: 14, name: "Kottilaparambil Suvidh Sunil"},
+        {id: 15, name: "Kushwaha Vinit Vidyanand"},
+        {id: 16, name: "Mishra Shashak Sureshkumar"},
+        {id: 17, name: "Nesamoney Cinderella Jaiross"},
+        {id: 18, name: "Pal Aryan Naveen"},
+        {id: 19, name: "Pal Ashish Ramavadh"},
+        {id: 20, name: "Pal Laxmi Kapildev"},
+        {id: 21, name: "Pandey Sharad Umeshchandra"},
+        {id: 22, name: "Rajput Prachi Narsing"},
+        {id: 23, name: "Reddi Mahesh Chandranna"},
+        {id: 24, name: "Sawant Narayan Manohar"},
+        {id: 25, name: "Sharma Abhay Chandrika"},
+        {id: 26, name: "Sharma Kartike Sunil"},
+        {id: 27, name: "Shevale Pratham Dnyaneshwar"},
+        {id: 28, name: "Singh Aniket Rajesh"},
+        {id: 29, name: "Singh Anurag Kush"},
+        {id: 30, name: "Singh Aryan Sanjay"},
+        {id: 31, name: "Singh Bablu Kumar Santosh Kumar"},
+        {id: 32, name: "Singh Janvi Anil"},
+        {id: 33, name: "Singh Noel Damer"},
+        {id: 34, name: "Singh Sachi Ashutosh"},
+        {id: 37, name: "Yadav Pooja Om Prakash"},
+        {id: 38, name: "Yadav Prince Virendrakumar"},
+        {id: 39, name: "Yadav Vivek Rudra"},
+        {id: 40, name: "Yadav Yogank Ashok"},
+        {id: 41, name: "Mishra Aditya Rajesh"},
+        {id: 42, name: "Pardhe Harshit Chandrakant"},
+        {id: 43, name: "Jaiswal Moksh Rajkumar"},
+        {id: 44, name: "Ghadigaonkar Maithili Mahesh"},
+        {id: 46, name: "Tiwari Pavan Awadesh"},
+        {id: 47, name: "Thorat Kaustubh Ramesh"},
+        {id: 48, name: "Makwana Ayushi Nilesh"},
+        {id: 49, name: "Dubey Harsh Puneet"},
+        {id: 50, name: "Mourya Ansh Deenanath"},
+        {id: 51, name: "Morye Mihir Mangesh"},
+        {id: 52, name: "Pandey Sakshi"},
+        {id: 53, name: "Uttam Tripathi"},
+        {id: 54, name: "Anchal Jaiswar"},
+        {id: 55, name: "Harshit Tiwari"},
+        {id: 56, name: "Shivam Patel"},
+        {id: 57, name: "Shivansu Mishra"},
+        {id: 58, name: "Abhay Yadav"},
+        {id: 59, name: "Mahek Pandya"}
+    ];
+
+    function loadData() {
+        students = SafeStorage.get('bscit_sem2_data', []);
+        subjectTotals = SafeStorage.get('bscit_subject_totals', {});
+
+        if (students.length === 0) {
+            students = MASTER_LIST.map(s => ({ ...s, att: {}, history: {} }));
+        } else {
+            MASTER_LIST.forEach(m => {
+                const existing = students.find(s => s.id === m.id);
+                if (!existing) {
+                    students.push({ ...m, att: {}, history: {} });
+                } else {
+                    existing.name = m.name;
+                }
+            });
+            students.sort((a, b) => a.id - b.id);
+        }
+
+        // Pre-load January totals from PDF
+        if (!subjectTotals['OOP_CPP']) subjectTotals['OOP_CPP'] = 19;
+        if (!subjectTotals['Web_Designing']) subjectTotals['Web_Designing'] = 19;
+        if (!subjectTotals['Psychology']) subjectTotals['Psychology'] = 13;
+        if (!subjectTotals['Capital_Market']) subjectTotals['Capital_Market'] = 15;
+        if (!subjectTotals['Env_Mgmt']) subjectTotals['Env_Mgmt'] = 19;
+        if (!subjectTotals['Hindi']) subjectTotals['Hindi'] = 16;
+        if (!subjectTotals['CC']) subjectTotals['CC'] = 19;
+
+        // New practical subjects
+        if (!subjectTotals['Assembly']) subjectTotals['Assembly'] = 0;
+        if (!subjectTotals['PLSQL']) subjectTotals['PLSQL'] = 0;
+        if (!subjectTotals['FPP']) subjectTotals['FPP'] = 0;
+
+        if (!useLocalStorage) {
+            document.getElementById('sandboxWarning').style.display = 'flex';
+        }
+    }
+
+    function save() {
+        if (useLocalStorage) {
+            SafeStorage.set('bscit_sem2_data', students);
+            SafeStorage.set('bscit_subject_totals', subjectTotals);
+        }
+    }
+
+    function setTotalLectures() {
+        const sub = document.getElementById('subjectSelect').value;
+        let val = parseInt(document.getElementById('totalLecturesInput').value);
+        if (isNaN(val) || val < 1) {
+            alert("⚠️ Please enter a valid number ≥ 1");
+            return;
+        }
+        subjectTotals[sub] = val;
+        save();
+        updateTotalDisplay();
+        renderTable();
+        alert(`✅ Total lectures for ${sub} updated to ${val}`);
+    }
+
+    function updateTotalDisplay() {
+        const sub = document.getElementById('subjectSelect').value;
+        const display = document.getElementById('totalDisplay');
+        const total = subjectTotals[sub] || 0;
+        if (total) {
+            display.innerHTML = `✅ <strong>${total}</strong> lectures set`;
+            display.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            display.style.color = 'white';
+        } else {
+            display.innerHTML = `Not set yet`;
+            display.style.background = '#f1f5f9';
+            display.style.color = '#64748b';
+        }
+    }
+
+    function handleSubjectChange() {
+        updateTotalDisplay();
+        renderTable();
+    }
+
+    function renderTable() {
+        const sub = document.getElementById('subjectSelect').value;
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        const tbody = document.getElementById('tableBody');
+        let html = '';
+
+        students.forEach((s, idx) => {
+            if (query && !s.name.toLowerCase().includes(query) && !s.id.toString().includes(query)) return;
+
+            if (!s.att[sub]) s.att[sub] = { p: 0, t: 0 };
+            if (!s.history) s.history = {}; 
+            if (!s.history[sub]) s.history[sub] = [];
+
+            const sAtt = s.att[sub];
+            let grandP = 0, grandT = 0;
+            
+            Object.keys(s.att).forEach(key => {
+                const attData = s.att[key];
+                grandP += attData.p;
+                grandT += (key === sub && subjectTotals[key] !== undefined) 
+                          ? subjectTotals[key] 
+                          : (attData.t || 0);
+            });
+
+            Object.values(s.history).forEach(subHist => {
+                subHist.forEach(monthRecord => {
+                    grandP += monthRecord.p;
+                    grandT += monthRecord.t;
+                });
+            });
+
+            const totalPct = grandT ? ((grandP / grandT) * 100).toFixed(1) : 0;
+            const isDefaulter = totalPct < 75;
+            const rowClass = isDefaulter ? 'row-defaulter' : '';
+
+            const displayTotal = (subjectTotals[sub] !== undefined) ? subjectTotals[sub] : (sAtt.t || 0);
+            const totalLabel = (subjectTotals[sub] !== undefined) ? '(fixed)' : '(cur)';
+
+            html += `
+                <tr class="${rowClass}">
+                    <td><span class="roll-no" style="font-family:'Courier New', monospace; font-weight:bold; color:#64748b;">#${s.id}</span></td>
+                    <td><span class="student-name">${s.name}</span></td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-weight:700;">${sAtt.p}/${displayTotal}</span>
+                            <span style="font-size:0.75em; color:#94a3b8;">${totalLabel}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${isDefaulter ? 'badge-red' : 'badge-green'}">
+                            ${totalPct}%
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="mark-btn mark-p" onclick="mark(${idx}, true)">Present</button>
+                            <button class="mark-btn mark-a" onclick="mark(${idx}, false)">Absent</button>
+                        </div>
+                    </td>
+                    <td style="text-align:center; display:flex; gap:5px; justify-content:center;">
+                        <button class="mini-btn" title="Reset Current Subject" onclick="resetSingle(${idx})">🔄</button>
+                        <button class="mini-btn" title="WIPE ALL ATTENDANCE" onclick="wipeStudentTotal(${idx})" style="border-color:#f59e0b; color:#d97706;">🧨</button>
+                        <button class="mini-btn" title="Delete Student" onclick="deleteSingle(${idx})" style="color:#ef4444; border-color:#fee2e2;">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function mark(idx, isP) {
+        const sub = document.getElementById('subjectSelect').value;
+        if (!students[idx].att[sub]) students[idx].att[sub] = { p: 0, t: 0 };
+        students[idx].att[sub].t++;
+        if (isP) students[idx].att[sub].p++;
+        save(); 
+        renderTable();
+    }
+
+    function markAllPresent() {
+        const sub = document.getElementById('subjectSelect').value;
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        let count = 0;
+        students.forEach(s => {
+            if (query && !s.name.toLowerCase().includes(query) && !s.id.toString().includes(query)) return;
+            if (!s.att[sub]) s.att[sub] = { p: 0, t: 0 };
+            s.att[sub].t++;
+            s.att[sub].p++;
+            count++;
+        });
+        save(); 
+        renderTable();
+    }
+
+    function resetSingle(idx) {
+        const sub = document.getElementById('subjectSelect').value;
+        if(confirm(`Reset attendance for ${students[idx].name} in this subject?`)) {
+            students[idx].att[sub] = { p: 0, t: 0 };
+            save(); 
+            renderTable();
+        }
+    }
+
+    function wipeStudentTotal(idx) {
+        const s = students[idx];
+        if(confirm(`⚠️ DANGER ZONE ⚠️\n\nWipe ALL attendance data for:\n${s.name}\n\nThis cannot be undone.`)) {
+            students[idx].att = {};
+            students[idx].history = {};
+            save(); 
+            renderTable();
+            alert(`${s.name} has been completely reset.`);
+        }
+    }
+
+    function deleteSingle(idx) {
+        if(confirm(`Remove ${students[idx].name} permanently?`)) {
+            students.splice(idx, 1);
+            save(); 
+            renderTable();
+        }
+    }
+
+    function restoreMissing() {
+        const currentIds = new Set(students.map(s => s.id));
+        let added = 0;
+        MASTER_LIST.forEach(m => {
+            if (!currentIds.has(m.id)) {
+                students.push({ ...m, att: {}, history: {} });
+                added++;
+            }
+        });
+        if(added) {
+            students.sort((a,b) => a.id - b.id);
+            save(); 
+            renderTable();
+            alert(`✅ Restored ${added} missing students from master list.`);
+        } else {
+            alert("✅ Roster is already up to date.");
+        }
+    }
+
+    function resetMonth() {
+        const sub = document.getElementById('subjectSelect').value;
+        const monthLabel = prompt(`Enter Month Name to archive for ${sub} (e.g. "January 2026"):`, "Jan 2026");
+        if (!monthLabel) return;
+        if(confirm(`Archive current attendance for "${sub}" under "${monthLabel}" and reset?`)) {
+            students.forEach(s => {
+                if (!s.history) s.history = {};
+                if (!s.history[sub]) s.history[sub] = [];
+                const currentP = s.att[sub] ? s.att[sub].p : 0;
+                const currentT = s.att[sub] ? s.att[sub].t : 0;
+                if(currentT > 0) s.history[sub].push({ month: monthLabel, p: currentP, t: currentT });
+                s.att[sub] = { p: 0, t: 0 };
+            });
+            save(); 
+            renderTable();
+            alert(`✅ Data archived and reset.`);
+        }
+    }
+
+    function addStudent() {
+        const name = document.getElementById('newName').value.trim();
+        if (!name) return;
+        const currentIds = students.map(s => s.id);
+        const newId = currentIds.length > 0 ? Math.max(...currentIds) + 1 : 1;
+        students.push({ id: newId, name: name, att: {}, history: {} });
+        save(); 
+        renderTable();
+        toggleModal(false);
+        document.getElementById('newName').value = '';
+    }
+
+    function exportToCSV() { exportToStyledExcel(); }
+
+    function exportToStyledExcel() {
+        const sub = document.getElementById('subjectSelect').value;
+        const date = new Date().toLocaleDateString();
+        let totalStudents = students.length;
+        let defaulters = 0, eligible = 0;
+
+        students.forEach(s => {
+            let grandP = 0, grandT = 0;
+            Object.keys(s.att).forEach(k => {
+                grandP += s.att[k].p || 0;
+                grandT += (k === sub && subjectTotals[k] !== undefined) ? subjectTotals[k] : (s.att[k].t || 0);
+            });
+            Object.values(s.history).forEach(h => h.forEach(r => { grandP += r.p; grandT += r.t; }));
+            const pct = grandT ? (grandP/grandT)*100 : 0;
+            if(pct < 75) defaulters++; else eligible++;
+        });
+
+        let excelContent = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head><style>body{font-family:Arial,sans-serif}.header-row th{background:#4f46e5;color:white;border:1px solid #000;padding:10px}td{border:1px solid #ccc;padding:5px;text-align:center}.defaulter{background:#fee2e2;color:#991b1b;font-weight:bold}.safe{background:#dcfce7;color:#166534}.name-col{text-align:left;font-weight:bold}</style></head>
+            <body>
+                <h2 style="text-align:center">Attendance Report: ${sub}</h2>
+                <p style="text-align:center">Generated on: ${date}</p>
+                <table style="margin-bottom:20px;border:2px solid #000">
+                    <tr><td style="background:#e0e7ff;font-weight:bold">Total Students</td><td style="background:#fee2e2;font-weight:bold;color:#991b1b">Defaulters</td><td style="background:#dcfce7;font-weight:bold;color:#166534">Eligible</td></tr>
+                    <tr><td style="font-size:1.2em">${totalStudents}</td><td style="font-size:1.2em">${defaulters}</td><td style="font-size:1.2em">${eligible}</td></tr>
+                </table>
+                <table>
+                    <thead><tr class="header-row"><th>Roll No</th><th style="width:250px">Student Name</th><th>Current (P/T)</th><th>Grand Total</th><th>Percentage</th><th>Status</th></tr></thead>
+                    <tbody>
+        `;
+
+        students.forEach(s => {
+            let curP = s.att[sub] ? s.att[sub].p : 0;
+            let effectiveCurT = (subjectTotals[sub] !== undefined) ? subjectTotals[sub] : (s.att[sub] ? s.att[sub].t : 0);
+            let grandP = 0, grandT = 0;
+            Object.keys(s.att).forEach(k => {
+                grandP += s.att[k].p || 0;
+                grandT += (k === sub && subjectTotals[k] !== undefined) ? subjectTotals[k] : (s.att[k].t || 0);
+            });
+            Object.values(s.history).forEach(h => h.forEach(r => { grandP += r.p; grandT += r.t; }));
+            let totalPct = grandT ? ((grandP / grandT) * 100).toFixed(2) : "0.00";
+            let isDefaulter = totalPct < 75;
+            let status = isDefaulter ? "DEFAULTER" : "Eligible";
+            let rowStyle = isDefaulter ? 'class="defaulter"' : 'class="safe"';
+
+            excelContent += `
+                <tr>
+                    <td>${s.id}</td>
+                    <td class="name-col">${s.name}</td>
+                    <td>${curP}/${effectiveCurT}</td>
+                    <td>${grandP}/${grandT}</td>
+                    <td ${rowStyle}>${totalPct}%</td>
+                    <td ${rowStyle}>${status}</td>
+                </tr>
+            `;
+        });
+
+        excelContent += `</tbody></table></body></html>`;
+
+        const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Attendance_${sub}_${date.replace(/\//g,'-')}.xls`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function toggleModal(show) {
+        const overlay = document.getElementById('overlay');
+        const form = document.getElementById('addForm');
+        overlay.style.display = show ? 'block' : 'none';
+        form.style.display = show ? 'block' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadData();
+        updateTotalDisplay();
+        renderTable();
+    });
+</script>
+</body>
+</html>
