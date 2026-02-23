@@ -1,0 +1,63 @@
+# ==========================================
+# Attendify - Git Ignore Configuration
+# ==========================================
+
+# --- OS Specific Files ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# --- IDE & Editor Settings ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# --- Node.js / Dependencies ---
+# (Included for when you migrate to a build system or local dev server)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# --- Environment & Secrets ---
+# (Crucial if you add Firebase or Backend API keys later)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+
+# --- Build & Distribution ---
+dist/
+build/
+out/
+.next/
+.cache/
+.parcel-cache/
+
+# --- Temporary / Logs ---
+logs
+*.log
+npm-debug.log*
+.eslintcache
+.stylelintcache
+
+# --- Testing ---
+coverage/
+.nyc_output/
+
+# --- Project Specific ---
+# If you keep the original filename for backup, but don't want it in the repo
+ATTENDIFY\ (2).html
