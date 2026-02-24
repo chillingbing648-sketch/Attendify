@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>FY BSC IT (Sem II) - Attendance System</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -33,6 +33,7 @@
         }
 
         /* Animated Mesh Gradient Background */
+        /* MOBILE FIX: Added text-size-adjust for Android DPI scaling and dvh fallback */
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(-45deg, #c7d2fe, #fbcfe8, #bfdbfe, #ddd6fe);
@@ -42,8 +43,12 @@
             margin: 0;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: 100vh; /* Fallback */
+            height: 100dvh; /* Mobile Fix */
             overflow: hidden;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            max-width: 100vw;
         }
 
         @keyframes gradientBG {
@@ -112,10 +117,11 @@
             to { box-shadow: 0 0 20px rgba(139, 92, 246, 0.6); }
         }
 
+        /* MOBILE FIX: Added padding-bottom with env() for iOS safe areas */
         .container {
             max-width: 1420px;
             margin: 0 auto;
-            padding: 0 15px 15px 15px;
+            padding: 0 15px max(15px, env(safe-area-inset-bottom)) 15px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -152,6 +158,7 @@
             align-items: center; 
         }
 
+        /* MOBILE FIX: Improved tap targets */
         .subject-select, .search-input {
             padding: 13px 18px;
             border-radius: 14px;
@@ -164,6 +171,8 @@
             color: var(--text-main);
             font-weight: 600;
             box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            min-height: 44px; /* Tap target */
+            box-sizing: border-box;
         }
 
         .subject-select { cursor: pointer; min-width: 360px; }
@@ -198,6 +207,7 @@
             gap: 6px;
         }
 
+        /* MOBILE FIX: Tap target improvement */
         .total-lectures input {
             width: 70px;
             padding: 8px 12px;
@@ -210,6 +220,8 @@
             color: var(--text-main);
             transition: all 0.3s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            min-height: 44px; /* Tap target */
+            box-sizing: border-box;
         }
 
         .total-lectures input:focus {
@@ -230,11 +242,17 @@
             min-width: 110px;
             text-align: center;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px; /* Tap target */
+            box-sizing: border-box;
         }
 
         .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
 
         /* Modern 3D Buttons with Hover Effects */
+        /* MOBILE FIX: Tap target improvement */
         .btn {
             padding: 12px 22px;
             border: none;
@@ -250,6 +268,8 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+            min-height: 44px; /* Tap target */
+            box-sizing: border-box;
         }
 
         /* Shine effect on buttons */
@@ -385,6 +405,7 @@
         }
 
         /* Upgraded Quick Action Buttons */
+        /* MOBILE FIX: Tap target improvement */
         .action-btns { display: flex; gap: 10px; }
         .mark-btn {
             padding: 10px 16px;
@@ -397,6 +418,8 @@
             transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
+            min-height: 44px; /* Tap target */
+            box-sizing: border-box;
         }
         
         .mark-p { background: #f0fdf4; color: #15803d; box-shadow: inset 0 0 0 1px #bbf7d0; }
@@ -408,16 +431,18 @@
         .mark-a:active { transform: translateY(0); }
 
         /* Mini Icon Buttons */
+        /* MOBILE FIX: Tap target minimum size */
         .mini-btn {
             background: rgba(255,255,255,0.8);
             border: 1px solid #e2e8f0;
-            width: 38px; height: 38px;
+            width: 44px; height: 44px; /* Updated from 38px for touch target */
             display: flex; justify-content: center; align-items: center;
             border-radius: 12px;
             cursor: pointer;
             color: var(--text-muted);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            box-sizing: border-box;
         }
         .mini-btn:hover { 
             background: white;
@@ -455,6 +480,7 @@
             animation: fadeIn 0.3s ease-out forwards;
         }
 
+        /* MOBILE FIX: Dynamic modal width to 92% on phones */
         .modal {
             display: none;
             position: fixed;
@@ -462,13 +488,14 @@
             transform: translate(-50%, -50%) scale(0.9);
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            padding: 35px;
+            padding: clamp(24px, 6vw, 35px);
             border-radius: 28px;
             z-index: 101;
-            width: 420px;
+            width: clamp(280px, 92%, 420px);
             border: 1px solid rgba(255,255,255,0.8);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 40px rgba(99, 102, 241, 0.1);
             animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            box-sizing: border-box;
         }
 
         .modal h3 { margin-top: 0; color: var(--text-main); font-weight: 800; font-size: 1.5rem; }
@@ -487,6 +514,7 @@
             font-weight: 600;
             transition: all 0.3s;
             background: #f8fafc;
+            min-height: 44px; /* Tap target */
         }
         
         .modal-input:focus {
@@ -502,6 +530,148 @@
         @keyframes popIn { 
             from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } 
             to { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
+        }
+
+        /* =========================================================
+           RESPONSIVE ENHANCEMENTS & MOBILE FIXES REWRITTEN
+           ========================================================= */
+
+        /* 1. Global Viewport & Fluid Typography Enhancements */
+        header h1 {
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
+        }
+
+        .subtitle {
+            font-size: clamp(0.75em, 2.5vw, 0.92em);
+        }
+
+        .admin-badge {
+            font-size: clamp(0.7rem, 2.5vw, 0.87rem);
+            padding: clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 18px);
+        }
+
+        /* 2. Tablets & Mobile Landscape (Max: 768px) */
+        @media (max-width: 768px) {
+            /* MOBILE FIX: Prevent horizontal scroll while enabling vertical */
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+                height: auto;
+                min-height: 100dvh;
+            }
+
+            .container {
+                overflow: visible;
+                height: auto;
+                padding: clamp(10px, 3vw, 15px);
+                padding-bottom: max(15px, env(safe-area-inset-bottom));
+            }
+
+            /* MOBILE FIX: Ensure header wraps properly */
+            header {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+                margin: clamp(10px, 3vw, 15px);
+                padding: 14px 20px;
+            }
+
+            /* MOBILE FIX: Stack controls vertically below 768px */
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 14px;
+                gap: 14px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+
+            /* MOBILE FIX: Subject select and search input full-width */
+            .subject-select, .search-input {
+                min-width: 100%;
+                max-width: 100%;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .total-lectures {
+                width: 100%;
+                justify-content: space-between;
+                box-sizing: border-box;
+                flex-wrap: wrap;
+            }
+
+            .btn-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+                text-align: center;
+                padding: 10px 14px;
+                font-size: 0.85rem;
+                white-space: nowrap;
+            }
+
+            /* MOBILE FIX: Ensure table scrolls horizontally inside its container ONLY */
+            .table-container {
+                overflow-x: auto;
+                overflow-y: hidden;
+                margin-bottom: 20px;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+            }
+            
+            table {
+                min-width: 800px; /* Force horizontal scroll */
+            }
+        }
+
+        /* 3. Small Phones (Max: 480px) */
+        @media (max-width: 480px) {
+            .btn-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            /* Buttons full-width on small screens */
+            .btn { 
+                width: 100%; 
+            }
+            
+            .total-lectures {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                padding: 12px;
+            }
+            
+            .total-lectures input { width: 100%; box-sizing: border-box; }
+            .total-badge { width: 100%; box-sizing: border-box; }
+
+            .action-btns {
+                flex-direction: column;
+                gap: 6px;
+            }
+            
+            .mark-btn {
+                width: 100%;
+                padding: 12px;
+                font-size: 0.8rem;
+            }
+
+            th { padding: 14px 10px; font-size: 0.75rem; }
+            td { padding: 10px; }
+            
+            td[style*="justify-content:center"] {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
