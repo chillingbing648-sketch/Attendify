@@ -94,7 +94,10 @@ const MarkAttendanceView = (() => {
           <button class="btn btn-outline btn-sm" id="btn-undo-mark" ${historyStack.length === 0 ? 'disabled' : ''} title="Undo last change">
             Undo Last Mark
           </button>
-          <button class="btn btn-outline btn-sm" id="btn-quick-all-present">All Present</button>
+          <button class="btn btn-primary btn-sm" id="btn-quick-all-present" title="Mark all students as Present">
+            ${UI.icon('check')}
+            All Present
+          </button>
           <button class="btn btn-outline btn-sm" id="btn-quick-all-absent">All Absent</button>
           <button class="btn btn-outline btn-sm" id="btn-quick-reset">Reset</button>
         </div>

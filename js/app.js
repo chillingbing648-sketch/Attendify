@@ -118,6 +118,8 @@ const App = (() => {
 
             <span class="topbar-date">${Utils.formatDate(new Date())}</span>
 
+            <span class="topbar-session-counter" style="margin-left:12px; font-size:var(--fs-xs); color:var(--ink-tertiary);">0 Sessions</span>
+
             <button class="icon-btn" id="topbar-theme-btn" aria-label="Toggle theme" title="Toggle Theme">
               ${UI.icon('sun')}
             </button>
@@ -126,6 +128,14 @@ const App = (() => {
             <div style="width:28px; height:28px; border-radius:50%; background:var(--accent-subtle); color:var(--accent); font-weight:700; font-size:11px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--accent-border);" title="Admin Account">
               AD
             </div>
+          </div>
+
+          <!-- Subject Selector -->
+          <div class="topbar-subject-selector" style="display:flex; align-items:center; gap:4px; white-space:nowrap;">
+            <span class="topbar-subject-label" style="font-size:var(--fs-xs); color:var(--ink-tertiary);">Subject</span>
+            <select class="topbar-subject-select" style="font-size:var(--fs-sm); padding:4px 8px; border:1px solid var(--border-subtle); border-radius:var(--r-sm); background:var(--bg-subtle); color:var(--ink); min-width:120px; cursor:pointer;">
+              <option value="">All Subjects</option>
+            </select>
           </div>
         </div>
 
@@ -146,6 +156,7 @@ const App = (() => {
 
     bindNav();
     bindGlobalSearch();
+    bindSubjectSelector();
   }
 
   function bindNav() {
@@ -280,6 +291,105 @@ const App = (() => {
         openGlobalSearchModal();
       }
     });
+  }
+
+  function bindSubjectSelector() {
+    const subjectSelect = document.querySelector('.topbar-subject-select');
+    if (!subjectSelect) return;
+
+    function updateSubjectOptions() {
+      const subjects = State.get().subjects;
+      const currentValue = subjectSelect.value;
+      subjectSelect.innerHTML = '<option value="">All Subjects</option>';
+      subjects.forEach(subj => {
+        const opt = document.createElement('option');
+        opt.value = subj.id;
+        opt.textContent = subj.name;
+        if (subj.id === currentValue) opt.selected = true;
+        subjectSelect.appendChild(opt);
+      });
+    }
+
+    // Initial render
+    updateSubjectOptions();
+
+    // Subscribe to subject changes
+    const unsub = State.subscribe(() => {
+      updateSubjectOptions();
+    });
+
+    subjectSelect.addEventListener('change', (e) => {
+      const subjectId = e.target.value;
+      // Update session count
+      const sessions = subjectId ? State.getSessionsForSubject(subjectId) : State.getAllSessions();
+      updateSessionCounter(sessions.length);
+      // Update student percentages for selected subject
+      updateStudentPercentages(subjectId);
+      // Update current session context
+      updateCurrentSessionContext(subjectId);
+      // Unsubscribe and re-subscribe to avoid memory leaks
+      unsub();
+    });
+  }
+
+  function updateSessionCounter(count) {
+    // Find or create the session counter element
+    let counterEl = document.querySelector('.topbar-session-counter');
+    if (!counterEl) {
+      // Add after the date
+      const dateEl = document.querySelector('.topbar-date');
+      if (dateEl) {
+        counterEl = document.createElement('span');
+        counterEl.className = 'topbar-session-counter';
+        counterEl.style.fontSize = 'var(--fs-xs)';
+        counterEl.style.color = 'var(--ink-tertiary)';
+        dateEl.parentNode.insertBefore(counterEl, dateEl.nextSibling);
+      }
+    }
+    if (counterEl) {
+      counterEl.textContent = `${count} Sessions`;
+    }
+  }
+
+  function updateStudentPercentages(subjectId) {
+    const students = State.getAllStudents();
+    const resultsEl = document.querySelector('.topbar-student-percentages');
+    if (!resultsEl) return;
+
+    if (subjectId) {
+      const subjectSessions = State.getSessionsForSubject(subjectId);
+      const subjectRecords = State.get().records.filter(r => subjectSessions.some(s => s.id === r.sessionId));
+      
+      let totalPresent = 0, totalLate = 0, totalRecords = subjectRecords.length;
+      subjectRecords.forEach(r => {
+        if (r.status === 'present') totalPresent++;
+        if (r.status === 'late') totalLate++;
+      });
+      
+      const pct = totalRecords > 0 ? Utils.safePercent(totalPresent + totalLate, totalRecords) : 0;
+      resultsEl.innerHTML = `<span style="font-size:var(--fs-xs); color:var(--ink-tertiary);">Subject: ${pct.toFixed(1)}%</span>`;
+    } else {
+      // Overall percentages
+      const allRecords = State.get().records;
+      let totalPresent = 0, totalLate = 0, totalRecords = allRecords.length;
+      allRecords.forEach(r => {
+        if (r.status === 'present') totalPresent++;
+        if (r.status === 'late') totalLate++;
+      });
+      const pct = totalRecords > 0 ? Utils.safePercent(totalPresent + totalLate, totalRecords) : 0;
+      resultsEl.innerHTML = `<span style="font-size:var(--fs-xs); color:var(--ink-tertiary);">Overall: ${pct.toFixed(1)}%</span>`;
+    }
+  }
+
+  function updateCurrentSessionContext(subjectId) {
+    // Update the view title and session info
+    const titleEl = document.getElementById('topbar-view-title');
+    if (subjectId) {
+      const subject = State.getSubject(subjectId);
+      if (titleEl) titleEl.textContent = subject ? `${subject.name} — Attendance` : 'Attendance';
+    } else {
+      if (titleEl) titleEl.textContent = 'Dashboard';
+    }
   }
 
   function openGlobalSearchModal() {

@@ -3,6 +3,18 @@
         "/^cd /d \"c:\\\\Users\\\\PRATEEK DUBEY\\\\Downloads\\\\Attendify\" ; python -m http\\.server 8080$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^powershell -Command \"\\(Get-Content c:\\\\Users\\\\PRATEEK DUBEY\\\\Downloads\\\\Attendify\\\\js\\\\app\\.js -Raw\\) \\| Select-String -Pattern 'function init\\(\\)'\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^powershell -Command \"Get-Content 'c:\\\\Users\\\\PRATEEK DUBEY\\\\Downloads\\\\Attendify\\\\js\\\\app\\.js' \\| Out-File -Encoding utf8 /tmp/appjs\\.txt\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^powershell -Command \"Copy-Item 'c:\\\\Users\\\\PRATEEK DUBEY\\\\Downloads\\\\Attendify\\\\js\\\\app\\.js' 'c:\\\\temp\\\\appjs_backup\\.js'\"$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }
