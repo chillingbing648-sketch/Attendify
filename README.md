@@ -36,6 +36,14 @@ History · Analytics · Reports · Student Records
 
 A new session can start with all students marked **Present**, or attendance can be entered quickly using roll-number based bulk marking. Individual records remain available for verification and correction.
 
+### Product UI at a glance
+
+The overview below is a **simplified representation of the actual Attendify interface**: the compact admin sidebar, taskbar, batch metrics, lecture/practical session surfaces, and dense 60-student register all mirror the product's current information architecture.
+
+<p align="center">
+  <img src="assets/attendify-ui-overview.svg" alt="Attendify admin dashboard and attendance register overview" width="1100">
+</p>
+
 ---
 
 ## Key Features
@@ -151,17 +159,28 @@ Attendify is intentionally lightweight and uses browser-native technologies rath
 
 ### Frontend
 
-- **HTML5** — application structure and semantic markup
-- **CSS3** — design system, responsive layouts, themes, print styles, and component styling
-- **Modern JavaScript (ES6+)** — application logic, state, interactions, reporting, and business rules
-- **SVG** — lightweight interface icons and data visualizations
+| Technology | Role |
+|---|---|
+| [![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](#) | Semantic application structure and accessible markup |
+| [![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](#) | Design system, responsive layouts, themes, print styles, and component styling |
+| [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=111827)](#) | Application logic, state, interactions, reporting, and business rules |
+| [![SVG](https://img.shields.io/badge/SVG-FFB13B?logo=svg&logoColor=111827)](#) | Lightweight UI iconography and data visualizations |
 
 ### Persistence & Data
 
-- **Web Storage / LocalStorage** — offline-first client-side persistence
-- **Versioned application state** — current storage namespace: `attendify:v2`
-- **JSON** — backup / restore format
-- **CSV** — report/export format
+| Technology | Role |
+|---|---|
+| [![Web Storage](https://img.shields.io/badge/Web_Storage-Offline--First-4285F4?logo=googlechrome&logoColor=white)](#) | Local browser persistence without a required server database |
+| [![JSON](https://img.shields.io/badge/JSON-000000?logo=json&logoColor=white)](#) | Backup and restore format |
+| [![CSV](https://img.shields.io/badge/CSV-217346?logo=microsoft-excel&logoColor=white)](#) | Attendance and report export format |
+
+### Engineering & Delivery
+
+| Technology | Role |
+|---|---|
+| [![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white)](#) | Source control and version history |
+| [![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white)](#) | Repository hosting and project delivery |
+| [![Responsive](https://img.shields.io/badge/Responsive-Design-6B7280?logo=googlechrome&logoColor=white)](#) | Desktop, tablet, and mobile layouts |
 
 ### Application Architecture
 
@@ -245,7 +264,7 @@ The **attendance records are the source of truth**. Batch and student percentage
 
 ```text
 Attendify/
-├── assets/              # Static assets
+├── assets/              # Static assets and product illustrations
 ├── css/                 # Global, component, dashboard, responsive styles
 ├── docs/                # Project documentation
 ├── js/                  # Application, domain, state and feature modules
