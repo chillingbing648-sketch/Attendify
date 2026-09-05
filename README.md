@@ -24,68 +24,7 @@ The application is built around one primary workflow:
 
 The application comes pre-loaded with all **60 real students** (Roll Numbers 1 to 60) enrolled in the single SY BSc IT batch:
 
-1. Andre Harshad Balu
-2. Ansari Farman Lukman
-3. Behera Shubham Binod
-4. Chaurasiya Shivanshu Ashok
-5. Chendvankar Tanishq Abhijit
-6. Choursia Shraddha Madreshkumar
-7. Dudaye Shubham Pandurang
-8. Gupta Himanshu Laxmikant
-9. Gupta Nikhil Ganesh
-10. Gupta Raj Omprakash
-11. Gurav Shreya Prakash
-12. Jaiswal Khushi Dashrath
-13. Jaiswal Prince Dharmendra
-14. Kottilaparambil Suvidh Sunil
-15. Kushwaha Vinit Vidyanand
-16. Mishra Shashank Sureshkumar
-17. Nesamoney Cinderella Jaiross
-18. Pal Aryan Naveen
-19. Pal Ashish Ramavadh
-20. Pal Laxmi Kapildev
-21. Pandey Sharad Umeshchandra
-22. Rajput Prachi Narsing
-23. Reddi Mahesh Chandranna
-24. Sawant Narayan Manohar
-25. Sharma Abhay Chandrika
-26. Sharma Kartike Sunil
-27. Shevale Pratham Dryaneshwar
-28. Singh Aniket Rajesh
-29. Singh Anurag Kush
-30. Singh Aryan Sanjay
-31. Singh Bablu Kumar Santosh Kumar
-32. Singh Janvi Anil
-33. Singh Noel Damer
-34. Singh Sachi Ashutosh
-35. Singh Sandhya Amarnath
-36. Singh Vikash Kumar Laxman
-37. Yadav Pooja Om Prakash
-38. Yadav Prince Virendrakumar
-39. Yadav Vivek Rudra
-40. Yadav Yogank Ashok
-41. Mishra Aditya Rajesh
-42. Pardhe Harshit Chandrakant
-43. Jaiswal Moksh Rajkumar
-44. Ghadigaonkar Maithili Mahesh
-45. Pal Sanjana Rajendra
-46. Tiwari Pavan Awadesh
-47. Thorat Kaustubh Ramesh
-48. Makwana Ayushi Nilesh
-49. Dubey Harsh Puneet
-50. Mourya Ansh Deenanath
-51. Morye Mihir Mangesh
-52. Pandey Sakshi
-53. Uttam Tripathi
-54. Anchal Jaiswar
-55. Harshit Tiwari
-56. Shivam Patel
-57. Shivansu Mishra
-58. Abhay Yadav
-59. Mahek Pandya
-60. Abhishek Yadav
 
----
 
 ## 📐 Academic Courses (Subjects)
 
