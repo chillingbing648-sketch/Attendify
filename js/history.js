@@ -62,7 +62,7 @@ const HistoryView = (() => {
 
       <!-- History Table (Prompt 13: Date | Subject | Type | Present | Absent | Late | % | Status | Actions) -->
       <div class="table-wrap">
-        <table class="data-table">
+        <table class="data-table workbench-table">
           <thead>
             <tr>
               <th style="width: 110px;">Date</th>

@@ -314,6 +314,46 @@
   background: var(--surface-hover);
 }
 
+/* Workbench High-Density Data Tables (Mark Attendance, Students, History) */
+.workbench-table th {
+  padding: 6px 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  background: var(--surface-subtle);
+  border-bottom: 1px solid var(--border-strong);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.workbench-table td {
+  padding: 5px 12px;
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.roll-cell {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.pct-cell {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
 /* Form Controls */
 .input, .select {
   height: 32px;
@@ -518,3 +558,81 @@
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+
+/* ============================================================
+   OFFICIAL ACADEMIC DOCUMENT MODE (Practical Reports)
+   Visual split: App is modern & interactive; Document is formal & print-ready.
+   ============================================================ */
+.practical-document {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--r-sm) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
+  padding: 32px 36px !important;
+  margin: 0 auto 28px auto !important;
+  max-width: 980px !important;
+}
+
+[data-theme="dark"] .practical-document {
+  background: #111827 !important;
+  color: #F8FAFC !important;
+  border-color: #374151 !important;
+}
+
+.document-header-institution {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #475569;
+  border-bottom: 2px solid #0F172A;
+  padding-bottom: 6px;
+}
+
+[data-theme="dark"] .document-header-institution {
+  color: #94A3B8;
+  border-bottom-color: #E2E8F0;
+}
+
+.document-title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0F172A;
+  margin: 6px 0 2px 0;
+}
+
+[data-theme="dark"] .document-title {
+  color: #F8FAFC;
+}
+
+.document-meta-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  margin: 14px 0 18px 0;
+}
+
+[data-theme="dark"] .document-meta-strip {
+  background: #1E293B;
+  border-color: #334155;
+}
+
+.document-signature-block {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+[data-theme="dark"] .document-signature-block {
+  border-top-color: #334155;
+}
+

@@ -36,20 +36,25 @@ const Dashboard = (() => {
     });
 
     container.innerHTML = `
-      <!-- Header with Primary CTA (Prompt 5) -->
+      <!-- 1. Header with Primary Action (Attendance Overview + Mark Attendance) -->
       <div class="view-header">
         <div>
           <h1>Attendance Overview</h1>
           <p class="view-subtitle">SY BSc IT · Single Batch · 60 Students · ${Utils.formatDate(new Date())}</p>
         </div>
         <div class="view-header-actions">
+          ${pendingSlots.length > 0 ? `
+            <button class="btn btn-outline btn-sm" onclick="App.navigateToMarkSlot('${pendingSlots[0].subjectId}', '${pendingSlots[0].start}', '${pendingSlots[0].type || 'lecture'}')" title="Start attendance for next pending class">
+              Start Pending (${pendingSlots[0].start}) →
+            </button>
+          ` : ''}
           <button class="btn btn-primary" onclick="App.openMarkChoiceModal()">
             ${UI.icon('plus')} Mark Attendance
           </button>
         </div>
       </div>
 
-      <!-- Compact Apple-Inspired Metrics (Prompt 5) -->
+      <!-- 2. Compact Metrics -->
       <div class="stat-grid section">
         <div class="stat-card" style="cursor:pointer;" onclick="App.navigateTo('students')">
           <div class="stat-label">${UI.icon('users')} 60 Students</div>
@@ -60,7 +65,7 @@ const Dashboard = (() => {
         <div class="stat-card" style="cursor:pointer;" onclick="App.navigateTo('timetable')">
           <div class="stat-label">${UI.icon('clock')} Today's Sessions</div>
           <div class="stat-value">${todaySlots.length}</div>
-          <div class="stat-sub">${todaySessions.length} recorded, ${pendingSlots.length} pending</div>
+          <div class="stat-sub">${todaySessions.length} recorded · ${pendingSlots.length} pending</div>
         </div>
 
         <div class="stat-card" style="cursor:pointer;" onclick="App.navigateTo('analytics')">
@@ -68,7 +73,7 @@ const Dashboard = (() => {
           <div class="stat-value" style="color:${stats.avgPct >= 75 ? 'var(--safe)' : 'var(--critical)'};">
             ${stats.totalSessions > 0 ? stats.avgPct + '%' : '—'}
           </div>
-          <div class="stat-sub">${defaulters.length} student${defaulters.length === 1 ? '' : 's'} below 75%</div>
+          <div class="stat-sub">${defaulters.length} student${defaulters.length === 1 ? '' : 's'} below 75% threshold</div>
         </div>
 
         <div class="stat-card">
@@ -76,30 +81,11 @@ const Dashboard = (() => {
           <div class="stat-value" style="color:${pendingSlots.length > 0 ? 'var(--warn)' : 'var(--safe)'};">
             ${pendingSlots.length}
           </div>
-          <div class="stat-sub">${pendingSlots.length === 0 ? 'All marked for today' : 'Require attendance'}</div>
+          <div class="stat-sub">${pendingSlots.length === 0 ? 'All sessions marked today' : 'Require attendance marking'}</div>
         </div>
       </div>
 
-      <!-- Actionable Smart Insights (Prompt 19) -->
-      ${insights.length > 0 ? `
-        <div class="section">
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            ${insights.slice(0, 2).map(item => `
-              <div class="card" style="padding:8px 12px; border-left:3px solid ${item.type === 'critical' ? 'var(--critical)' : item.type === 'warn' ? 'var(--warn)' : 'var(--accent)'}; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span style="color:${item.type === 'critical' ? 'var(--critical)' : item.type === 'warn' ? 'var(--warn)' : 'var(--accent)'};">${UI.icon('alert')}</span>
-                  <span style="font-size:12px; font-weight:600; color:var(--ink);">${Utils.escapeHTML(item.text)}</span>
-                </div>
-                <button class="btn btn-outline btn-sm dashboard-insight-btn" data-view="${item.actionView}" data-prefill-sub="${item.prefillSubjectId || ''}" data-prefill-time="${item.prefillTime || ''}" data-prefill-type="${item.prefillType || ''}">
-                  ${item.actionLabel} →
-                </button>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      ` : ''}
-
-      <!-- PRIORITIZED SECTION 1: TODAY'S LECTURE ATTENDANCE & PRACTICAL ATTENDANCE (Prompt 5 & 6) -->
+      <!-- 3. Today's Lecture Attendance & 4. Today's Practical Attendance -->
       <div class="today-sections-grid section">
         <!-- TODAY'S LECTURE ATTENDANCE -->
         <div class="session-category-card">
@@ -281,7 +267,14 @@ const Dashboard = (() => {
             <div class="section-title">Recent Attendance Sessions</div>
             <div class="section-desc">Audit trail showing Subject, Time, Present / Absent / Late, %, Pending / Completed</div>
           </div>
-          <button class="btn btn-outline btn-sm" onclick="App.navigateTo('history')">View Full History</button>
+          <div style="display:flex; gap:6px;">
+            ${recentSessions.length > 0 ? `
+              <button class="btn btn-ghost btn-sm" onclick="App.navigateToMarkSession('${recentSessions[0].id}')" title="View most recently recorded session">
+                View Last Session
+              </button>
+            ` : ''}
+            <button class="btn btn-outline btn-sm" onclick="App.navigateTo('history')">View Full History</button>
+          </div>
         </div>
 
         <div class="table-wrap">

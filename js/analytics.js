@@ -137,6 +137,22 @@ const AnalyticsView = (() => {
         </div>
       </div>
 
+      <!-- Attendance Trend & Improvement/Decline (Prompt 13) -->
+      <div class="section">
+        <div class="card" style="padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div>
+              <div class="section-title" style="font-size:13.5px; font-weight:700;">Attendance Trend (Last 6 Weeks)</div>
+              <div class="section-desc">Weekly percentage turnout compared against the 75% university safe threshold</div>
+            </div>
+            ${renderTrendSummaryBadge(trend)}
+          </div>
+          <div style="width:100%; overflow-x:auto;">
+            ${renderTrendSVG(trend)}
+          </div>
+        </div>
+      </div>
+
       <!-- Course Comparison Table (Prompt 18) -->
       <div class="section">
         <div class="section-title-row">
@@ -252,7 +268,95 @@ const AnalyticsView = (() => {
     });
   }
 
+  function renderTrendSummaryBadge(trend) {
+    const activeWeeks = trend.filter(w => w.sessions > 0);
+    if (activeWeeks.length < 2) {
+      return '<span class="badge badge-neutral">Baseline Active</span>';
+    }
+    const latest = activeWeeks[activeWeeks.length - 1];
+    const prev = activeWeeks[activeWeeks.length - 2];
+    const diff = latest.pct - prev.pct;
+    if (diff > 0) {
+      return `<span class="badge badge-safe">▲ +${diff.toFixed(1)}% Improvement</span>`;
+    } else if (diff < 0) {
+      return `<span class="badge badge-critical">▼ ${diff.toFixed(1)}% Decline</span>`;
+    } else {
+      return '<span class="badge badge-neutral">Turnout Stable</span>';
+    }
+  }
+
+  function renderTrendSVG(trend) {
+    const activeWeeks = trend.filter(w => w.sessions > 0);
+    if (activeWeeks.length === 0) {
+      return `
+        <div style="padding:28px 16px; text-align:center; color:var(--ink-secondary); font-size:12px;">
+          No weekly trend data available yet. Record attendance sessions to generate trend visualization.
+        </div>
+      `;
+    }
+
+    const w = 700;
+    const h = 160;
+    const padL = 40;
+    const padR = 25;
+    const padT = 20;
+    const padB = 30;
+    const chartW = w - padL - padR;
+    const chartH = h - padT - padB;
+
+    const safeY = padT + chartH * (1 - 0.75);
+
+    const points = trend.map((item, idx) => {
+      const x = padL + (idx / Math.max(1, trend.length - 1)) * chartW;
+      const y = padT + chartH * (1 - Math.min(100, Math.max(0, item.pct)) / 100);
+      return { x, y, item, idx };
+    });
+
+    const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const areaD = `${pathD} L ${points[points.length - 1].x.toFixed(1)} ${(padT + chartH).toFixed(1)} L ${points[0].x.toFixed(1)} ${(padT + chartH).toFixed(1)} Z`;
+
+    return `
+      <svg viewBox="0 0 ${w} ${h}" class="chart-svg" style="width:100%; height:auto; overflow:visible;" aria-label="Weekly Attendance Trend Line Chart">
+        <!-- Background Grid & Y-Axis Scale -->
+        <line x1="${padL}" y1="${padT + chartH}" x2="${w - padR}" y2="${padT + chartH}" stroke="var(--border)" stroke-width="1" />
+        <line x1="${padL}" y1="${padT + chartH * 0.5}" x2="${w - padR}" y2="${padT + chartH * 0.5}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" />
+        <line x1="${padL}" y1="${safeY}" x2="${w - padR}" y2="${safeY}" stroke="var(--warn)" stroke-width="1.2" stroke-dasharray="4,3" />
+        <line x1="${padL}" y1="${padT}" x2="${w - padR}" y2="${padT}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" />
+
+        <!-- Y Axis Labels -->
+        <text x="${padL - 6}" y="${padT + 4}" text-anchor="end" font-size="10" fill="var(--ink-tertiary)" font-family="var(--font-sans)">100%</text>
+        <text x="${padL - 6}" y="${safeY + 3}" text-anchor="end" font-size="10" fill="var(--warn)" font-weight="600" font-family="var(--font-sans)">75%</text>
+        <text x="${padL - 6}" y="${padT + chartH + 3}" text-anchor="end" font-size="10" fill="var(--ink-tertiary)" font-family="var(--font-sans)">0%</text>
+
+        <!-- 75% Safe Threshold Label -->
+        <text x="${w - padR}" y="${safeY - 5}" text-anchor="end" font-size="10" font-weight="600" fill="var(--warn)" font-family="var(--font-sans)">
+          75% Safe Attendance Threshold
+        </text>
+
+        <!-- Area Fill -->
+        <path d="${areaD}" fill="var(--accent)" fill-opacity="0.08" />
+
+        <!-- Polyline Line -->
+        <path d="${pathD}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+
+        <!-- Data Points & Labels -->
+        ${points.map(p => `
+          <g>
+            <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="var(--surface)" stroke="${p.item.pct >= 75 ? 'var(--safe)' : 'var(--critical)'}" stroke-width="2.2" />
+            <text x="${p.x.toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ink)" font-family="var(--font-sans)">
+              ${p.item.sessions > 0 ? p.item.pct + '%' : ''}
+            </text>
+            <text x="${p.x.toFixed(1)}" y="${(padT + chartH + 18).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--ink-secondary)" font-family="var(--font-sans)">
+              ${p.item.weekLabel.split(',')[0]}
+            </text>
+          </g>
+        `).join('')}
+      </svg>
+    `;
+  }
+
   return { render };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = AnalyticsView;
+

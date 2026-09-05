@@ -150,8 +150,8 @@ const Notifications = (() => {
         ${notifs.length === 0 ? `
           <div class="empty-state">
             <div class="empty-state-icon">${UI.icon('notifications')}</div>
-            <h3>You're all caught up</h3>
-            <p>Notifications about attendance thresholds and upcoming classes will show up here.</p>
+            <h3>No Unread Notifications</h3>
+            <p>System alerts regarding attendance thresholds and academic schedule updates will appear here.</p>
           </div>
         ` : notifs.map(notifItemHTML).join('')}
       </div>

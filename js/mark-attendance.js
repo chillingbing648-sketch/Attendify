@@ -92,7 +92,8 @@ const MarkAttendanceView = (() => {
     const isPractical = selectedSessionType === 'practical';
 
     container.innerHTML = `
-      <div class="view-header">
+      <!-- 1. Mark Attendance Header -->
+      <div class="view-header" style="margin-bottom: 12px;">
         <div>
           <h1>${editingSessionId ? 'Edit Attendance Session' : 'Mark Attendance'}</h1>
           <p class="view-subtitle">SY BSc IT · Single Batch · ${students.length} Students</p>
@@ -112,32 +113,60 @@ const MarkAttendanceView = (() => {
         </div>
       </div>
 
-      <!-- Segmented Type Switcher: Lecture Attendance vs Practical Attendance -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
-        <div class="register-type-segmented">
-          <button class="segmented-tab ${!isPractical ? 'active' : ''}" id="tab-type-lecture">
-            Lecture Attendance
-          </button>
-          <button class="segmented-tab ${isPractical ? 'active' : ''}" id="tab-type-practical">
-            Practical Attendance
-          </button>
-        </div>
+      <!-- 2. Subject · Type · Date · Time Session Bar -->
+      <div class="register-bar" style="margin-bottom: 12px;">
+        <div class="register-bar-controls" style="flex:1;">
+          <div class="register-bar-field" style="min-width: 200px;">
+            <label for="mark-subject-select">Course / Subject</label>
+            <select id="mark-subject-select" class="select">
+              ${subjects.map(sub => `
+                <option value="${sub.id}" ${sub.id === selectedSubjectId ? 'selected' : ''}>${Utils.escapeHTML(sub.name)}</option>
+              `).join('')}
+            </select>
+          </div>
 
-        <span style="font-size:11.5px; color:var(--ink-secondary);">
-          ${isPractical ? 'Laboratory session with practical / experiment title' : 'Regular classroom theory lecture session'}
-        </span>
+          <!-- Type Switcher -->
+          <div class="register-bar-field">
+            <label>Session Type</label>
+            <div class="register-type-segmented">
+              <button class="segmented-tab ${!isPractical ? 'active' : ''}" id="tab-type-lecture" type="button">
+                Lecture
+              </button>
+              <button class="segmented-tab ${isPractical ? 'active' : ''}" id="tab-type-practical" type="button">
+                Practical
+              </button>
+            </div>
+          </div>
+
+          ${isPractical ? `
+            <div class="register-bar-field" style="min-width: 220px; flex:1;">
+              <label for="mark-exp-title">Practical / Experiment Title</label>
+              <input type="text" id="mark-exp-title" class="input" placeholder="e.g. Practical 04: File Handling" value="${Utils.escapeHTML(experimentTitle)}">
+            </div>
+          ` : ''}
+
+          <div class="register-bar-field">
+            <label for="mark-date-input">Date</label>
+            <input type="date" id="mark-date-input" class="input" value="${selectedDate}">
+          </div>
+
+          <div class="register-bar-field">
+            <label for="mark-time-input">Time</label>
+            <input type="time" id="mark-time-input" class="input" value="${selectedStartTime}">
+          </div>
+        </div>
       </div>
 
-      <!-- Quick Attendance Bar (Optimised for 60-Student Batch) -->
+      <!-- 3. Quick Mark Bar -->
       <div class="card" style="background:var(--surface); border:1px solid ${isPractical ? 'var(--practical-border)' : 'var(--accent-border)'}; margin-bottom:12px; padding:10px 14px;">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:320px; flex-wrap:wrap;">
             <span style="font-size:11px; font-weight:700; color:${isPractical ? 'var(--practical)' : 'var(--accent)'}; text-transform:uppercase; letter-spacing:0.04em;">
-              ⚡ Quick Mark:
+              Quick Mark:
             </span>
             <select id="quick-mark-mode" class="select" style="height:28px; font-size:11.5px; padding:2px 8px; width:auto;">
-              <option value="absent" ${quickMarkMode === 'absent' ? 'selected' : ''}>Mark Absent Students</option>
-              <option value="present" ${quickMarkMode === 'present' ? 'selected' : ''}>Mark Present Students</option>
+              <option value="absent" ${quickMarkMode === 'absent' ? 'selected' : ''}>Absent Roll Numbers</option>
+              <option value="present" ${quickMarkMode === 'present' ? 'selected' : ''}>Present Roll Numbers</option>
             </select>
             <input type="text" id="quick-roll-input" class="input" style="height:28px; font-size:var(--fs-xs); flex:1; min-width:180px; max-width:340px;" placeholder="Roll Nos: e.g. 4, 12, 18, 32, 47">
             <button class="btn btn-primary btn-sm" id="btn-apply-quick-mark" style="${isPractical ? 'background:var(--practical); border-color:var(--practical);' : ''}">
@@ -145,79 +174,52 @@ const MarkAttendanceView = (() => {
             </button>
           </div>
           <span style="font-size:11px; color:var(--ink-secondary);">
-            Enters roll numbers and automatically calculates remaining students.
+            Sets entered roll numbers to ${quickMarkMode === 'absent' ? 'Absent' : 'Present'} and remaining students to ${quickMarkMode === 'absent' ? 'Present' : 'Absent'}.
           </span>
         </div>
       </div>
 
+      <!-- 4. Search & Filter Bar + 5. Live Summary (Sticky Header) -->
       <div class="register-container">
-        <!-- Control Bar -->
-        <div class="register-bar">
-          <div class="register-bar-controls">
-            <div class="register-bar-field" style="min-width: 200px;">
-              <label for="mark-subject-select">Course / Subject</label>
-              <select id="mark-subject-select" class="select">
-                ${subjects.map(sub => `
-                  <option value="${sub.id}" ${sub.id === selectedSubjectId ? 'selected' : ''}>${Utils.escapeHTML(sub.name)}</option>
-                `).join('')}
-              </select>
-            </div>
-
-            ${isPractical ? `
-              <div class="register-bar-field" style="min-width: 220px;">
-                <label for="mark-exp-title">Practical / Experiment Title</label>
-                <input type="text" id="mark-exp-title" class="input" placeholder="e.g. Practical 04: File Handling" value="${Utils.escapeHTML(experimentTitle)}">
-              </div>
-            ` : ''}
-
-            <div class="register-bar-field">
-              <label for="mark-date-input">Date</label>
-              <input type="date" id="mark-date-input" class="input" value="${selectedDate}">
-            </div>
-
-            <div class="register-bar-field">
-              <label for="mark-time-input">Time</label>
-              <input type="time" id="mark-time-input" class="input" value="${selectedStartTime}">
-            </div>
-          </div>
-
-          <div class="search-box">
-            ${UI.icon('search')}
-            <input type="text" id="mark-student-search" class="input" placeholder="Filter by roll no. or name..." value="${Utils.escapeHTML(searchQuery)}">
-          </div>
-        </div>
-
-        <!-- Sticky Live Headcount & Exceptions Filter Bar -->
         <div class="register-counts-sticky">
+          <!-- Reconciled Live Summary (60 Total · Present · Absent · Late · Unmarked) -->
           <div class="count-pills">
             <span class="pill pill-total">Total: ${students.length}</span>
             <span class="pill pill-present" id="count-present">Present: ${counts.present}</span>
             <span class="pill pill-absent" id="count-absent">Absent: ${counts.absent}</span>
             <span class="pill pill-late" id="count-late">Late: ${counts.late}</span>
-            ${counts.unmarked > 0 ? `<span class="pill pill-warn" id="count-unmarked" style="background:var(--warn-subtle); color:var(--warn-ink); border:1px solid var(--warn-border);">Unmarked: ${counts.unmarked}</span>` : ''}
+            <span class="pill pill-unmarked ${counts.unmarked > 0 ? 'has-unmarked' : ''}" id="count-unmarked">Unmarked: ${counts.unmarked}</span>
           </div>
 
-          <div style="display:flex; gap:4px; flex-wrap:wrap;">
-            <button class="btn btn-sm ${activeFilter === 'all' ? 'btn-secondary' : 'btn-ghost'}" data-filter="all">All (${students.length})</button>
-            <button class="btn btn-sm ${activeFilter === 'exceptions' ? 'btn-secondary' : 'btn-ghost'}" data-filter="exceptions" title="Show only Absentees, Late and Unmarked students">
-              Only Exceptions (${counts.absent + counts.late + counts.unmarked})
-            </button>
-            <button class="btn btn-sm ${activeFilter === 'present' ? 'btn-secondary' : 'btn-ghost'}" data-filter="present">Present (${counts.present})</button>
-            <button class="btn btn-sm ${activeFilter === 'absent' ? 'btn-secondary' : 'btn-ghost'}" data-filter="absent">Absent (${counts.absent})</button>
-            <button class="btn btn-sm ${activeFilter === 'late' ? 'btn-secondary' : 'btn-ghost'}" data-filter="late">Late (${counts.late})</button>
-            ${counts.unmarked > 0 ? `<button class="btn btn-sm ${activeFilter === 'unmarked' ? 'btn-secondary' : 'btn-ghost'}" data-filter="unmarked" style="color:var(--warn);">Unmarked (${counts.unmarked})</button>` : ''}
+          <!-- Quick Filters & Search -->
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <div style="display:flex; gap:3px;">
+              <button class="btn btn-sm ${activeFilter === 'all' ? 'btn-secondary' : 'btn-ghost'}" data-filter="all">All (${students.length})</button>
+              <button class="btn btn-sm ${activeFilter === 'exceptions' ? 'btn-secondary' : 'btn-ghost'}" data-filter="exceptions" title="Show only Absentees, Late and Unmarked students">
+                Only Exceptions (${counts.absent + counts.late + counts.unmarked})
+              </button>
+              <button class="btn btn-sm ${activeFilter === 'present' ? 'btn-secondary' : 'btn-ghost'}" data-filter="present">Present (${counts.present})</button>
+              <button class="btn btn-sm ${activeFilter === 'absent' ? 'btn-secondary' : 'btn-ghost'}" data-filter="absent">Absent (${counts.absent})</button>
+              <button class="btn btn-sm ${activeFilter === 'late' ? 'btn-secondary' : 'btn-ghost'}" data-filter="late">Late (${counts.late})</button>
+              <button class="btn btn-sm ${activeFilter === 'unmarked' ? 'btn-secondary' : 'btn-ghost'}" data-filter="unmarked">Unmarked (${counts.unmarked})</button>
+            </div>
+
+            <div class="search-box" style="min-width: 170px;">
+              ${UI.icon('search')}
+              <input type="text" id="mark-student-search" class="input" style="height: 28px; font-size: 11.5px;" placeholder="Search roll or name..." value="${Utils.escapeHTML(searchQuery)}">
+            </div>
           </div>
         </div>
 
-        <!-- 60-Student Register Table -->
+        <!-- 6. 60-Student Register Table (Workbench High-Density) -->
         <div class="table-wrap">
-          <table class="data-table" id="attendance-register-table">
+          <table class="data-table workbench-table" id="attendance-register-table">
             <thead>
               <tr>
                 <th style="width: 45px; text-align: center;">#</th>
                 <th style="width: 80px;">Roll No.</th>
                 <th>Student</th>
-                <th style="width: 170px; text-align: center;">Status</th>
+                <th style="width: 130px; text-align: center;">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -226,7 +228,7 @@ const MarkAttendanceView = (() => {
           </table>
         </div>
 
-        <!-- Sticky Footer Summary & Save with Safety Checks -->
+        <!-- 7. Sticky Footer Summary & Save Action -->
         <div class="register-footer">
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <span style="font-size:var(--fs-sm); font-weight:650; color:var(--ink);" id="footer-reconciled-summary">
@@ -283,12 +285,12 @@ const MarkAttendanceView = (() => {
     return filtered.map((stu, idx) => {
       const status = studentStatusMap[stu.id] || 'present';
       return `
-        <tr data-student-id="${stu.id}" tabindex="0" class="register-row ${status === 'absent' ? 'row-absent' : status === 'unmarked' ? 'row-unmarked' : ''}">
+        <tr data-student-id="${stu.id}" tabindex="0" class="register-row ${status === 'absent' ? 'row-absent' : status === 'late' ? 'row-late' : status === 'unmarked' ? 'row-unmarked' : ''}">
           <td style="color:var(--ink-tertiary); text-align: center; font-variant-numeric: tabular-nums; font-size: 11px;">
             ${String(idx + 1).padStart(2, '0')}
           </td>
           <td>
-            <span style="font-weight: 700; color:var(--ink); font-variant-numeric: tabular-nums;">
+            <span class="roll-cell">
               ${stu.rollNumber}
             </span>
           </td>
@@ -327,6 +329,10 @@ const MarkAttendanceView = (() => {
     if (p) p.textContent = `Present: ${counts.present}`;
     if (a) a.textContent = `Absent: ${counts.absent}`;
     if (l) l.textContent = `Late: ${counts.late}`;
+    if (u) {
+      u.textContent = `Unmarked: ${counts.unmarked}`;
+      u.classList.toggle('has-unmarked', counts.unmarked > 0);
+    }
 
     const summaryEl = document.getElementById('footer-reconciled-summary');
     if (summaryEl) {
@@ -590,24 +596,46 @@ const MarkAttendanceView = (() => {
       const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
+      // Arrow navigation between student rows
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        const row = document.activeElement ? document.activeElement.closest('.register-row') : null;
+        if (row) {
+          e.preventDefault();
+          const targetRow = e.key === 'ArrowDown' ? row.nextElementSibling : row.previousElementSibling;
+          if (targetRow && targetRow.classList.contains('register-row')) {
+            targetRow.focus();
+          }
+          return;
+        }
+      }
+
       const key = e.key.toUpperCase();
-      if (['P', 'A', 'L'].includes(key)) {
+      if (['P', 'A', 'L', 'U'].includes(key)) {
         const row = document.activeElement ? document.activeElement.closest('.register-row') : null;
         if (row) {
           const stuId = row.dataset.studentId;
-          const status = key === 'P' ? 'present' : key === 'A' ? 'absent' : 'late';
+          const status = key === 'P' ? 'present' : key === 'A' ? 'absent' : key === 'L' ? 'late' : 'unmarked';
           setStudentStatus(stuId, status, true);
 
           const group = row.querySelector('.status-btn-group');
           if (group) {
             group.querySelectorAll('.status-btn').forEach(b => { b.className = 'status-btn'; });
-            const activeBtn = group.querySelector(`[data-val="${status}"]`);
-            if (activeBtn) activeBtn.classList.add(`active-${status}`);
+            if (status !== 'unmarked') {
+              const activeBtn = group.querySelector(`[data-val="${status}"]`);
+              if (activeBtn) activeBtn.classList.add(`active-${status}`);
+            }
           }
           row.classList.toggle('row-absent', status === 'absent');
-          row.classList.toggle('row-unmarked', false);
+          row.classList.toggle('row-late', status === 'late');
+          row.classList.toggle('row-unmarked', status === 'unmarked');
 
           updateLivePills();
+
+          // Smoothly advance focus to next student row for rapid data entry
+          const nextRow = row.nextElementSibling;
+          if (nextRow && nextRow.classList.contains('register-row')) {
+            nextRow.focus();
+          }
           e.preventDefault();
         }
       }

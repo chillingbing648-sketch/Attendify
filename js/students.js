@@ -102,10 +102,10 @@ const StudentsView = (() => {
 
       <!-- Professional Directory Table (Prompt Specification: Roll No. | Name | Overall % | Status | Action) -->
       <div class="table-wrap">
-        <table class="data-table">
+        <table class="data-table workbench-table">
           <thead>
             <tr>
-              <th style="width: 90px;">Roll No.</th>
+              <th style="width: 80px;">Roll No.</th>
               <th>Name</th>
               <th style="width: 140px;">Overall %</th>
               <th style="width: 120px;">Status</th>
@@ -124,7 +124,7 @@ const StudentsView = (() => {
               const statusLabel = s.stats.total === 0 ? 'No Data' : Utils.statusLabel(s.stats.status);
               return `
                 <tr>
-                  <td><strong style="font-variant-numeric: tabular-nums;">${s.rollNumber}</strong></td>
+                  <td><span class="roll-cell">${s.rollNumber}</span></td>
                   <td>
                     <div style="font-weight:600; color:var(--ink);">${Utils.escapeHTML(s.name)}</div>
                   </td>

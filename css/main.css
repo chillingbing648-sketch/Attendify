@@ -331,6 +331,12 @@ body {
   font-weight: 400;
 }
 
+.topbar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .topbar-badge {
   display: inline-flex;
   align-items: center;
@@ -340,8 +346,9 @@ body {
   color: var(--ink-secondary);
   background: var(--surface-subtle);
   border: 1px solid var(--border);
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: var(--r-full);
+  letter-spacing: -0.01em;
 }
 
 .topbar-badge-dot {
@@ -402,6 +409,11 @@ body {
   padding: 18px 22px 32px 22px;
 }
 
+/* ============================================================
+   WORKBENCH & COMMAND CENTER DENSITY MODES
+   Command Center: Dashboard, Analytics, Reports (more breathing room)
+   Workbench: Mark Attendance, Students, History (compact, high-density)
+   ============================================================ */
 .view {
   display: none;
   max-width: 1140px;
@@ -412,25 +424,63 @@ body {
   display: block;
 }
 
+/* Workbench density specialization */
+#view-mark-attendance,
+#view-students,
+#view-history,
+#view-subjects {
+  max-width: 1240px;
+}
+
 /* ============================================================
-   STRICT SVG SCALING (CONSTRAINED AT 18px PER DESIGN SPEC)
+   PRECISE ICONOGRAPHY (CONSTRAINED AT 16-18px)
+   Charts and data visualizations (.chart-svg) are responsive.
    ============================================================ */
-svg,
-.topbar svg,
-.nav-item svg,
-.stat-label svg,
+.ui-icon,
+.btn .ui-icon,
 .btn svg,
+.icon-btn .ui-icon,
 .icon-btn svg,
-.search-box svg {
-  width: 18px !important;
-  height: 18px !important;
-  min-width: 18px !important;
-  min-height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-  flex: 0 0 18px !important;
+.nav-item .ui-icon,
+.nav-item svg,
+.stat-label .ui-icon,
+.stat-label svg,
+.search-box .ui-icon,
+.search-box svg,
+.toast-icon svg,
+.session-category-icon svg {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  flex: 0 0 16px;
   display: inline-block;
   vertical-align: middle;
+}
+
+.topbar-left svg,
+.topbar-right svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+/* Responsive Charts & Data Visualizations */
+svg.chart-svg,
+svg.svg-chart,
+.chart-container svg,
+.chart-svg {
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  flex: initial !important;
+  display: block !important;
+  overflow: visible !important;
 }
 
 :focus-visible {

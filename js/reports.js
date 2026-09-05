@@ -31,6 +31,11 @@ const ReportsView = (() => {
           <h1>Attendance Reports</h1>
           <p class="view-subtitle">SY BSc IT · Academic Ledgers, Summaries & Presets</p>
         </div>
+        <div class="view-header-actions">
+          <button class="btn btn-primary" id="btn-quick-generate-today" ${todaySessions.length === 0 ? 'disabled' : ''} title="Export CSV for today's classes">
+            ${UI.icon('download')} Generate Today's Report
+          </button>
+        </div>
       </div>
 
       <!-- Presets Grid (Prompt 15) -->

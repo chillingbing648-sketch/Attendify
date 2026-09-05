@@ -109,7 +109,7 @@ const Timetable = (() => {
                     <td>${slot.room || '—'}</td>
                     <td style="text-align:center;"><span class="badge badge-warn">Pending</span></td>
                     <td style="text-align: right;">
-                      <button class="btn btn-primary btn-sm" style="${isPractical ? 'background:var(--practical); border-color:var(--practical);' : ''}" onclick="App.navigateToMarkSlot('${slot.subjectId}', '${slot.start}', '${slot.type || 'theory'}')">
+                      <button class="btn btn-primary btn-sm" style="${isPractical ? 'background:var(--practical); border-color:var(--practical);' : ''}" onclick="App.navigateToMarkSlot('${slot.subjectId}', '${slot.start}', '${isPractical ? 'practical' : 'lecture'}')">
                         ${UI.icon('plus')} Mark Attendance
                       </button>
                     </td>

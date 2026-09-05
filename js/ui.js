@@ -39,7 +39,11 @@ const UI = (() => {
     filter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>'
   };
 
-  function icon(name) { return ICONS[name] || ''; }
+  function icon(name) {
+    const raw = ICONS[name];
+    if (!raw) return '';
+    return raw.replace('<svg ', '<svg class="ui-icon" ');
+  }
 
   /* ---------------- Announcer ---------------- */
   let srAnnouncer = null;

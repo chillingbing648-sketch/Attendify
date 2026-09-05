@@ -230,22 +230,26 @@
 .pill-present { background: var(--safe-subtle); color: var(--safe-ink); border-color: var(--safe-border); }
 .pill-absent { background: var(--critical-subtle); color: var(--critical-ink); border-color: var(--critical-border); }
 .pill-late { background: var(--warn-subtle); color: var(--warn-ink); border-color: var(--warn-border); }
+.pill-unmarked { background: var(--surface-subtle); color: var(--ink-secondary); border-color: var(--border); }
+.pill-unmarked.has-unmarked { background: var(--warn-subtle); color: var(--warn-ink); border-color: var(--warn-border); }
 
-/* Quick Status Segmented Toggle Button Group */
+/* Quick Status Segmented Toggle Button Group (Apple / Linear Segmented Control) */
 .status-btn-group {
   display: inline-flex;
-  border: 1px solid var(--border-strong);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
   border-radius: var(--r-md);
-  overflow: hidden;
-  background: var(--surface);
-  box-shadow: var(--shadow-xs);
+  padding: 2px;
+  gap: 2px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .status-btn {
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   width: 32px;
-  height: 25px;
+  height: 24px;
+  border-radius: calc(var(--r-md) - 2px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -253,45 +257,70 @@
   font-weight: 700;
   cursor: pointer;
   color: var(--ink-secondary);
-  transition: all 0.1s ease;
+  transition: all 0.12s ease;
   user-select: none;
 }
 
 .status-btn:not(:last-child) {
-  border-right: 1px solid var(--border);
+  border-right: none;
 }
 
-.status-btn:hover {
-  background: var(--surface-subtle);
+.status-btn:hover:not([class*="active-"]) {
+  background: var(--surface);
   color: var(--ink);
+  box-shadow: var(--shadow-xs);
 }
 
 .status-btn.active-present {
   background: var(--safe);
   color: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.25);
 }
 
 .status-btn.active-absent {
   background: var(--critical);
   color: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(239, 68, 68, 0.25);
 }
 
 .status-btn.active-late {
   background: var(--warn);
   color: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(245, 158, 11, 0.25);
 }
 
 .status-btn.active-unmarked {
-  background: var(--ink-tertiary);
-  color: #FFFFFF;
+  background: var(--surface);
+  color: var(--ink-tertiary);
+  border-color: var(--border);
+}
+
+/* Subtle, Calm Row States (Apple/Linear aesthetics) */
+.register-row {
+  border-left: 3px solid transparent;
+  transition: background 0.1s ease, border-left-color 0.1s ease;
+}
+
+.register-row:hover {
+  background: var(--surface-hover);
 }
 
 .register-row.row-absent {
-  background: var(--critical-subtle) !important;
+  background: rgba(239, 68, 68, 0.035) !important;
+  border-left-color: var(--critical) !important;
+}
+
+.register-row.row-late {
+  background: rgba(245, 158, 11, 0.03) !important;
+  border-left-color: var(--warn) !important;
 }
 
 .register-row.row-unmarked {
-  background: var(--warn-subtle) !important;
+  background: rgba(245, 158, 11, 0.025) !important;
+  border-left-color: var(--ink-tertiary) !important;
 }
 
 .register-row:focus {
@@ -308,11 +337,12 @@
   border: 1px solid var(--border-strong);
   border-radius: var(--r-lg);
   padding: 10px 16px;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 12px;
+  backdrop-filter: blur(8px);
 }
 
 /* Charts in Admin Analytics */
