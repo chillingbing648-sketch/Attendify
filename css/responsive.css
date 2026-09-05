@@ -1,0 +1,139 @@
+/* ============================================================
+   ATTENDIFY — responsive.css (Mobile, Tablet & Desktop Layouts)
+   ============================================================ */
+
+/* Large Desktop screens (1280px+) */
+@media (min-width: 1280px) {
+  .view {
+    max-width: 1180px;
+  }
+}
+
+/* Tablet screens (861px - 1024px) */
+@media (max-width: 1024px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile & Small Tablet (<= 860px) */
+@media (max-width: 860px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 250px;
+    transform: translateX(-100%);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-popover);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 35;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .sidebar-scrim.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .view-scroll {
+    padding: 14px 16px;
+  }
+
+  .register-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .register-bar-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .register-bar-field {
+    width: 100%;
+  }
+
+  .register-bar-field .select,
+  .register-bar-field .input {
+    width: 100%;
+  }
+
+  .register-counts-sticky {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .count-pills {
+    flex-wrap: wrap;
+  }
+
+  .register-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .register-footer .btn {
+    width: 100%;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Small Smartphone screens (<= 420px) */
+@media (max-width: 420px) {
+  .topbar {
+    padding: 0 12px;
+  }
+
+  .view-scroll {
+    padding: 10px 12px;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .view-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .view-header-actions {
+    width: 100%;
+  }
+
+  .view-header-actions .btn {
+    flex: 1;
+  }
+
+  /* Status button group comfortable on narrow screens */
+  .status-btn {
+    width: 28px;
+    height: 24px;
+    font-size: 10px;
+  }
+}

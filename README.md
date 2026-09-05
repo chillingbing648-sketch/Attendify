@@ -1,235 +1,115 @@
-# Attendify
+# Attendify — SY BSc IT Attendance Management System
 
-### FY BSc IT · Semester II Attendance Management System
-
-> A lightweight, browser-based attendance management dashboard for tracking subject-wise attendance, identifying defaulters, maintaining monthly records, and exporting reports.
-
-[![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
-[![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?logo=javascript&logoColor=111111)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![Chart.js](https://img.shields.io/badge/Charts-Chart.js-FF6384)](https://www.chartjs.org/)
-[![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-222222?logo=github)](https://pages.github.com/)
-
-## Overview
-
-Attendify is a client-side attendance system built for the **FY BSc IT Semester II** workflow. It replaces repetitive manual calculations with a responsive dashboard that keeps attendance data, subject selection, student records and eligibility calculations in one place.
-
-The current repository is intentionally portable: the application is contained in a single `index.html` file with no framework or build step. fileciteturn13file0L2-L10
-
-## Core Features
-
-### 📊 Attendance Analytics
-
-- Real-time present/absent attendance tracking
-- Automatic percentage calculation
-- Aggregate attendance calculation
-- 75% eligibility/defaulter threshold
-- Visual identification of students below the threshold
-- Subject-wise attendance views
-
-### 📚 Subject Management
-
-- Switch between theory and practical subjects
-- Designed around FY BSc IT Semester II subjects
-- Dynamic total-lecture handling
-- Subject-specific attendance records
-
-### 👥 Roster Management
-
-- Add students to the working roster
-- Restore students from the master list
-- Remove/reset individual attendance records
-- Search the student roster
-
-### 🗓️ Records & Reporting
-
-- Monthly attendance archiving
-- Historical month-based records
-- Current and aggregate totals
-- Eligibility status reporting
-- Excel-compatible `.xls` export
-
-### 💾 Local-First Storage
-
-Attendance data is persisted through browser `localStorage`, allowing the dashboard to retain records between sessions without requiring a backend or database.
-
-### ✨ User Experience
-
-- Glassmorphism visual system
-- Animated gradient background
-- Responsive layout for desktop and mobile
-- Large touch-friendly controls
-- Sticky table headers
-- Search and filtering
-- Chart.js-powered visual analytics
-- Google Fonts / Plus Jakarta Sans typography
-
-The current UI uses CSS variables, glass effects, responsive viewport handling and mobile tap-target improvements. fileciteturn6file0L2-L2
-
-## How It Works
-
-```text
-Select Subject
-      ↓
-Set / Review Total Lectures
-      ↓
-Manage Student Roster
-      ↓
-Mark Attendance
-      ↓
-Calculate Percentages
-      ↓
-Identify < 75% Students
-      ↓
-Archive / Export Report
-```
-
-## Attendance Logic
-
-For each student:
-
-```text
-Attendance % = Present Lectures / Total Lectures × 100
-```
-
-The dashboard also provides aggregate attendance across the selected academic context and visually highlights students who fall below the configured **75% threshold**.
-
-> Attendance eligibility is an administrative indicator. Institutional attendance rules should always take precedence over application calculations.
-
-## Technology Stack
-
-| Layer | Technology |
-|---|---|
-| Structure | HTML5 |
-| Styling | CSS3 + CSS Variables |
-| UI Effects | Glassmorphism, gradients, transitions, animations |
-| Logic | Vanilla JavaScript (ES6+) |
-| Persistence | Browser `localStorage` |
-| Charts | Chart.js via CDN |
-| Typography | Google Fonts — Plus Jakarta Sans |
-| Reporting | Browser-generated Excel-compatible `.xls` output |
-| Deployment | Static hosting / GitHub Pages |
-
-## Architecture
-
-```text
-┌─────────────────────────────────────┐
-│             index.html              │
-│                                     │
-│  UI + CSS + JavaScript application  │
-│            │                        │
-│     ┌──────┴──────┐                 │
-│     │             │                 │
-│ localStorage   Chart.js             │
-│     │             │                 │
-│ attendance      analytics            │
-│ records                              │
-└─────────────────────────────────────┘
-```
-
-There is currently **no server, API or external database**. This makes Attendify easy to deploy and use, but also means data is tied to the browser/device where it is stored.
-
-## Project Structure
-
-```text
-Attendify/
-├── .gitignore
-├── README.md
-└── index.html
-```
-
-The repository currently contains exactly these project-level files on `main`. fileciteturn13file0L2-L10
-
-## Run Locally
-
-No dependency installation is required.
-
-### Option 1 — Open directly
-
-Open `index.html` in a modern browser.
-
-### Option 2 — Use a local server
-
-From the repository directory:
-
-```bash
-python -m http.server 8000
-```
-
-Then visit:
-
-```text
-http://localhost:8000
-```
-
-Using a local server is recommended for more predictable browser behavior with external resources.
-
-## Deployment
-
-Attendify is a static application and can be deployed directly to GitHub Pages or another static hosting provider.
-
-```text
-Git Push
-   ↓
-GitHub Repository
-   ↓
-GitHub Pages / Static Host
-   ↓
-Attendify
-```
-
-No Node.js runtime, database server or build pipeline is required for the current implementation.
-
-## Data & Privacy Considerations
-
-Because attendance records are stored in browser `localStorage`:
-
-- Clearing browser/site data can remove stored attendance records.
-- Data does not automatically synchronize between devices.
-- Different browsers maintain separate local storage.
-- A backend/database would be required for centralized multi-user records.
-- Export important records if they need to be retained independently of the browser.
-
-## Current Engineering State
-
-| Area | Status |
-|---|:---:|
-| Attendance calculations | 🟢 |
-| Subject switching | 🟢 |
-| Student roster | 🟢 |
-| Search/filtering | 🟢 |
-| Local persistence | 🟢 |
-| Monthly archiving | 🟢 |
-| Excel-compatible export | 🟢 |
-| Responsive UI | 🟢 |
-| Visual analytics | 🟢 |
-| Backend synchronization | ⚪ Not implemented |
-| Authentication | ⚪ Not implemented |
-| Automated test suite | ⚪ Not implemented |
-
-## Roadmap
-
-- [ ] Modularize HTML, CSS and JavaScript into separate files
-- [ ] Add automated calculation/regression tests
-- [ ] Add import/export backup in JSON/CSV format
-- [ ] Add configurable attendance thresholds
-- [ ] Add richer monthly analytics and trends
-- [ ] Add secure backend synchronization
-- [ ] Add authentication and role-based access
-- [ ] Add database-backed multi-device support
-- [ ] Improve accessibility and keyboard navigation
-- [ ] Add print-optimized attendance reports
-
-## Design Philosophy
-
-**Fast enough for attendance. Clear enough for administration. Simple enough to carry anywhere.**
-
-Attendify prioritizes quick data entry and immediate feedback over unnecessary complexity. The local-first architecture keeps the application usable even without a backend while leaving a clear path toward a scalable multi-user system.
-
-## Author
-
-**Harsh Dubey** · [GitHub](https://github.com/chillingbing648-sketch)
+A polished, admin-first attendance management web application designed for faculty and administrators to mark, manage, review, and analyze attendance for the **SY BSc IT batch (Single Batch · 60 Students)**.
 
 ---
 
-*Attendify is an academic project focused on practical frontend engineering, client-side state management, responsive UI design and attendance workflow automation.*
+## 🎯 Core Product Mission
+
+The application is built around one primary workflow:
+**"A faculty or admin should be able to mark attendance for 60 students as quickly and accurately as possible (under 60 seconds)."**
+
+### The North-Star Flow:
+1. **Open Attendify** → Click prominent **+ Mark Attendance**.
+2. **Select Subject, Date, and Lecture Time**.
+3. All **60 enrolled students** load immediately, defaulted to **Present**.
+4. Quickly mark absentees or late arrivals using 1-click toggles or search.
+5. Sticky live headcount automatically reconciles: `Present + Absent + Late = 60`.
+6. Click **Save Attendance Session**.
+7. The session is recorded in **Attendance History**, and the **Dashboard**, **Student Roster**, **Subject Averages**, and **Analytics** update in real-time.
+
+---
+
+## 👥 Student Roster (SY BSc IT)
+
+The application comes pre-loaded with all **60 real students** (Roll Numbers 1 to 60) enrolled in the single SY BSc IT batch:
+
+1. Andre Harshad Balu
+2. Ansari Farman Lukman
+3. Behera Shubham Binod
+4. Chaurasiya Shivanshu Ashok
+5. Chendvankar Tanishq Abhijit
+6. Choursia Shraddha Madreshkumar
+7. Dudaye Shubham Pandurang
+8. Gupta Himanshu Laxmikant
+9. Gupta Nikhil Ganesh
+10. Gupta Raj Omprakash
+11. Gurav Shreya Prakash
+12. Jaiswal Khushi Dashrath
+13. Jaiswal Prince Dharmendra
+14. Kottilaparambil Suvidh Sunil
+15. Kushwaha Vinit Vidyanand
+16. Mishra Shashank Sureshkumar
+17. Nesamoney Cinderella Jaiross
+18. Pal Aryan Naveen
+19. Pal Ashish Ramavadh
+20. Pal Laxmi Kapildev
+21. Pandey Sharad Umeshchandra
+22. Rajput Prachi Narsing
+23. Reddi Mahesh Chandranna
+24. Sawant Narayan Manohar
+25. Sharma Abhay Chandrika
+26. Sharma Kartike Sunil
+27. Shevale Pratham Dryaneshwar
+28. Singh Aniket Rajesh
+29. Singh Anurag Kush
+30. Singh Aryan Sanjay
+31. Singh Bablu Kumar Santosh Kumar
+32. Singh Janvi Anil
+33. Singh Noel Damer
+34. Singh Sachi Ashutosh
+35. Singh Sandhya Amarnath
+36. Singh Vikash Kumar Laxman
+37. Yadav Pooja Om Prakash
+38. Yadav Prince Virendrakumar
+39. Yadav Vivek Rudra
+40. Yadav Yogank Ashok
+41. Mishra Aditya Rajesh
+42. Pardhe Harshit Chandrakant
+43. Jaiswal Moksh Rajkumar
+44. Ghadigaonkar Maithili Mahesh
+45. Pal Sanjana Rajendra
+46. Tiwari Pavan Awadesh
+47. Thorat Kaustubh Ramesh
+48. Makwana Ayushi Nilesh
+49. Dubey Harsh Puneet
+50. Mourya Ansh Deenanath
+51. Morye Mihir Mangesh
+52. Pandey Sakshi
+53. Uttam Tripathi
+54. Anchal Jaiswar
+55. Harshit Tiwari
+56. Shivam Patel
+57. Shivansu Mishra
+58. Abhay Yadav
+59. Mahek Pandya
+60. Abhishek Yadav
+
+---
+
+## 📐 Academic Courses (Subjects)
+
+The system is configured with the core curriculum subjects:
+
+
+---
+
+## 🚀 Key Modules & Architecture
+
+- **`Dashboard`**: Operational overview displaying overall batch attendance %, total lectures held, recent sessions with quick Edit actions, and defaulters needing attention (< 75%).
+- **`Mark Attendance`**: Optimized 60-student register with default-present workflow, search-by-roll/name, absentee filters, sticky live count pills, and save verification.
+- **`Students`**: Full 60-student directory showing roll number, lectures attended vs missed, attendance percentage, status badges (Safe / Warning / Defaulter), and student modal breakdowns.
+- **`Subjects`**: Course directory showing teacher assignments, total sessions held, and average class attendance.
+- **`Attendance History`**: Audit ledger of all sessions with subject filter, timestamps, headcounts, and session editing/deletion.
+- **`Analytics`**: High-density batch segmentation (Safe ≥75%, Warning 65-74%, Defaulters <65%), course comparisons, and total attendance marks ratios.
+- **`Reports`**: One-click exports of the Full Batch Ledger CSV, Defaulters List CSV (< 75%), and Session Audit Log CSV.
+- **`Settings`**: Safe threshold customization (default: 75% safe, 65% warning), JSON backup export/import, and database reset.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Zero dependencies / Vanilla JS / HTML5 / CSS3**
+- Native LocalStorage persistence with backup-key rotation (`attendify:v2`)
+- Strict SVG constraint styling preventing card overflows
+- Clean Linear/Apple-inspired academic administration theme

@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd /d \"c:\\\\Users\\\\PRATEEK DUBEY\\\\Downloads\\\\Attendify\" ; python -m http\\.server 8080$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

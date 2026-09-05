@@ -1,0 +1,332 @@
+/* ============================================================
+   ATTENDIFY — dashboard.css (Admin Dashboard & Register Layouts)
+   Lecture Attendance + Practical Attendance Visual Distinction
+   ============================================================ */
+
+/* Two-Section Today Grid */
+.today-sections-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+/* Category Section Cards */
+.session-category-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.session-category-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+}
+
+.session-category-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-category-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+
+.icon-lecture {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+.icon-practical {
+  background: var(--practical-subtle);
+  color: var(--practical);
+}
+
+.session-category-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.session-category-subtitle {
+  font-size: 11px;
+  color: var(--ink-secondary);
+}
+
+.session-category-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Compact Lecture / Practical Row */
+.today-session-row {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.12s ease;
+}
+
+.today-session-row:last-child {
+  border-bottom: none;
+}
+
+.today-session-row:hover {
+  background-color: var(--surface-hover);
+}
+
+.today-session-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.today-session-name {
+  font-weight: 650;
+  font-size: 13.5px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.today-session-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--ink-secondary);
+}
+
+.today-session-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Attendance Register Workflow */
+.register-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Segmented Type Switcher in Register */
+.register-type-segmented {
+  display: inline-flex;
+  background: var(--surface-subtle);
+  padding: 3px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+}
+
+.segmented-tab {
+  border: none;
+  background: transparent;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.segmented-tab.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-xs);
+}
+
+.register-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-xs);
+}
+
+.register-bar-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.register-bar-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.register-bar-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+
+/* Sticky Live Headcount Bar */
+.register-counts-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  padding: 7px 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.count-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.pill {
+  padding: 2.5px 8px;
+  border-radius: var(--r-xs);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid transparent;
+}
+
+.pill-total { background: var(--surface-subtle); color: var(--ink); border-color: var(--border); }
+.pill-present { background: var(--safe-subtle); color: var(--safe-ink); border-color: var(--safe-border); }
+.pill-absent { background: var(--critical-subtle); color: var(--critical-ink); border-color: var(--critical-border); }
+.pill-late { background: var(--warn-subtle); color: var(--warn-ink); border-color: var(--warn-border); }
+
+/* Quick Status Segmented Toggle Button Group */
+.status-btn-group {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+}
+
+.status-btn {
+  border: none;
+  background: transparent;
+  width: 32px;
+  height: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--ink-secondary);
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.status-btn:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+
+.status-btn:hover {
+  background: var(--surface-subtle);
+  color: var(--ink);
+}
+
+.status-btn.active-present {
+  background: var(--safe);
+  color: #FFFFFF;
+}
+
+.status-btn.active-absent {
+  background: var(--critical);
+  color: #FFFFFF;
+}
+
+.status-btn.active-late {
+  background: var(--warn);
+  color: #FFFFFF;
+}
+
+/* Sticky Action Footer */
+.register-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  padding: 10px 16px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+/* Charts in Admin Analytics */
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 14px;
+  box-shadow: var(--shadow-xs);
+}
+
+.chart-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.chart-card-head h3 {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.chart-card-desc {
+  font-size: var(--fs-xs);
+  color: var(--ink-tertiary);
+  margin-bottom: 12px;
+}
