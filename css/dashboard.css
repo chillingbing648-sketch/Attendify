@@ -281,6 +281,24 @@
   color: #FFFFFF;
 }
 
+.status-btn.active-unmarked {
+  background: var(--ink-tertiary);
+  color: #FFFFFF;
+}
+
+.register-row.row-absent {
+  background: var(--critical-subtle) !important;
+}
+
+.register-row.row-unmarked {
+  background: var(--warn-subtle) !important;
+}
+
+.register-row:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 /* Sticky Action Footer */
 .register-footer {
   position: sticky;

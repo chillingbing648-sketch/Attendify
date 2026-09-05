@@ -180,12 +180,153 @@ const Attendance = (() => {
     }));
   }
 
+  /* ---- Lecture vs Practical Turnout (Prompt 18) ---- */
+  function lectureVsPracticalStats() {
+    const sessions = State.getAllSessions();
+    const lectureSessIds = new Set(sessions.filter(s => s.type !== 'practical').map(s => s.id));
+    const practicalSessIds = new Set(sessions.filter(s => s.type === 'practical').map(s => s.id));
+
+    const records = State.get().records;
+    const lectureRecs = records.filter(r => lectureSessIds.has(r.sessionId));
+    const practicalRecs = records.filter(r => practicalSessIds.has(r.sessionId));
+
+    const lPresent = lectureRecs.filter(r => r.status === 'present' || r.status === 'late').length;
+    const lTotal = lectureRecs.length;
+    const lPct = Utils.safePercent(lPresent, lTotal);
+
+    const pPresent = practicalRecs.filter(r => r.status === 'present' || r.status === 'late').length;
+    const pTotal = practicalRecs.length;
+    const pPct = Utils.safePercent(pPresent, pTotal);
+
+    return {
+      lecture: { sessionCount: lectureSessIds.size, present: lPresent, total: lTotal, pct: lPct },
+      practical: { sessionCount: practicalSessIds.size, present: pPresent, total: pTotal, pct: pPct }
+    };
+  }
+
+  /* ---- Repeat Absentees (Prompt 18) ---- */
+  function repeatAbsentees(limit = 8) {
+    const students = State.getAllStudents();
+    const list = students.map(s => {
+      const st = statsForStudent(s.id);
+      return { student: s, ...st };
+    })
+    .filter(s => s.absent > 0)
+    .sort((a, b) => b.absent - a.absent || a.pct - b.pct);
+
+    return list.slice(0, limit);
+  }
+
+  /* ---- Consecutive Absences (Prompt 18 & 19) ---- */
+  function consecutiveAbsences(n = 2) {
+    const sessions = State.getAllSessions();
+    if (sessions.length < n) return [];
+
+    const lastNSessions = sessions.slice(0, n);
+    const lastNSessIds = lastNSessions.map(s => s.id);
+    const students = State.getAllStudents();
+    const records = State.get().records;
+
+    const matched = [];
+    students.forEach(stu => {
+      const stuRecs = records.filter(r => r.studentId === stu.id && lastNSessIds.includes(r.sessionId));
+      if (stuRecs.length === n && stuRecs.every(r => r.status === 'absent')) {
+        matched.push({
+          student: stu,
+          consecutiveCount: n,
+          sessions: lastNSessions
+        });
+      }
+    });
+
+    return matched;
+  }
+
+  /* ---- Smart Admin Insights (Prompt 19) ---- */
+  function smartInsights() {
+    const insights = [];
+    const stats = overallBatchStats();
+    const th = thresholds();
+    const todayISO = Utils.todayISO();
+
+    // 1. Defaulters alert
+    const below75 = studentsBelow(th.safe);
+    if (below75.length > 0) {
+      insights.push({
+        type: 'critical',
+        text: `${below75.length} student${below75.length === 1 ? '' : 's'} below ${th.safe}% minimum attendance.`,
+        actionLabel: 'View Defaulters',
+        actionView: 'students',
+        filter: 'critical'
+      });
+    }
+
+    // 2. Consecutive absences
+    const consecutive = consecutiveAbsences(2);
+    if (consecutive.length > 0) {
+      insights.push({
+        type: 'warn',
+        text: `${consecutive.length} student${consecutive.length === 1 ? '' : 's'} absent in the last 2 consecutive sessions.`,
+        actionLabel: 'Review Students',
+        actionView: 'students',
+        filter: 'warn'
+      });
+    }
+
+    // 3. Subject practical comparison vs batch average
+    if (stats.totalSessions > 0) {
+      const practicalSessions = State.getPracticalSessions();
+      const subjects = State.get().subjects;
+      subjects.forEach(sub => {
+        const subPracticals = practicalSessions.filter(s => s.subjectId === sub.id);
+        if (subPracticals.length > 0) {
+          const sessIds = new Set(subPracticals.map(s => s.id));
+          const subRecs = State.get().records.filter(r => sessIds.has(r.sessionId));
+          const pPresent = subRecs.filter(r => r.status === 'present' || r.status === 'late').length;
+          const pPct = Utils.safePercent(pPresent, subRecs.length);
+          if (subRecs.length > 0 && pPct < stats.avgPct) {
+            insights.push({
+              type: 'info',
+              text: `${sub.name} practical attendance (${pPct}%) is below the batch average (${stats.avgPct}%).`,
+              actionLabel: 'View Practical Report',
+              actionView: 'practical-reports'
+            });
+          }
+        }
+      });
+    }
+
+    // 4. Today's pending attendance
+    const todaySlots = State.getTodayTimetable();
+    const todaySessions = State.getSessionsForDate(todayISO);
+    const pendingSlots = todaySlots.filter(slot => {
+      return !todaySessions.some(s => s.subjectId === slot.subjectId && s.startTime === slot.start);
+    });
+
+    if (pendingSlots.length > 0) {
+      const firstPending = pendingSlots[0];
+      const sub = State.getSubject(firstPending.subjectId);
+      insights.push({
+        type: 'warn',
+        text: `${sub ? sub.name : 'Scheduled class'} attendance is pending for today (${firstPending.start}).`,
+        actionLabel: 'Mark Now',
+        actionView: 'mark-attendance',
+        prefillSubjectId: firstPending.subjectId,
+        prefillTime: firstPending.start,
+        prefillType: firstPending.type || 'theory'
+      });
+    }
+
+    return insights;
+  }
+
   return {
     thresholds, statusFromPct,
     statsForSession, statsForStudent, statsForStudentInSubject, statsForSubject,
     overallBatchStats, studentsBelow, subjectComparison,
     weeklyTrend, presentVsAbsent, statusDistribution,
-    sessionStudentList, computeFromRecords
+    sessionStudentList, computeFromRecords,
+    lectureVsPracticalStats, repeatAbsentees, consecutiveAbsences, smartInsights
   };
 })();
 

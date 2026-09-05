@@ -413,21 +413,22 @@ body {
 }
 
 /* ============================================================
-   STRICT SVG SCALING (LOCKED AT 16px EVERYWHERE)
+   STRICT SVG SCALING (CONSTRAINED AT 18px PER DESIGN SPEC)
    ============================================================ */
 svg,
 .topbar svg,
 .nav-item svg,
 .stat-label svg,
 .btn svg,
-.icon-btn svg {
-  width: 15px !important;
-  height: 15px !important;
-  min-width: 15px !important;
-  min-height: 15px !important;
-  max-width: 15px !important;
-  max-height: 15px !important;
-  flex: 0 0 15px !important;
+.icon-btn svg,
+.search-box svg {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  flex: 0 0 18px !important;
   display: inline-block;
   vertical-align: middle;
 }

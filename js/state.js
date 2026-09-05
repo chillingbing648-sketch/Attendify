@@ -81,8 +81,25 @@ const State = (() => {
     const sessionIds = new Set(data.sessions.filter(s => s.subjectId === id).map(s => s.id));
     data.sessions = data.sessions.filter(s => s.subjectId !== id);
     data.records = data.records.filter(r => !sessionIds.has(r.sessionId));
-    data.timetable = data.timetable.filter(t => t.subjectId !== id);
+    data.timetable = (data.timetable || []).filter(t => t.subjectId !== id);
+    if (data.attendance) data.attendance = data.attendance.filter(a => a.subjectId !== id);
+    if (data.notifications) data.notifications = data.notifications.filter(n => n.subjectId !== id);
     emit('subjects');
+  }
+
+  function markAttendance(subjectId, status = 'present', date = Utils.todayISO()) {
+    let sess = findDuplicateSession(subjectId, date, '09:00');
+    if (!sess) {
+      sess = createSession({ subjectId, date, startTime: '09:00', type: 'theory' });
+    }
+    const stu = data.students && data.students[0] ? data.students[0].id : 'stu_1';
+    const rec = { id: Utils.uid('rec'), sessionId: sess.id, studentId: stu, status };
+    data.records.push(rec);
+    if (!data.attendance) data.attendance = [];
+    const attRec = { id: Utils.uid('att'), subjectId, status, date };
+    data.attendance.push(attRec);
+    emit('records');
+    return attRec;
   }
 
   /* ---- Sessions (Theory & Practical) ---- */
@@ -145,6 +162,21 @@ const State = (() => {
   }
 
   /* ---- Timetable ---- */
+  function addTimetableEntry(entry) {
+    const rec = {
+      id: entry.id || Utils.uid('tt'),
+      day: entry.day !== undefined ? entry.day : 0,
+      start: entry.start || '09:00',
+      end: entry.end || '10:00',
+      subjectId: entry.subjectId,
+      room: entry.room || 'Lab 1',
+      type: entry.type || 'theory'
+    };
+    if (!data.timetable) data.timetable = [];
+    data.timetable.push(rec);
+    emit('timetable');
+    return rec;
+  }
   function getTimetable() { return data.timetable || []; }
   function getTimetableForDay(dayIndex) { return (data.timetable || []).filter(t => t.day === dayIndex).sort((a,b) => a.start.localeCompare(b.start)); }
   function getTodayTimetable() {
@@ -167,6 +199,59 @@ const State = (() => {
   function markNotificationRead(id) { const n = data.notifications.find(x => x.id === id); if (n) { n.read = true; emit('notifications'); } }
   function clearNotifications() { data.notifications = []; emit('notifications'); }
   function unreadNotificationCount() { return data.notifications.filter(n => !n.read).length; }
+
+  /* ---- Archival (Prompt 16) ---- */
+  function getArchives() {
+    if (!Array.isArray(data.archives)) data.archives = [];
+    return data.archives;
+  }
+
+  function archiveSessionsBefore(dateISO) {
+    if (!Array.isArray(data.archives)) data.archives = [];
+    const sessionsToArchive = data.sessions.filter(s => s.date <= dateISO);
+    if (sessionsToArchive.length === 0) return { count: 0 };
+
+    const sessIds = new Set(sessionsToArchive.map(s => s.id));
+    const recordsToArchive = data.records.filter(r => sessIds.has(r.sessionId));
+
+    const archiveRecord = {
+      id: Utils.uid('arch'),
+      title: `Archived Sessions on or before ${Utils.formatDate(dateISO)}`,
+      cutoffDate: dateISO,
+      archivedAt: new Date().toISOString(),
+      sessionCount: sessionsToArchive.length,
+      recordCount: recordsToArchive.length,
+      sessions: sessionsToArchive,
+      records: recordsToArchive
+    };
+
+    data.archives.unshift(archiveRecord);
+    data.sessions = data.sessions.filter(s => !sessIds.has(s.id));
+    data.records = data.records.filter(r => !sessIds.has(r.sessionId));
+    emit('sessions');
+    return { count: sessionsToArchive.length, archive: archiveRecord };
+  }
+
+  function unarchiveSessionGroup(archiveId) {
+    if (!Array.isArray(data.archives)) return false;
+    const arch = data.archives.find(a => a.id === archiveId);
+    if (!arch) return false;
+
+    // Restore sessions & records safely
+    const existingSessIds = new Set(data.sessions.map(s => s.id));
+    arch.sessions.forEach(s => {
+      if (!existingSessIds.has(s.id)) data.sessions.push(s);
+    });
+
+    const existingRecIds = new Set(data.records.map(r => r.id));
+    arch.records.forEach(r => {
+      if (!existingRecIds.has(r.id)) data.records.push(r);
+    });
+
+    data.archives = data.archives.filter(a => a.id !== archiveId);
+    emit('sessions');
+    return true;
+  }
 
   /* ---- Import / Export / Reset ---- */
   function replaceAll(newState) {
@@ -196,8 +281,10 @@ const State = (() => {
     createSession, getSession, getAllSessions, getSessionsForSubject, getSessionsForDate, getPracticalSessions,
     updateSession, deleteSession, findDuplicateSession,
     saveRecords, getRecordsForSession, getRecordsForStudent, getRecordsForStudentAndSubject,
-    getTimetable, getTimetableForDay, getTodayTimetable,
+    markAttendance,
+    getTimetable, getTimetableForDay, getTodayTimetable, addTimetableEntry,
     addNotification, markNotificationRead, clearNotifications, unreadNotificationCount,
+    getArchives, archiveSessionsBefore, unarchiveSessionGroup,
     replaceAll, resetAll
   };
 })();

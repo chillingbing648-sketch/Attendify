@@ -110,32 +110,29 @@ const App = (() => {
 
           <div class="topbar-right">
             <!-- Global Search Trigger -->
-            <button class="topbar-search-trigger" id="topbar-search-btn" title="Quick Search">
+            <button class="topbar-search-trigger" id="topbar-search-btn" title="Quick Search (Ctrl+K)">
               ${UI.icon('search')}
-              <span>Search roll no. / student...</span>
+              <span>Search student, roll no., subject, session...</span>
               <span class="kbd-shortcut">Ctrl+K</span>
             </button>
 
+            <!-- Subject Selector -->
+            <div class="topbar-subject-selector" style="display:flex; align-items:center; gap:4px; white-space:nowrap;">
+              <select class="topbar-subject-select" style="font-size:var(--fs-xs); padding:4px 8px; border:1px solid var(--border); border-radius:var(--r-sm); background:var(--surface); color:var(--ink); min-width:110px; cursor:pointer;" title="Filter by Subject">
+                <option value="">All Subjects</option>
+              </select>
+            </div>
+
             <span class="topbar-date">${Utils.formatDate(new Date())}</span>
 
-            <span class="topbar-session-counter" style="margin-left:12px; font-size:var(--fs-xs); color:var(--ink-tertiary);">0 Sessions</span>
-
-            <button class="icon-btn" id="topbar-theme-btn" aria-label="Toggle theme" title="Toggle Theme">
+            <button class="icon-btn" id="topbar-theme-btn" aria-label="Toggle theme" title="Toggle Light/Dark Theme">
               ${UI.icon('sun')}
             </button>
 
             <!-- Admin Profile Indicator -->
-            <div style="width:28px; height:28px; border-radius:50%; background:var(--accent-subtle); color:var(--accent); font-weight:700; font-size:11px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--accent-border);" title="Admin Account">
+            <button class="icon-btn" id="topbar-profile-btn" style="width:28px; height:28px; border-radius:50%; background:var(--accent-subtle); color:var(--accent); font-weight:700; font-size:11px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--accent-border); cursor:pointer;" title="Faculty Admin Profile">
               AD
-            </div>
-          </div>
-
-          <!-- Subject Selector -->
-          <div class="topbar-subject-selector" style="display:flex; align-items:center; gap:4px; white-space:nowrap;">
-            <span class="topbar-subject-label" style="font-size:var(--fs-xs); color:var(--ink-tertiary);">Subject</span>
-            <select class="topbar-subject-select" style="font-size:var(--fs-sm); padding:4px 8px; border:1px solid var(--border-subtle); border-radius:var(--r-sm); background:var(--bg-subtle); color:var(--ink); min-width:120px; cursor:pointer;">
-              <option value="">All Subjects</option>
-            </select>
+            </button>
           </div>
         </div>
 
@@ -166,6 +163,9 @@ const App = (() => {
 
     document.getElementById('theme-toggle-btn').addEventListener('click', cycleTheme);
     document.getElementById('topbar-theme-btn').addEventListener('click', cycleTheme);
+
+    const profileBtn = document.getElementById('topbar-profile-btn');
+    if (profileBtn) profileBtn.addEventListener('click', openProfileModal);
 
     document.getElementById('topbar-menu-btn').addEventListener('click', () => {
       document.getElementById('sidebar').classList.add('open');
@@ -394,22 +394,26 @@ const App = (() => {
 
   function openGlobalSearchModal() {
     const students = State.getAllStudents();
+    const subjects = State.get().subjects;
+    const sessions = State.getAllSessions();
+
     const bodyHTML = `
       <div style="display:flex; flex-direction:column; gap:12px;">
         <div class="search-box" style="width:100%;">
           ${UI.icon('search')}
-          <input type="text" id="global-search-input" class="input" placeholder="Type roll number or name..." style="height:36px; font-size:14px;" autofocus>
+          <input type="text" id="global-search-input" class="input" placeholder="Type student, roll no, subject, or session date..." style="height:36px; font-size:13.5px;" autofocus>
         </div>
-        <div id="global-search-results" style="max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:4px;">
-          ${renderGlobalSearchResults(students.slice(0, 8))}
+        <div id="global-search-results" style="max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+          ${renderMultiCategorySearch('', students, subjects, sessions)}
         </div>
       </div>
     `;
 
     UI.openModal({
-      title: 'Quick Search Student Directory',
-      desc: 'SY BSc IT · 60 Students',
+      title: 'Global Search',
+      desc: 'SY BSc IT · Search Students, Roll Numbers, Subjects & Sessions',
       bodyHTML,
+      wide: true,
       footerHTML: '<button class="btn btn-outline" id="btn-close-search">Close</button>',
       onOpen: (overlay, close) => {
         const inp = overlay.querySelector('#global-search-input');
@@ -418,40 +422,193 @@ const App = (() => {
 
         inp.addEventListener('input', Utils.debounce((e) => {
           const q = e.target.value.toLowerCase().trim();
-          const matches = students.filter(s => s.name.toLowerCase().includes(q) || String(s.rollNumber).includes(q));
-          res.innerHTML = renderGlobalSearchResults(matches.slice(0, 10));
+          res.innerHTML = renderMultiCategorySearch(q, students, subjects, sessions);
         }, 100));
 
         res.addEventListener('click', (e) => {
-          const row = e.target.closest('[data-student-id]');
-          if (!row) return;
-          const stuId = row.dataset.studentId;
-          close();
-          StudentsView.openStudentDetail(stuId);
+          const studentRow = e.target.closest('[data-student-id]');
+          if (studentRow) {
+            close();
+            StudentsView.openStudentDetail(studentRow.dataset.studentId);
+            return;
+          }
+
+          const subjectRow = e.target.closest('[data-subject-id]');
+          if (subjectRow) {
+            close();
+            App.navigateToMarkSubject(subjectRow.dataset.subjectId);
+            return;
+          }
+
+          const sessionRow = e.target.closest('[data-session-id]');
+          if (sessionRow) {
+            close();
+            App.navigateToMarkSession(sessionRow.dataset.sessionId);
+            return;
+          }
         });
       }
     });
   }
 
-  function renderGlobalSearchResults(list) {
-    if (list.length === 0) {
-      return '<div style="padding:16px; text-align:center; color:var(--ink-tertiary); font-size:12px;">No matching students found</div>';
+  function renderMultiCategorySearch(query, students, subjects, sessions) {
+    const q = query.toLowerCase().trim();
+
+    // 1. Matched Students
+    const matchedStudents = q
+      ? students.filter(s => s.name.toLowerCase().includes(q) || String(s.rollNumber).includes(q)).slice(0, 8)
+      : students.slice(0, 6);
+
+    // 2. Matched Subjects
+    const matchedSubjects = q
+      ? subjects.filter(s => s.name.toLowerCase().includes(q) || (s.code && s.code.toLowerCase().includes(q)) || (s.teacher && s.teacher.toLowerCase().includes(q))).slice(0, 4)
+      : subjects.slice(0, 3);
+
+    // 3. Matched Sessions
+    const matchedSessions = q
+      ? sessions.filter(sess => {
+          const sub = State.getSubject(sess.subjectId);
+          const subName = sub ? sub.name.toLowerCase() : '';
+          const exp = (sess.experimentTitle || '').toLowerCase();
+          const dateStr = sess.date.toLowerCase();
+          return subName.includes(q) || exp.includes(q) || dateStr.includes(q);
+        }).slice(0, 5)
+      : sessions.slice(0, 3);
+
+    if (matchedStudents.length === 0 && matchedSubjects.length === 0 && matchedSessions.length === 0) {
+      return '<div style="padding:24px; text-align:center; color:var(--ink-secondary); font-size:12px;">No results found across students, subjects, or sessions.</div>';
     }
-    return list.map(s => {
-      const stats = Attendance.statsForStudent(s.id);
-      return `
-        <div class="today-session-row" data-student-id="${s.id}" style="padding:8px 12px; cursor:pointer; border-radius:var(--r-md); border:1px solid var(--border);">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <strong style="width:24px; font-size:12px; color:var(--ink);">${s.rollNumber}</strong>
-            <span style="font-weight:600; font-size:13px; color:var(--ink);">${Utils.escapeHTML(s.name)}</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:6px;">
-            <span style="font-size:11.5px; color:var(--ink-secondary);">${stats.total > 0 ? stats.pct + '%' : 'No Data'}</span>
-            <span class="badge ${stats.status === 'safe' ? 'badge-safe' : 'badge-critical'}">${stats.total > 0 ? Utils.statusLabel(stats.status) : '—'}</span>
+
+    return `
+      <!-- Students Section -->
+      ${matchedStudents.length > 0 ? `
+        <div>
+          <div style="font-size:10.5px; font-weight:700; color:var(--ink-tertiary); text-transform:uppercase; margin-bottom:4px;">Students (${matchedStudents.length})</div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            ${matchedStudents.map(s => {
+              const stats = Attendance.statsForStudent(s.id);
+              return `
+                <div class="today-session-row" data-student-id="${s.id}" style="padding:6px 10px; cursor:pointer; border-radius:var(--r-sm); border:1px solid var(--border);">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <strong style="width:24px; font-size:12px; color:var(--ink); font-variant-numeric:tabular-nums;">${s.rollNumber}</strong>
+                    <span style="font-weight:600; font-size:12.5px; color:var(--ink);">${Utils.escapeHTML(s.name)}</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-size:11.5px; color:var(--ink-secondary);">${stats.total > 0 ? stats.pct + '%' : 'No Data'}</span>
+                    <span class="badge ${stats.status === 'safe' ? 'badge-safe' : 'badge-critical'}">${stats.total > 0 ? Utils.statusLabel(stats.status) : '—'}</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
-      `;
-    }).join('');
+      ` : ''}
+
+      <!-- Subjects Section -->
+      ${matchedSubjects.length > 0 ? `
+        <div style="margin-top:6px;">
+          <div style="font-size:10.5px; font-weight:700; color:var(--ink-tertiary); text-transform:uppercase; margin-bottom:4px;">Curriculum Subjects (${matchedSubjects.length})</div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            ${matchedSubjects.map(sub => `
+              <div class="today-session-row" data-subject-id="${sub.id}" style="padding:6px 10px; cursor:pointer; border-radius:var(--r-sm); border:1px solid var(--border);">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="badge badge-neutral" style="font-size:10px;">COURSE</span>
+                  <span style="font-weight:600; font-size:12.5px; color:var(--ink);">${Utils.escapeHTML(sub.name)}</span>
+                  <span style="font-size:11px; color:var(--ink-tertiary);">${sub.teacher || ''}</span>
+                </div>
+                <button class="btn btn-primary btn-sm" style="height:22px; padding:0 8px; font-size:11px;">Mark</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- Attendance Sessions Section -->
+      ${matchedSessions.length > 0 ? `
+        <div style="margin-top:6px;">
+          <div style="font-size:10.5px; font-weight:700; color:var(--ink-tertiary); text-transform:uppercase; margin-bottom:4px;">Attendance Sessions (${matchedSessions.length})</div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            ${matchedSessions.map(sess => {
+              const sub = State.getSubject(sess.subjectId);
+              const stats = Attendance.statsForSession(sess.id);
+              const isPractical = sess.type === 'practical';
+              return `
+                <div class="today-session-row" data-session-id="${sess.id}" style="padding:6px 10px; cursor:pointer; border-radius:var(--r-sm); border:1px solid var(--border);">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="badge ${isPractical ? 'badge-safe' : 'badge-neutral'}" style="font-size:10px;">${isPractical ? 'PRACTICAL' : 'LECTURE'}</span>
+                    <strong style="font-size:12px; color:var(--ink);">${Utils.formatDate(sess.date)}</strong>
+                    <span style="font-size:12px; color:var(--ink-secondary);">${sub ? Utils.escapeHTML(sub.name) : ''}</span>
+                    ${sess.experimentTitle ? `<span style="font-size:11px; color:var(--ink-tertiary); font-style:italic;">(${Utils.escapeHTML(sess.experimentTitle)})</span>` : ''}
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-size:11px; font-weight:700; color:var(--ink);">${stats.present}/60</span>
+                    <span class="badge ${stats.status === 'safe' ? 'badge-safe' : 'badge-critical'}">${stats.pct}%</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      ` : ''}
+    `;
+  }
+
+  function openProfileModal() {
+    const s = State.get().settings;
+    const students = State.getAllStudents();
+    const stats = Attendance.overallBatchStats();
+
+    const bodyHTML = `
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; align-items:center; gap:12px; padding:6px 0;">
+          <div style="width:48px; height:48px; border-radius:50%; background:var(--accent-subtle); color:var(--accent); font-weight:800; font-size:18px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--accent-border);">
+            AD
+          </div>
+          <div>
+            <div style="font-size:15px; font-weight:700; color:var(--ink);">${Utils.escapeHTML(s.adminName || 'Faculty / Administrator')}</div>
+            <div style="font-size:12px; color:var(--ink-secondary);">Department of Information Technology</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; background:var(--surface-subtle); padding:10px 12px; border-radius:var(--r-md); border:1px solid var(--border);">
+          <div>
+            <div style="font-size:10px; font-weight:700; color:var(--ink-tertiary); text-transform:uppercase;">Class & Batch</div>
+            <div style="font-weight:700; font-size:13px; color:var(--ink);">${Utils.escapeHTML(s.className || 'SY BSc IT')}</div>
+          </div>
+          <div>
+            <div style="font-size:10px; font-weight:700; color:var(--ink-tertiary); text-transform:uppercase;">Students Enrolled</div>
+            <div style="font-weight:700; font-size:13px; color:var(--ink);">${students.length} Students</div>
+          </div>
+          <div style="margin-top:6px;">
+            <div style="font-size:10px; font-weight:700; color:var(--ink-tertiary); text-transform:uppercase;">Safe Threshold</div>
+            <div style="font-weight:700; font-size:13px; color:var(--safe);">${s.thresholdSafe || 75}%</div>
+          </div>
+          <div style="margin-top:6px;">
+            <div style="font-size:10px; font-weight:700; color:var(--ink-tertiary); text-transform:uppercase;">Batch Turnout</div>
+            <div style="font-weight:700; font-size:13px; color:var(--ink);">${stats.totalSessions > 0 ? stats.avgPct + '%' : 'No Sessions'}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    UI.openModal({
+      title: 'Administrator Profile',
+      desc: 'SY BSc IT Attendance System',
+      bodyHTML,
+      footerHTML: `
+        <div style="display:flex; justify-content:space-between; width:100%;">
+          <button class="btn btn-outline" id="btn-profile-to-settings">Open Settings</button>
+          <button class="btn btn-primary" id="btn-close-profile">Close</button>
+        </div>
+      `,
+      onOpen: (overlay, close) => {
+        overlay.querySelector('#btn-close-profile').addEventListener('click', close);
+        overlay.querySelector('#btn-profile-to-settings').addEventListener('click', () => {
+          close();
+          navigateTo('settings');
+        });
+      }
+    });
   }
 
   function renderView(viewId) {

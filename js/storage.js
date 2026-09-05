@@ -94,11 +94,19 @@ const Storage = (() => {
     return s;
   }
 
+  function getStorage() {
+    if (typeof window !== 'undefined' && window.localStorage) return window.localStorage;
+    if (typeof localStorage !== 'undefined') return localStorage;
+    return null;
+  }
+
   function isAvailable() {
     try {
+      const s = getStorage();
+      if (!s) return false;
       const t = '__attendify_test__';
-      localStorage.setItem(t, '1');
-      localStorage.removeItem(t);
+      s.setItem(t, '1');
+      s.removeItem(t);
       return true;
     } catch { return false; }
   }
@@ -106,43 +114,68 @@ const Storage = (() => {
   let memoryFallback = null;
 
   function load() {
-    if (!isAvailable()) {
+    const s = getStorage();
+    if (!s || !isAvailable()) {
       memoryFallback = memoryFallback || seededState();
       return { state: memoryFallback, recovered: false, usedFallback: true };
     }
 
-    let raw = localStorage.getItem(KEY);
+    // Check primary v2 or v1 keys
+    let raw = s.getItem(KEY);
+    let backupRaw = s.getItem(BACKUP);
+    let isV1Only = false;
+
+    if (!raw && !backupRaw) {
+      const oldRaw = s.getItem(OLD_KEY);
+      const oldBkp = s.getItem(OLD_KEY + ':backup');
+      if (oldRaw || oldBkp) {
+        raw = oldRaw;
+        backupRaw = oldBkp;
+        isV1Only = true;
+      }
+    }
+
     let recovered = false;
 
-    if (!raw) {
-      raw = localStorage.getItem(BACKUP);
-      if (raw) recovered = true;
+    if (!raw && backupRaw) {
+      raw = backupRaw;
+      recovered = true;
     }
 
     if (!raw) {
-      const oldRaw = localStorage.getItem(OLD_KEY);
-      if (oldRaw) {
-        try { localStorage.removeItem(OLD_KEY); } catch {}
-      }
       const fresh = seededState();
       save(fresh);
       return { state: fresh, recovered: false, usedFallback: false };
     }
 
-    let parsed;
+    let parsed = null;
     try {
       parsed = JSON.parse(raw);
     } catch {
-      const bkp = localStorage.getItem(BACKUP);
-      if (bkp) {
-        try { parsed = JSON.parse(bkp); recovered = true; } catch { parsed = null; }
+      if (backupRaw) {
+        try {
+          parsed = JSON.parse(backupRaw);
+          recovered = true;
+        } catch {
+          parsed = null;
+        }
       }
     }
 
-    if (!parsed || typeof parsed !== 'object' || parsed.version !== 2) {
-      const fresh = seededState();
+    if (!parsed || typeof parsed !== 'object') {
+      // Primary and backup were corrupted; fall back to clean state
+      const fresh = defaultState();
       save(fresh);
-      return { state: fresh, recovered: false, usedFallback: false };
+      return { state: fresh, recovered: true, usedFallback: false };
+    }
+
+    if (isV1Only && parsed && !parsed.version) {
+      // Legacy format loaded
+      if (!Array.isArray(parsed.subjects)) parsed.subjects = [];
+      if (!Array.isArray(parsed.attendance)) parsed.attendance = [];
+      if (!Array.isArray(parsed.timetable)) parsed.timetable = [];
+      if (!Array.isArray(parsed.notifications)) parsed.notifications = [];
+      return { state: parsed, recovered, usedFallback: false };
     }
 
     ['students','subjects','sessions','records','timetable','notifications'].forEach(k => {
@@ -151,8 +184,8 @@ const Storage = (() => {
     if (!parsed.settings) parsed.settings = defaultState().settings;
     if (!parsed.meta) parsed.meta = defaultState().meta;
 
-    // Ensure timetable is present if empty
-    if (parsed.timetable.length === 0) {
+    // Ensure timetable is present if empty in normal v2 usage
+    if (parsed.timetable.length === 0 && parsed.students.length > 0) {
       parsed.timetable = seedTimetable();
     }
 
@@ -161,11 +194,18 @@ const Storage = (() => {
 
   function save(data) {
     if (memoryFallback) { memoryFallback = data; return; }
-    if (!isAvailable()) return;
+    const s = getStorage();
+    if (!s || !isAvailable()) return;
     try {
-      const current = localStorage.getItem(KEY);
-      if (current) localStorage.setItem(BACKUP, current);
-      localStorage.setItem(KEY, JSON.stringify(data));
+      // Rotate and save primary v2
+      const current = s.getItem(KEY);
+      if (current) s.setItem(BACKUP, current);
+      s.setItem(KEY, JSON.stringify(data));
+
+      // Also maintain v1 rotation for compatibility
+      const oldCurrent = s.getItem(OLD_KEY);
+      if (oldCurrent) s.setItem(OLD_KEY + ':backup', oldCurrent);
+      s.setItem(OLD_KEY, JSON.stringify(data));
     } catch (e) {
       console.error('Storage.save failed:', e);
     }

@@ -4,7 +4,9 @@
    • Choice between Lecture Attendance and Practical Attendance
    • Practical: Subject, Experiment Title, Date, Time, 60 Students
    • Lecture: Subject, Date, Time, 60 Students
-   • Quick Absent roll entry, Exceptions filter, Undo, and Keyboard shortcuts
+   • Quick Mark: Mark Absent Students OR Mark Present Students
+   • Copy Previous Session with confirmation
+   • Exceptions filter, Unmarked safety, Undo, and Keyboard shortcuts
    ============================================================ */
 
 const MarkAttendanceView = (() => {
@@ -13,9 +15,10 @@ const MarkAttendanceView = (() => {
   let selectedStartTime = '09:00';
   let selectedSessionType = 'lecture'; // lecture | practical
   let experimentTitle = '';
-  let studentStatusMap = {}; // { studentId: 'present' | 'absent' | 'late' | 'unreviewed' }
+  let studentStatusMap = {}; // { studentId: 'present' | 'absent' | 'late' | 'unmarked' }
   let searchQuery = '';
-  let activeFilter = 'all'; // all | exceptions | present | absent | late
+  let activeFilter = 'all'; // all | exceptions | present | absent | late | unmarked
+  let quickMarkMode = 'absent'; // 'absent' | 'present'
   let editingSessionId = null;
   let keyboardBound = false;
   let historyStack = [];
@@ -36,6 +39,10 @@ const MarkAttendanceView = (() => {
         experimentTitle = sess.experimentTitle || '';
         const recs = State.getRecordsForSession(sessionId);
         recs.forEach(r => { studentStatusMap[r.studentId] = r.status; });
+        // Fill any students who were not in records as unmarked
+        students.forEach(s => {
+          if (!studentStatusMap[s.id]) studentStatusMap[s.id] = 'unmarked';
+        });
       }
     } else {
       const subjects = State.get().subjects;
@@ -91,12 +98,14 @@ const MarkAttendanceView = (() => {
           <p class="view-subtitle">SY BSc IT · Single Batch · ${students.length} Students</p>
         </div>
         <div class="view-header-actions">
-          <button class="btn btn-outline btn-sm" id="btn-undo-mark" ${historyStack.length === 0 ? 'disabled' : ''} title="Undo last change">
-            Undo Last Mark
+          <button class="btn btn-outline btn-sm" id="btn-undo-mark" ${historyStack.length === 0 ? 'disabled' : ''} title="Undo last change (Ctrl+Z)">
+            Undo Last Change
+          </button>
+          <button class="btn btn-outline btn-sm" id="btn-copy-previous" title="Copy attendance from the last session for this course">
+            Copy Previous Attendance
           </button>
           <button class="btn btn-primary btn-sm" id="btn-quick-all-present" title="Mark all students as Present">
-            ${UI.icon('check')}
-            All Present
+            ${UI.icon('check')} All Present
           </button>
           <button class="btn btn-outline btn-sm" id="btn-quick-all-absent">All Absent</button>
           <button class="btn btn-outline btn-sm" id="btn-quick-reset">Reset</button>
@@ -115,24 +124,28 @@ const MarkAttendanceView = (() => {
         </div>
 
         <span style="font-size:11.5px; color:var(--ink-secondary);">
-          ${isPractical ? 'Recording laboratory session with experiment details' : 'Recording regular classroom theory lecture'}
+          ${isPractical ? 'Laboratory session with practical / experiment title' : 'Regular classroom theory lecture session'}
         </span>
       </div>
 
-      <!-- Quick Absent Entry Bar -->
+      <!-- Quick Attendance Bar (Optimised for 60-Student Batch) -->
       <div class="card" style="background:var(--surface); border:1px solid ${isPractical ? 'var(--practical-border)' : 'var(--accent-border)'}; margin-bottom:12px; padding:10px 14px;">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-          <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:280px;">
+          <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:320px; flex-wrap:wrap;">
             <span style="font-size:11px; font-weight:700; color:${isPractical ? 'var(--practical)' : 'var(--accent)'}; text-transform:uppercase; letter-spacing:0.04em;">
-              ⚡ Quick Absent Entry:
+              ⚡ Quick Mark:
             </span>
-            <input type="text" id="quick-roll-input" class="input" style="height:28px; font-size:var(--fs-xs); max-width:320px;" placeholder="e.g. 4, 12, 18, 32, 47">
-            <button class="btn btn-primary btn-sm" id="btn-apply-absentees" style="${isPractical ? 'background:var(--practical); border-color:var(--practical);' : ''}">
-              Apply Absentees
+            <select id="quick-mark-mode" class="select" style="height:28px; font-size:11.5px; padding:2px 8px; width:auto;">
+              <option value="absent" ${quickMarkMode === 'absent' ? 'selected' : ''}>Mark Absent Students</option>
+              <option value="present" ${quickMarkMode === 'present' ? 'selected' : ''}>Mark Present Students</option>
+            </select>
+            <input type="text" id="quick-roll-input" class="input" style="height:28px; font-size:var(--fs-xs); flex:1; min-width:180px; max-width:340px;" placeholder="Roll Nos: e.g. 4, 12, 18, 32, 47">
+            <button class="btn btn-primary btn-sm" id="btn-apply-quick-mark" style="${isPractical ? 'background:var(--practical); border-color:var(--practical);' : ''}">
+              Apply
             </button>
           </div>
           <span style="font-size:11px; color:var(--ink-secondary);">
-            Enter absentee roll numbers. All unlisted students remain Present.
+            Enters roll numbers and automatically calculates remaining students.
           </span>
         </div>
       </div>
@@ -174,22 +187,25 @@ const MarkAttendanceView = (() => {
           </div>
         </div>
 
-        <!-- Sticky Live Headcount Bar -->
+        <!-- Sticky Live Headcount & Exceptions Filter Bar -->
         <div class="register-counts-sticky">
           <div class="count-pills">
             <span class="pill pill-total">Total: ${students.length}</span>
             <span class="pill pill-present" id="count-present">Present: ${counts.present}</span>
             <span class="pill pill-absent" id="count-absent">Absent: ${counts.absent}</span>
             <span class="pill pill-late" id="count-late">Late: ${counts.late}</span>
+            ${counts.unmarked > 0 ? `<span class="pill pill-warn" id="count-unmarked" style="background:var(--warn-subtle); color:var(--warn-ink); border:1px solid var(--warn-border);">Unmarked: ${counts.unmarked}</span>` : ''}
           </div>
 
-          <div style="display:flex; gap:4px;">
+          <div style="display:flex; gap:4px; flex-wrap:wrap;">
             <button class="btn btn-sm ${activeFilter === 'all' ? 'btn-secondary' : 'btn-ghost'}" data-filter="all">All (${students.length})</button>
-            <button class="btn btn-sm ${activeFilter === 'exceptions' ? 'btn-secondary' : 'btn-ghost'}" data-filter="exceptions" title="Show only Absentees & Late students">
-              Exceptions (${counts.absent + counts.late})
+            <button class="btn btn-sm ${activeFilter === 'exceptions' ? 'btn-secondary' : 'btn-ghost'}" data-filter="exceptions" title="Show only Absentees, Late and Unmarked students">
+              Only Exceptions (${counts.absent + counts.late + counts.unmarked})
             </button>
-            <button class="btn btn-sm ${activeFilter === 'absent' ? 'btn-secondary' : 'btn-ghost'}" data-filter="absent">Absentees (${counts.absent})</button>
+            <button class="btn btn-sm ${activeFilter === 'present' ? 'btn-secondary' : 'btn-ghost'}" data-filter="present">Present (${counts.present})</button>
+            <button class="btn btn-sm ${activeFilter === 'absent' ? 'btn-secondary' : 'btn-ghost'}" data-filter="absent">Absent (${counts.absent})</button>
             <button class="btn btn-sm ${activeFilter === 'late' ? 'btn-secondary' : 'btn-ghost'}" data-filter="late">Late (${counts.late})</button>
+            ${counts.unmarked > 0 ? `<button class="btn btn-sm ${activeFilter === 'unmarked' ? 'btn-secondary' : 'btn-ghost'}" data-filter="unmarked" style="color:var(--warn);">Unmarked (${counts.unmarked})</button>` : ''}
           </div>
         </div>
 
@@ -199,9 +215,9 @@ const MarkAttendanceView = (() => {
             <thead>
               <tr>
                 <th style="width: 45px; text-align: center;">#</th>
-                <th style="width: 80px;">Roll No</th>
-                <th>Student Name</th>
-                <th style="width: 140px; text-align: center;">Status (P / A / L)</th>
+                <th style="width: 80px;">Roll No.</th>
+                <th>Student</th>
+                <th style="width: 170px; text-align: center;">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -210,11 +226,11 @@ const MarkAttendanceView = (() => {
           </table>
         </div>
 
-        <!-- Sticky Footer Summary & Save -->
+        <!-- Sticky Footer Summary & Save with Safety Checks -->
         <div class="register-footer">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:var(--fs-sm); font-weight:650; color:var(--ink);">
-              Reconciled: ${counts.present} Present · ${counts.absent} Absent · ${counts.late} Late
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span style="font-size:var(--fs-sm); font-weight:650; color:var(--ink);" id="footer-reconciled-summary">
+              ${students.length} Total · ${counts.present} Present · ${counts.absent} Absent · ${counts.late} Late · ${counts.unmarked} Unmarked
             </span>
             <span style="font-size:var(--fs-xs); color:var(--ink-secondary); font-weight:500;">
               (${Utils.safePercent(counts.present + counts.late, students.length)}% Turnout)
@@ -248,7 +264,7 @@ const MarkAttendanceView = (() => {
     if (activeFilter === 'exceptions') {
       filtered = filtered.filter(s => {
         const st = studentStatusMap[s.id];
-        return st === 'absent' || st === 'late';
+        return st === 'absent' || st === 'late' || st === 'unmarked';
       });
     } else if (activeFilter !== 'all') {
       filtered = filtered.filter(s => studentStatusMap[s.id] === activeFilter);
@@ -258,7 +274,7 @@ const MarkAttendanceView = (() => {
       return `
         <tr>
           <td colspan="4" style="text-align:center; padding: 24px; color:var(--ink-secondary);">
-            No students match the active filter or query.
+            No students match the active filter or search query.
           </td>
         </tr>
       `;
@@ -267,7 +283,7 @@ const MarkAttendanceView = (() => {
     return filtered.map((stu, idx) => {
       const status = studentStatusMap[stu.id] || 'present';
       return `
-        <tr data-student-id="${stu.id}" tabindex="0" class="register-row ${status === 'absent' ? 'row-absent' : ''}">
+        <tr data-student-id="${stu.id}" tabindex="0" class="register-row ${status === 'absent' ? 'row-absent' : status === 'unmarked' ? 'row-unmarked' : ''}">
           <td style="color:var(--ink-tertiary); text-align: center; font-variant-numeric: tabular-nums; font-size: 11px;">
             ${String(idx + 1).padStart(2, '0')}
           </td>
@@ -296,24 +312,34 @@ const MarkAttendanceView = (() => {
     const present = vals.filter(v => v === 'present').length;
     const absent = vals.filter(v => v === 'absent').length;
     const late = vals.filter(v => v === 'late').length;
-    return { present, absent, late, total: vals.length };
+    const unmarked = vals.filter(v => v === 'unmarked' || !v).length;
+    return { present, absent, late, unmarked, total: vals.length };
   }
 
   function updateLivePills() {
     const counts = calculateCounts();
+    const students = State.getAllStudents();
     const p = document.getElementById('count-present');
     const a = document.getElementById('count-absent');
     const l = document.getElementById('count-late');
+    let u = document.getElementById('count-unmarked');
+
     if (p) p.textContent = `Present: ${counts.present}`;
     if (a) a.textContent = `Absent: ${counts.absent}`;
     if (l) l.textContent = `Late: ${counts.late}`;
+
+    const summaryEl = document.getElementById('footer-reconciled-summary');
+    if (summaryEl) {
+      summaryEl.textContent = `${students.length} Total · ${counts.present} Present · ${counts.absent} Absent · ${counts.late} Late · ${counts.unmarked} Unmarked`;
+    }
+
     const undoBtn = document.getElementById('btn-undo-mark');
     if (undoBtn) undoBtn.disabled = historyStack.length === 0;
   }
 
   function setStudentStatus(stuId, newStatus, recordHistory = true) {
     if (recordHistory) {
-      historyStack.push({ studentId: stuId, prevStatus: studentStatusMap[stuId] || 'present' });
+      historyStack.push({ studentId: stuId, prevStatus: studentStatusMap[stuId] || 'unmarked' });
     }
     studentStatusMap[stuId] = newStatus;
   }
@@ -355,32 +381,38 @@ const MarkAttendanceView = (() => {
       }, 120));
     }
 
-    // Quick Absent Roll Numbers
-    const applyAbsentBtn = container.querySelector('#btn-apply-absentees');
+    // Quick Mark Mode and Input
+    const quickModeSelect = container.querySelector('#quick-mark-mode');
+    if (quickModeSelect) {
+      quickModeSelect.addEventListener('change', (e) => {
+        quickMarkMode = e.target.value;
+      });
+    }
+
+    const applyQuickBtn = container.querySelector('#btn-apply-quick-mark');
     const quickRollInput = container.querySelector('#quick-roll-input');
-    if (applyAbsentBtn && quickRollInput) {
-      applyAbsentBtn.addEventListener('click', () => {
-        applyQuickAbsent(quickRollInput.value);
+    if (applyQuickBtn && quickRollInput) {
+      applyQuickBtn.addEventListener('click', () => {
+        applyQuickMark(quickRollInput.value, quickMarkMode);
       });
       quickRollInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          applyQuickAbsent(quickRollInput.value);
+          applyQuickMark(quickRollInput.value, quickMarkMode);
         }
       });
+    }
+
+    // Copy Previous Session
+    const copyPrevBtn = container.querySelector('#btn-copy-previous');
+    if (copyPrevBtn) {
+      copyPrevBtn.addEventListener('click', handleCopyPrevious);
     }
 
     // Undo action
     const undoBtn = container.querySelector('#btn-undo-mark');
     if (undoBtn) {
-      undoBtn.addEventListener('click', () => {
-        if (historyStack.length === 0) return;
-        const last = historyStack.pop();
-        studentStatusMap[last.studentId] = last.prevStatus;
-        refreshTable(container);
-        updateLivePills();
-        UI.toast('Undid last mark', 'info', 1000);
-      });
+      undoBtn.addEventListener('click', handleUndo);
     }
 
     container.querySelectorAll('[data-filter]').forEach(btn => {
@@ -393,8 +425,8 @@ const MarkAttendanceView = (() => {
     const allP = container.querySelector('#btn-quick-all-present');
     if (allP) {
       allP.addEventListener('click', () => {
-        State.getAllStudents().forEach(s => { setStudentStatus(s.id, 'present', false); });
-        historyStack = [];
+        historyStack.push({ fullSnapshot: { ...studentStatusMap } });
+        State.getAllStudents().forEach(s => { studentStatusMap[s.id] = 'present'; });
         render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
         UI.toast('All 60 students marked Present', 'info', 1500);
       });
@@ -403,8 +435,8 @@ const MarkAttendanceView = (() => {
     const allA = container.querySelector('#btn-quick-all-absent');
     if (allA) {
       allA.addEventListener('click', () => {
-        State.getAllStudents().forEach(s => { setStudentStatus(s.id, 'absent', false); });
-        historyStack = [];
+        historyStack.push({ fullSnapshot: { ...studentStatusMap } });
+        State.getAllStudents().forEach(s => { studentStatusMap[s.id] = 'absent'; });
         render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
         UI.toast('All 60 students marked Absent', 'info', 1500);
       });
@@ -413,6 +445,7 @@ const MarkAttendanceView = (() => {
     const resetBtn = container.querySelector('#btn-quick-reset');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
+        historyStack.push({ fullSnapshot: { ...studentStatusMap } });
         initSession(editingSessionId, selectedSubjectId, selectedStartTime, selectedSessionType);
         render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
         UI.toast('Register reset to default', 'info', 1500);
@@ -428,8 +461,16 @@ const MarkAttendanceView = (() => {
 
       setStudentStatus(stuId, newStatus, true);
 
-      group.querySelectorAll('.status-btn').forEach(b => { b.className = 'status-btn'; });
+      group.querySelectorAll('.status-btn').forEach(b => {
+        b.className = 'status-btn';
+      });
       btn.classList.add(`active-${newStatus}`);
+
+      const row = btn.closest('.register-row');
+      if (row) {
+        row.classList.toggle('row-absent', newStatus === 'absent');
+        row.classList.toggle('row-unmarked', newStatus === 'unmarked');
+      }
 
       updateLivePills();
     });
@@ -438,30 +479,94 @@ const MarkAttendanceView = (() => {
     if (saveBtn) saveBtn.addEventListener('click', handleSave);
   }
 
-  function applyQuickAbsent(inputStr) {
+  function handleUndo() {
+    if (historyStack.length === 0) return;
+    const last = historyStack.pop();
+    if (last.fullSnapshot) {
+      studentStatusMap = { ...last.fullSnapshot };
+    } else {
+      studentStatusMap[last.studentId] = last.prevStatus;
+    }
+    const container = document.getElementById('view-mark-attendance');
+    if (container) {
+      refreshTable(container);
+      updateLivePills();
+    }
+    UI.toast('Undid last change', 'info', 1200);
+  }
+
+  function applyQuickMark(inputStr, mode = 'absent') {
     if (!inputStr.trim()) return;
     const tokens = inputStr.split(/[\s,]+/).map(t => parseInt(t.trim(), 10)).filter(n => !isNaN(n));
     if (tokens.length === 0) {
-      UI.toast('Please enter valid roll numbers', 'error');
+      UI.toast('Please enter valid roll numbers (e.g. 4, 12, 18, 32, 47)', 'error');
       return;
     }
 
-    const absentSet = new Set(tokens);
+    const tokenSet = new Set(tokens);
     const students = State.getAllStudents();
-    let markedCount = 0;
+    historyStack.push({ fullSnapshot: { ...studentStatusMap } });
 
+    let matchCount = 0;
     students.forEach(s => {
-      if (absentSet.has(s.rollNumber)) {
-        setStudentStatus(s.id, 'absent', false);
-        markedCount++;
+      const isTarget = tokenSet.has(s.rollNumber);
+      if (mode === 'absent') {
+        if (isTarget) {
+          studentStatusMap[s.id] = 'absent';
+          matchCount++;
+        } else {
+          studentStatusMap[s.id] = 'present';
+        }
       } else {
-        setStudentStatus(s.id, 'present', false);
+        // Mode is present
+        if (isTarget) {
+          studentStatusMap[s.id] = 'present';
+          matchCount++;
+        } else {
+          studentStatusMap[s.id] = 'absent';
+        }
       }
     });
 
-    historyStack = [];
     render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
-    UI.toast(`Applied: ${markedCount} Absent, ${students.length - markedCount} Present`, 'success', 2500);
+    const counts = calculateCounts();
+    UI.toast(`Quick Mark applied: ${counts.present} Present, ${counts.absent} Absent`, 'success', 2500);
+  }
+
+  function handleCopyPrevious() {
+    if (!selectedSubjectId) {
+      UI.toast('Please select a course first', 'error');
+      return;
+    }
+
+    // Find the latest session for this subject and type
+    const sessions = State.getSessionsForSubject(selectedSubjectId)
+      .filter(s => s.type === selectedSessionType && s.id !== editingSessionId);
+
+    if (sessions.length === 0) {
+      UI.toast(`No previous ${selectedSessionType} session found for this course`, 'info', 2500);
+      return;
+    }
+
+    const prevSession = sessions[0]; // latest by date
+    const prevStats = Attendance.statsForSession(prevSession.id);
+    const sub = State.getSubject(selectedSubjectId);
+
+    UI.confirmDialog({
+      title: 'Copy Previous Attendance?',
+      message: `Copy attendance records from session on ${Utils.formatDate(prevSession.date)} (${prevSession.startTime}) for ${sub ? sub.name : 'this subject'} (${prevStats.present} Present, ${prevStats.absent} Absent)? You can modify any exceptions before saving.`,
+      confirmLabel: 'Copy Attendance',
+      danger: false
+    }).then(ok => {
+      if (!ok) return;
+      historyStack.push({ fullSnapshot: { ...studentStatusMap } });
+      const recs = State.getRecordsForSession(prevSession.id);
+      recs.forEach(r => {
+        studentStatusMap[r.studentId] = r.status;
+      });
+      render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
+      UI.toast(`Copied attendance from ${Utils.formatDate(prevSession.date)}`, 'success', 2000);
+    });
   }
 
   function initKeyboardShortcuts() {
@@ -469,11 +574,21 @@ const MarkAttendanceView = (() => {
     keyboardBound = true;
 
     document.addEventListener('keydown', (e) => {
-      const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
-
       const view = App.getCurrentView();
       if (view !== 'mark-attendance') return;
+
+      // Global undo Ctrl+Z or Cmd+Z
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+        const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        if (tag !== 'input' && tag !== 'textarea') {
+          e.preventDefault();
+          handleUndo();
+          return;
+        }
+      }
+
+      const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
       const key = e.key.toUpperCase();
       if (['P', 'A', 'L'].includes(key)) {
@@ -489,6 +604,9 @@ const MarkAttendanceView = (() => {
             const activeBtn = group.querySelector(`[data-val="${status}"]`);
             if (activeBtn) activeBtn.classList.add(`active-${status}`);
           }
+          row.classList.toggle('row-absent', status === 'absent');
+          row.classList.toggle('row-unmarked', false);
+
           updateLivePills();
           e.preventDefault();
         }
@@ -507,6 +625,30 @@ const MarkAttendanceView = (() => {
       return;
     }
 
+    const counts = calculateCounts();
+    if (counts.unmarked > 0) {
+      UI.confirmDialog({
+        title: 'Unmarked Students Detected',
+        message: `There are ${counts.unmarked} unmarked students in this session. Would you like to mark all unmarked students as Absent and save?`,
+        confirmLabel: 'Mark Unmarked as Absent & Save',
+        danger: true
+      }).then(ok => {
+        if (!ok) return;
+        // Mark remaining unmarked as absent
+        State.getAllStudents().forEach(s => {
+          if (!studentStatusMap[s.id] || studentStatusMap[s.id] === 'unmarked') {
+            studentStatusMap[s.id] = 'absent';
+          }
+        });
+        proceedSaveCheck();
+      });
+      return;
+    }
+
+    proceedSaveCheck();
+  }
+
+  function proceedSaveCheck() {
     if (!editingSessionId) {
       const dupe = State.findDuplicateSession(selectedSubjectId, selectedDate, selectedStartTime);
       if (dupe) {
