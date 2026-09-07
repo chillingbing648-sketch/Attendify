@@ -157,6 +157,19 @@ Attendify follows a **modern academic administration** design language inspired 
 
 Attendify is intentionally lightweight and uses browser-native technologies rather than a framework-heavy stack.
 
+<p align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" alt="HTML5">
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white" alt="CSS3">
+  <img src="https://img.shields.io/badge/JavaScript-ES2022%2B-F7DF1E?style=flat-square&logo=javascript&logoColor=111827" alt="JavaScript ES2022+">
+  <img src="https://img.shields.io/badge/SVG-FFB13B?style=flat-square&logo=svg&logoColor=111827" alt="SVG">
+  <img src="https://img.shields.io/badge/Web%20Storage-Offline--First-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Web Storage">
+  <img src="https://img.shields.io/badge/JSON-000000?style=flat-square&logo=json&logoColor=white" alt="JSON">
+  <img src="https://img.shields.io/badge/CSV-217346?style=flat-square&logo=microsoftexcel&logoColor=white" alt="CSV">
+  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git">
+  <img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub">
+  <img src="https://img.shields.io/badge/Responsive-Design-6B7280?style=flat-square&logo=googlechrome&logoColor=white" alt="Responsive Design">
+</p>
+
 ### Frontend
 
 | Technology | Role |
