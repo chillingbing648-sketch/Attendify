@@ -2,6 +2,18 @@
 
 ### SY BSc IT · Admin Attendance Management System
 
+<p align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" alt="HTML5">
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white" alt="CSS3">
+  <img src="https://img.shields.io/badge/JavaScript-ES2022%2B-F7DF1E?style=flat-square&logo=javascript&logoColor=111827" alt="JavaScript ES2022+">
+  <img src="https://img.shields.io/badge/SVG-FFB13B?style=flat-square&logo=svg&logoColor=111827" alt="SVG">
+  <img src="https://img.shields.io/badge/Web%20Storage-Offline--First-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Web Storage">
+  <img src="https://img.shields.io/badge/JSON-000000?style=flat-square&logo=json&logoColor=white" alt="JSON">
+  <img src="https://img.shields.io/badge/CSV-217346?style=flat-square&logo=microsoftexcel&logoColor=white" alt="CSV">
+  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git">
+  <img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub">
+</p>
+
 Attendify is a focused, offline-first web application for faculty and academic administrators to **record, manage, review, analyze, and report attendance** for a single **SY BSc IT batch of 60 students**.
 
 The product is designed around one principle:
@@ -157,43 +169,30 @@ Attendify follows a **modern academic administration** design language inspired 
 
 Attendify is intentionally lightweight and uses browser-native technologies rather than a framework-heavy stack.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" alt="HTML5">
-  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white" alt="CSS3">
-  <img src="https://img.shields.io/badge/JavaScript-ES2022%2B-F7DF1E?style=flat-square&logo=javascript&logoColor=111827" alt="JavaScript ES2022+">
-  <img src="https://img.shields.io/badge/SVG-FFB13B?style=flat-square&logo=svg&logoColor=111827" alt="SVG">
-  <img src="https://img.shields.io/badge/Web%20Storage-Offline--First-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Web Storage">
-  <img src="https://img.shields.io/badge/JSON-000000?style=flat-square&logo=json&logoColor=white" alt="JSON">
-  <img src="https://img.shields.io/badge/CSV-217346?style=flat-square&logo=microsoftexcel&logoColor=white" alt="CSV">
-  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" alt="Git">
-  <img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub">
-  <img src="https://img.shields.io/badge/Responsive-Design-6B7280?style=flat-square&logo=googlechrome&logoColor=white" alt="Responsive Design">
-</p>
-
 ### Frontend
 
 | Technology | Role |
 |---|---|
-| [![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](#) | Semantic application structure and accessible markup |
-| [![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](#) | Design system, responsive layouts, themes, print styles, and component styling |
-| [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=111827)](#) | Application logic, state, interactions, reporting, and business rules |
-| [![SVG](https://img.shields.io/badge/SVG-FFB13B?logo=svg&logoColor=111827)](#) | Lightweight UI iconography and data visualizations |
+| HTML5 | Semantic application structure and accessible markup |
+| CSS3 | Design system, responsive layouts, themes, print styles, and component styling |
+| JavaScript ES2022+ | Application logic, state, interactions, reporting, and business rules |
+| SVG | Lightweight UI iconography and data visualizations |
 
 ### Persistence & Data
 
 | Technology | Role |
 |---|---|
-| [![Web Storage](https://img.shields.io/badge/Web_Storage-Offline--First-4285F4?logo=googlechrome&logoColor=white)](#) | Local browser persistence without a required server database |
-| [![JSON](https://img.shields.io/badge/JSON-000000?logo=json&logoColor=white)](#) | Backup and restore format |
-| [![CSV](https://img.shields.io/badge/CSV-217346?logo=microsoft-excel&logoColor=white)](#) | Attendance and report export format |
+| Web Storage | Local browser persistence without a required server database |
+| JSON | Backup and restore format |
+| CSV | Attendance and report export format |
 
 ### Engineering & Delivery
 
 | Technology | Role |
 |---|---|
-| [![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white)](#) | Source control and version history |
-| [![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white)](#) | Repository hosting and project delivery |
-| [![Responsive](https://img.shields.io/badge/Responsive-Design-6B7280?logo=googlechrome&logoColor=white)](#) | Desktop, tablet, and mobile layouts |
+| Git | Source control and version history |
+| GitHub | Repository hosting and project delivery |
+| Responsive Design | Desktop, tablet, and mobile layouts |
 
 ### Application Architecture
 
