@@ -5,34 +5,34 @@
 
 :root {
   /* Apple/Linear Neutral Canvas */
-  --bg: #F5F6F8;
+  --bg: #F6F7F9;
   --surface: #FFFFFF;
-  --surface-subtle: #F0F2F5;
-  --surface-hover: #F8F9FA;
-  --surface-active: #E4E7EC;
+  --surface-subtle: #F1F3F6;
+  --surface-hover: #F8FAFC;
+  --surface-active: #E7EBF1;
 
-  --ink: #111827;
-  --ink-secondary: #4B5563;
-  --ink-tertiary: #9CA3AF;
+  --ink: #101828;
+  --ink-secondary: #526071;
+  --ink-tertiary: #8A96A8;
   --ink-inverse: #FFFFFF;
 
-  --border: #E5E7EB;
-  --border-strong: #D1D5DB;
-  --border-focus: #2563EB;
+  --border: #E2E7EE;
+  --border-strong: #CBD4E1;
+  --border-focus: #526DFF;
 
-  /* Refined Apple Indigo/Blue Accent */
-  --accent: #2563EB;
-  --accent-hover: #1D4ED8;
-  --accent-active: #1E40AF;
-  --accent-subtle: #EFF6FF;
-  --accent-ink: #1E3A8A;
-  --accent-border: #BFDBFE;
+  /* Sophisticated periwinkle accent: quieter than default bright blue */
+  --accent: #526DFF;
+  --accent-hover: #435BE4;
+  --accent-active: #3447BD;
+  --accent-subtle: #EEF1FF;
+  --accent-ink: #3546A8;
+  --accent-border: #C9D0FF;
 
   /* Distinct Visual Treatment for Practical Sessions (Emerald/Teal) */
-  --practical: #0D9488;
-  --practical-subtle: #F0FDFA;
-  --practical-ink: #115E59;
-  --practical-border: #99F6E4;
+  --practical: #159C93;
+  --practical-subtle: #EAF9F7;
+  --practical-ink: #0B665F;
+  --practical-border: #A5E2DD;
 
   /* Status Colors */
   --safe: #10B981;
@@ -59,16 +59,19 @@
   --sp-6: 24px;
   --sp-8: 32px;
 
-  /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Typography — editorial admin system */
+  --font-sans: "Manrope", "Segoe UI", sans-serif;
+  --font-display: "Instrument Sans", "Manrope", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --fs-xs: 11px;
+  --fs-xs: 10.5px;
   --fs-sm: 12.5px;
   --fs-base: 13.5px;
   --fs-md: 15px;
   --fs-lg: 18px;
   --fs-xl: 21px;
+  --fs-2xl: 26px;
+  --fs-3xl: 30px;
 
   /* Radii */
   --r-xs: 4px;
@@ -100,26 +103,29 @@
   --ink-tertiary: #6B7280;
   --ink-inverse: #0B0F19;
 
-  --border: #1F2937;
-  --border-strong: #374151;
+  --border: #202B3E;
+  --border-strong: #304058;
 
-  --accent-subtle: rgba(37, 99, 235, 0.16);
-  --accent-ink: #93C5FD;
-  --accent-border: rgba(37, 99, 235, 0.35);
+  --accent: #7187FF;
+  --accent-hover: #8396FF;
+  --accent-active: #5D73E5;
+  --accent-subtle: rgba(113, 135, 255, 0.13);
+  --accent-ink: #B7C1FF;
+  --accent-border: rgba(113, 135, 255, 0.30);
 
-  --practical-subtle: rgba(13, 148, 136, 0.16);
+  --practical-subtle: rgba(21, 156, 147, 0.12);
   --practical-ink: #5EEAD4;
   --practical-border: rgba(13, 148, 136, 0.35);
 
-  --safe-subtle: rgba(16, 185, 129, 0.16);
+  --safe-subtle: rgba(50, 194, 138, 0.12);
   --safe-ink: #6EE7B7;
   --safe-border: rgba(16, 185, 129, 0.35);
 
-  --warn-subtle: rgba(245, 158, 11, 0.16);
+  --warn-subtle: rgba(216, 163, 61, 0.13);
   --warn-ink: #FDE68A;
   --warn-border: rgba(245, 158, 11, 0.35);
 
-  --critical-subtle: rgba(239, 68, 68, 0.16);
+  --critical-subtle: rgba(232, 106, 106, 0.12);
   --critical-ink: #FCA5A5;
   --critical-border: rgba(239, 68, 68, 0.35);
 
@@ -227,10 +233,11 @@ body {
 }
 
 .nav-section-title {
-  font-size: 10px;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.10em;
   color: var(--ink-tertiary);
   padding: 8px 10px 4px 10px;
   margin-top: 4px;
@@ -238,6 +245,7 @@ body {
 .nav-section-title:first-child { margin-top: 0; }
 
 .nav-item {
+  font-family: var(--font-sans);
   display: flex;
   align-items: center;
   gap: 9px;
