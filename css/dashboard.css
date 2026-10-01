@@ -58,13 +58,15 @@
 }
 
 .session-category-title {
-  font-size: 13px;
+  font-family: var(--font-display);
+  font-size: 14px;
   font-weight: 700;
   color: var(--ink);
   letter-spacing: -0.01em;
 }
 
 .session-category-subtitle {
+  font-family: var(--font-sans);
   font-size: 11px;
   color: var(--ink-secondary);
 }
@@ -102,8 +104,9 @@
 }
 
 .today-session-name {
-  font-weight: 650;
-  font-size: 13.5px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
   color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
@@ -143,6 +146,7 @@
 }
 
 .segmented-tab {
+  font-family: var(--font-sans);
   border: none;
   background: transparent;
   padding: 5px 14px;
@@ -187,7 +191,8 @@
 }
 
 .register-bar-field label {
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 10px;
   font-weight: 600;
   color: var(--ink-secondary);
 }
@@ -368,8 +373,9 @@
 }
 
 .chart-card-head h3 {
-  font-size: 13px;
-  font-weight: 650;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
   color: var(--ink);
 }
 
