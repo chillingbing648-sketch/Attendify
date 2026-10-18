@@ -182,6 +182,12 @@
   #rapid-mode-container > div[style*="grid-template-columns:1fr 320px"] {
     grid-template-columns: 1fr !important;
   }
+
+  /* QR Attendance Studio Responsive Adaptations */
+  #view-qr-attendance div[style*="grid-template-columns: 360px 1fr"],
+  #view-qr-attendance div[style*="grid-template-columns:360px 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* ============================================================

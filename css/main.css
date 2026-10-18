@@ -895,6 +895,7 @@ html, body, * {
 /* High-Density Workbenches */
 #view-mark-attendance,
 #view-rapid-roll,
+#view-qr-attendance,
 #view-students,
 #view-history,
 #view-subjects {

@@ -17,10 +17,18 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+const qrBackend = require('./qr-backend.js');
+
 const server = http.createServer((req, res) => {
   // Normalize URL and remove query params
   const parsedUrl = new URL(req.url, `http://localhost:${PORT}`);
   let pathname = decodeURIComponent(parsedUrl.pathname);
+
+  // Intercept QR Code Attendance Backend API routes
+  if (pathname.startsWith('/api/qr/')) {
+    qrBackend.handleApiRequest(req, res, parsedUrl);
+    return;
+  }
 
   if (pathname === '/' || pathname === '') {
     pathname = '/index.html';

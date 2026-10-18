@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Attendify — Student QR Check-In</title>
+<meta name="description" content="Secure student attendance verification for SY BSc IT cohort.">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface-subtle: #F0EDF7;
+    --ink: #1C1F33;
+    --ink-secondary: #4E526D;
+    --ink-tertiary: #787D9C;
+    --accent: #51458A;
+    --accent-hover: #40356F;
+    --safe: #178568;
+    --safe-subtle: rgba(23, 133, 104, 0.12);
+    --warn: #C28A25;
+    --critical: #C94B50;
+    --critical-subtle: rgba(201, 75, 80, 0.12);
+    --border: #E7E4DE;
+    --border-strong: #D5D1C7;
+    --r-md: 10px;
+    --r-lg: 14px;
+    --shadow-md: 0 4px 14px rgba(32, 36, 58, 0.08);
+  }
+
+  [data-theme="dark"] {
+    --bg: #141522;
+    --surface: #1C1E30;
+    --surface-subtle: #25283F;
+    --ink: #F6F4FD;
+    --ink-secondary: #B4B9D6;
+    --ink-tertiary: #878CAE;
+    --border: rgba(255, 255, 255, 0.09);
+    --border-strong: rgba(255, 255, 255, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Quicksand', -apple-system, sans-serif;
+    background-color: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    line-height: 1.5;
+  }
+
+  .checkin-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    width: 100%;
+    max-width: 440px;
+    padding: 28px 24px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .brand-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .brand-logo { width: 34px; height: 34px; }
+  .brand-title { font-size: 19px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+  .brand-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    background: var(--surface-subtle);
+    color: var(--accent);
+    border-radius: 4px;
+    border: 1px solid rgba(81,69,138,0.2);
+  }
+
+  .session-info-strip {
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+
+  .session-info-strip strong { color: var(--ink); }
+  .session-info-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .session-info-row:last-child { margin-bottom: 0; }
+
+  .form-group {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  select, input {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  select:focus, input:focus {
+    border-color: var(--accent);
+  }
+
+  .btn {
+    width: 100%;
+    height: 44px;
+    background: var(--accent);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--r-md);
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .status-banner {
+    border-radius: var(--r-md);
+    padding: 14px;
+    margin-top: 18px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    display: none;
+  }
+
+  .status-banner.success {
+    display: block;
+    background: var(--safe-subtle);
+    border: 1px solid rgba(23,133,104,0.3);
+    color: var(--safe);
+  }
+
+  .status-banner.error {
+    display: block;
+    background: var(--critical-subtle);
+    border: 1px solid rgba(201,75,80,0.3);
+    color: var(--critical);
+  }
+
+  .security-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--ink-tertiary);
+    margin-top: 16px;
+    font-weight: 500;
+  }
+
+  .security-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--safe);
+  }
+</style>
+</head>
+<body>
+
+<div class="checkin-card">
+  <div class="brand-header">
+    <svg class="brand-logo" viewBox="0 0 64 64" fill="none">
+      <rect x="2" y="2" width="60" height="60" rx="16" fill="#1C1D30"/>
+      <path d="M19 47L29.5 17.2C30.4 14.6 33.6 14.6 34.5 17.2L45 47" stroke="#B8A9F8" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M22 35L29.5 41.5L46 22" stroke="#2CD5A4" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="32" cy="14.5" r="2.2" fill="#FFFFFF"/>
+    </svg>
+    <span class="brand-title">Attendify</span>
+    <span class="brand-badge">ACADEMIC QR</span>
+  </div>
+
+  <div class="session-info-strip" id="session-info">
+    <div class="session-info-row">
+      <span style="color:var(--ink-secondary);">Cohort:</span>
+      <strong>SY BSc IT (60 Students)</strong>
+    </div>
+    <div class="session-info-row">
+      <span style="color:var(--ink-secondary);">Session ID:</span>
+      <strong id="session-id-display">Loading...</strong>
+    </div>
+    <div class="session-info-row">
+      <span style="color:var(--ink-secondary);">Token Status:</span>
+      <strong style="color:var(--safe);" id="token-status-display">Checking server...</strong>
+    </div>
+  </div>
+
+  <form id="checkin-form">
+    <div class="form-group">
+      <label for="student-select">Select Your Enrolled Identity</label>
+      <select id="student-select" required>
+        <option value="">— Choose your Name & Roll No. —</option>
+      </select>
+    </div>
+
+    <div class="form-group" style="flex-direction:row; align-items:center; gap:8px;">
+      <input type="checkbox" id="remember-me" style="width:16px; height:16px; cursor:pointer;" checked>
+      <label for="remember-me" style="font-size:12px; font-weight:500; cursor:pointer; color:var(--ink-secondary);">
+        Remember my identity on this phone/browser
+      </label>
+    </div>
+
+    <button type="submit" class="btn" id="btn-submit">
+      <span>Confirm Attendance Check-In</span>
+    </button>
+  </form>
+
+  <div class="status-banner" id="status-banner"></div>
+
+  <div class="security-indicator">
+    <span class="security-dot"></span>
+    <span>Server-side cryptographic token validation active</span>
+  </div>
+</div>
+
+<script>
+  // Standard SY BSc IT 60 Enrolled Students list
+  const ENROLLED_STUDENTS = [
+    { roll: 1, name: "Aarav Patel" }, { roll: 2, name: "Ananya Sharma" }, { roll: 3, name: "Rohan Gupta" },
+    { roll: 4, name: "Priya Nair" }, { roll: 5, name: "Aditya Verma" }, { roll: 6, name: "Sneha Kulkarni" },
+    { roll: 7, name: "Vikram Singh" }, { roll: 8, name: "Neha Joshi" }, { roll: 9, name: "Rahul Deshmukh" },
+    { roll: 10, name: "Pooja Mehta" }, { roll: 11, name: "Kunal Shah" }, { roll: 12, name: "Ritu Mishra" },
+    { roll: 13, name: "Siddharth Rao" }, { roll: 14, name: "Divya Bhat" }, { roll: 15, name: "Varun Chopra" },
+    { roll: 16, name: "Tanvi Iyer" }, { roll: 17, name: "Gaurav Sen" }, { roll: 18, name: "Ishita Roy" },
+    { roll: 19, name: "Mayur Patil" }, { roll: 20, name: "Kavita Reddy" }, { roll: 21, name: "Alok Tiwari" },
+    { roll: 22, name: "Swati Pandey" }, { roll: 23, name: "Harsh Vardhan" }, { roll: 24, name: "Deepa Menon" },
+    { roll: 25, name: "Nikhil Shinde" }, { roll: 26, name: "Shruti Saxena" }, { roll: 27, name: "Prateek Dubey" },
+    { roll: 28, name: "Anjali Pillai" }, { roll: 29, name: "Akash Jha" }, { roll: 30, name: "Meera Nambiar" },
+    { roll: 31, name: "Saurabh More" }, { roll: 32, name: "Preeti Hegde" }, { roll: 33, name: "Omkar Jadhav" },
+    { roll: 34, name: "Bhavna Jain" }, { roll: 35, name: "Ashwin Bhatt" }, { roll: 36, name: "Komal Sethi" },
+    { roll: 37, name: "Yash Gaikwad" }, { roll: 38, name: "Mansi Dixit" }, { roll: 39, name: "Tejas Sawant" },
+    { roll: 40, name: "Namrata Bose" }, { roll: 41, name: "Abhishek Das" }, { roll: 42, name: "Payal Ghosh" },
+    { roll: 43, name: "Sanket Tambe" }, { roll: 44, name: "Rashmi Kamat" }, { roll: 45, name: "Vikas Chauhan" },
+    { roll: 46, name: "Monika Rawat" }, { roll: 47, name: "Sameer Wagh" }, { roll: 48, name: "Archana Soni" },
+    { roll: 49, name: "Chetan Solanki" }, { roll: 50, name: "Suman Tripathi" }, { roll: 51, name: "Bhavesh Rane" },
+    { roll: 52, name: "Aarti Shukla" }, { roll: 53, name: "Rohit Mane" }, { roll: 54, name: "Kiran Waghmare" },
+    { roll: 55, name: "Dinesh Parab" }, { roll: 56, name: "Pallavi Date" }, { roll: 57, name: "Mahesh Gurav" },
+    { roll: 58, name: "Urmila Bagwe" }, { roll: 59, name: "Girish Ghag" }, { roll: 60, name: "Shalini Shirke" }
+  ];
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionId = urlParams.get('s') || urlParams.get('session') || '';
+  const token = urlParams.get('t') || urlParams.get('token') || '';
+
+  const select = document.getElementById('student-select');
+  const banner = document.getElementById('status-banner');
+  const sessionDisplay = document.getElementById('session-id-display');
+  const tokenDisplay = document.getElementById('token-status-display');
+  const submitBtn = document.getElementById('btn-submit');
+
+  sessionDisplay.textContent = sessionId ? sessionId.slice(0, 16) + '...' : 'None (Manual Mode)';
+  tokenDisplay.textContent = token ? 'Active Token Attached' : 'Missing Token';
+
+  // Populate student list
+  const savedRoll = localStorage.getItem('attendify:student_roll');
+  ENROLLED_STUDENTS.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.roll;
+    opt.textContent = `Roll #${String(s.roll).padStart(2, '0')} — ${s.name}`;
+    if (savedRoll && parseInt(savedRoll, 10) === s.roll) {
+      opt.selected = true;
+    }
+    select.appendChild(opt);
+  });
+
+  if (!sessionId || !token) {
+    banner.className = 'status-banner error';
+    banner.innerHTML = '<strong>No Active QR Session Detected:</strong><br>Please scan the active rotating QR code projected in class using your camera.';
+    submitBtn.disabled = true;
+  }
+
+  document.getElementById('checkin-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const roll = parseInt(select.value, 10);
+    if (!roll) return;
+
+    const student = ENROLLED_STUDENTS.find(s => s.roll === roll);
+    if (!student) return;
+
+    if (document.getElementById('remember-me').checked) {
+      localStorage.setItem('attendify:student_roll', String(roll));
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Verifying token with server...</span>';
+    banner.style.display = 'none';
+
+    try {
+      const res = await fetch('/api/qr/session/checkin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          token,
+          studentId: 'stu_' + roll,
+          rollNumber: roll,
+          studentName: student.name
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        banner.className = 'status-banner success';
+        banner.innerHTML = `<strong>✓ Check-In Verified &amp; Recorded!</strong><br>Roll #${String(roll).padStart(2, '0')} (${student.name}) marked Present.<br><span style="font-size:11px; opacity:0.85;">Server Timestamp: ${new Date(data.checkedInAt).toLocaleTimeString()}</span>`;
+        submitBtn.innerHTML = '<span>✓ Attendance Confirmed</span>';
+      } else {
+        banner.className = 'status-banner error';
+        banner.innerHTML = `<strong>Check-In Rejected:</strong><br>${data.message || data.error}`;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Try Again</span>';
+      }
+    } catch (err) {
+      banner.className = 'status-banner error';
+      banner.innerHTML = '<strong>Connection Error:</strong><br>Unable to contact attendance server. Please ensure you are connected to the campus network.';
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Try Again</span>';
+    }
+  });
+</script>
+
+</body>
+</html>

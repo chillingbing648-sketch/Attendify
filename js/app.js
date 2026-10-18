@@ -3,7 +3,7 @@
    ============================================================ */
 
 const App = (() => {
-  const VIEWS = ['dashboard', 'rapid-roll', 'mark-attendance', 'students', 'subjects', 'history', 'analytics', 'reports', 'practical-reports', 'timetable', 'settings'];
+  const VIEWS = ['dashboard', 'rapid-roll', 'mark-attendance', 'students', 'subjects', 'history', 'analytics', 'reports', 'practical-reports', 'timetable', 'qr-attendance', 'settings'];
   let currentView = 'dashboard';
 
   const VIEW_TITLES = {
@@ -17,6 +17,7 @@ const App = (() => {
     'reports': 'Reports & Summary',
     'practical-reports': 'Practical Reports',
     'timetable': 'Timetable',
+    'qr-attendance': 'QR Attendance',
     'settings': 'Settings & Backup'
   };
 
@@ -54,6 +55,7 @@ const App = (() => {
       title: 'System',
       items: [
         { id: 'timetable', label: 'Timetable', icon: 'timetable' },
+        { id: 'qr-attendance', label: 'QR Attendance', icon: 'qrcode' },
         { id: 'settings', label: 'Settings & Backup', icon: 'settings' }
       ]
     }
@@ -187,6 +189,7 @@ const App = (() => {
           <div class="view" id="view-reports" data-view="reports"></div>
           <div class="view" id="view-practical-reports" data-view="practical-reports"></div>
           <div class="view" id="view-timetable" data-view="timetable"></div>
+          <div class="view" id="view-qr-attendance" data-view="qr-attendance"></div>
           <div class="view" id="view-settings" data-view="settings"></div>
         </div>
       </div>
@@ -270,6 +273,9 @@ const App = (() => {
   }
 
   function navigateTo(viewId) {
+    if (currentView === 'qr-attendance' && viewId !== 'qr-attendance' && typeof QRAttendanceView !== 'undefined' && QRAttendanceView.cleanup) {
+      QRAttendanceView.cleanup();
+    }
     if (!VIEWS.includes(viewId)) viewId = 'dashboard';
     currentView = viewId;
 
@@ -608,6 +614,7 @@ const App = (() => {
       case 'reports': ReportsView.render(); break;
       case 'practical-reports': PracticalReportsView.render(); break;
       case 'timetable': Timetable.render(); break;
+      case 'qr-attendance': QRAttendanceView.render(); break;
       case 'settings': SettingsView.render(); break;
     }
   }
@@ -618,6 +625,10 @@ const App = (() => {
     const themeParam = urlParams.get('theme');
     const activeTheme = themeParam || State.get().settings.theme || 'light';
     UI.applyTheme(activeTheme);
+
+    if (typeof QRAttendanceView !== 'undefined' && QRAttendanceView.checkServerHealth) {
+      QRAttendanceView.checkServerHealth();
+    }
 
     buildShell();
 

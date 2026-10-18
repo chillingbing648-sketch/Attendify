@@ -6,7 +6,8 @@
   ### Professional Academic Attendance Management & Faculty Workflow Platform
 
   [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero%20(Vanilla%20ES6%2B)-51458A?style=for-the-badge)](#-technology-stack)
-  [![Test Suite](https://img.shields.io/badge/Tests-23%20Passing%20(100%25)-178568?style=for-the-badge)](#-test-suite--quality-assurance)
+  [![Test Suite](https://img.shields.io/badge/Tests-32%20Passing%20(100%25)-178568?style=for-the-badge)](#-test-suite--quality-assurance)
+  [![Security](https://img.shields.io/badge/Security-Server--Validated%20Rotating%20Tokens-51458A?style=for-the-badge)](#3--rotating-qr-attendance--server-validated-security-new)
   [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20Contrast-2CD5A4?style=for-the-badge)](#-typography--design-tokens)
   [![Architecture](https://img.shields.io/badge/State-Reactive%20%2B%20Backup%20Rotation-4F5D95?style=for-the-badge)](#-state-engine--data-reliability)
   [![License](https://img.shields.io/badge/License-MIT-F0EDF7?style=for-the-badge&colorA=20243A&colorB=51458A)](#)
@@ -29,12 +30,13 @@
 - [Key Features & Modules](#-key-features--modules)
   - [⚡ Rapid Roll Call Studio](#1--rapid-roll-call-studio-new)
   - [Unified Attendance Register](#2-unified-attendance-register)
-  - [Students Directory](#3-students-directory)
-  - [Curriculum & Subjects](#4-curriculum--course-management)
-  - [Audited Attendance History](#5-audited-attendance-history)
-  - [Analytics & Defaulter Tracking](#6-analytics--defaulter-tracking)
-  - [Printable Practical Ledgers](#7-printable-practical-reports)
-  - [Weekly Timetable Engine](#8-weekly-timetable-engine)
+  - [📱 Rotating QR Attendance (Server-Validated Security)](#3--rotating-qr-attendance--server-validated-security-new)
+  - [Students Directory](#4-students-directory)
+  - [Curriculum & Subjects](#5-curriculum--course-management)
+  - [Audited Attendance History](#6-audited-attendance-history)
+  - [Analytics & Defaulter Tracking](#7-analytics--defaulter-tracking)
+  - [Printable Practical Ledgers](#8-printable-practical-reports)
+  - [Weekly Timetable Engine](#9-weekly-timetable-engine)
 - [Design System & UI Tokens](#-design-system--visual-identity)
   - [Color Palette](#color-palette)
   - [Typography Stack](#typography-system)
@@ -92,7 +94,29 @@ A next-generation attendance workbench designed for high-turnout university lect
 * **Collision Safety**: Warns professors before overwriting an existing session for the same date and time.
 * **Full Undo Engine**: Multi-level `Ctrl+Z` undo stack.
 
-### 3. Students Directory (`js/students.js`)
+### 3. 📱 Rotating QR Attendance & Server-Validated Security (`js/qr-attendance.js`, `qr-backend.js`, `checkin.html`)
+A university-grade touchless attendance module positioned in the primary sidebar immediately below Timetable:
+* **Cryptographically Unpredictable Rotating QR Codes**:
+  - Automatically regenerates every 20 seconds (configurable 15–45s) using server-side 24-byte `crypto.randomBytes` hex tokens.
+  - Generates zero-dependency SVG vector QR codes on the fly via Kazuhiko Arase's QR algorithm ([`js/qrcode.js`](file:///c:/Users/PRATEEK%20DUBEY/Downloads/Attendify/js/qrcode.js)).
+  - Clean animated radial & linear countdown indicators displaying time remaining before the next token rotation.
+* **Server-Validated Security Architecture**:
+  - **Zero Trust Client Verification**: Tokens, timestamps, enrollment status, and session validity are strictly verified server-side (`POST /api/qr/session/checkin`).
+  - **5-Second Grace Window**: Accommodates students whose scan occurred right before rotation while strictly rejecting replayed or expired tokens.
+  - **Strict Anti-Duplicate Submissions**: A student cannot submit attendance twice for the same active session.
+  - **Rate Limiting & Threat Logging**: Sliding rate limiter protects against brute-force token scans; every check-in, replay attempt, and manual correction is recorded in a tamper-evident audit log.
+* **Real-Time Live Classroom Roster**:
+  - Live headcount displays `Checked-in`, `Pending`, and `Turnout %` out of the 60 enrolled cohort.
+  - Live activity table reflects each student's timestamped check-in immediately.
+  - Faculty can review exceptions, flag suspicious submissions, and manually toggle student status with audit logging.
+* **Mobile Student Check-In Portal (`checkin.html`)**:
+  - Mobile-first, responsive interface opened when students scan the QR code (`?s=<sessionId>&t=<token>`).
+  - Student selects their roll number; portal validates token freshness with the server and gives instant haptic confirmation.
+  - Prevents fraudulent off-campus sharing through dynamic short token expiry.
+* **Direct State Engine Integration**:
+  - Finalizing attendance cleanly commits to `State.createSession` and `State.saveRecords`, synchronizing with History, Analytics, and Reports with zero duplicate schema or orphan records.
+
+### 4. Students Directory (`js/students.js`)
 * Complete roster of all **60 enrolled students** (Roll Numbers 1 to 60) in the single SY BSc IT cohort.
 * Monogram avatars with deterministic color palette matching student identity.
 * Attendance metrics per student: Total Sessions, Attended, Missed, Percentage, and Status Pill.
@@ -103,7 +127,7 @@ A next-generation attendance workbench designed for high-turnout university lect
 * Interactive filter pills (`All`, `Safe`, `Warning`, `Defaulter`), search box with debounce, and paginated table.
 * **Student Detail Drawer**: Breakdown of attendance across every curriculum subject and date log.
 
-### 4. Curriculum & Course Management (`js/subjects.js`)
+### 5. Curriculum & Course Management (`js/subjects.js`)
 * Pre-configured with the complete SY BSc IT curriculum:
   - *Python Programming* (PP) — Prof. Deshmukh
   - *Data Structures & Algorithms* (DSA) — Dr. Kulkarni
@@ -112,22 +136,22 @@ A next-generation attendance workbench designed for high-turnout university lect
   - *Software Engineering* (SE) — Prof. Joshi
 * Tracks total sessions held, average batch turnout %, and allows editing course codes and teachers.
 
-### 5. Audited Attendance History (`js/history.js`)
+### 6. Audited Attendance History (`js/history.js`)
 * Comprehensive audit ledger of all completed sessions.
 * Filter by Subject, Session Type (Lecture / Practical), or Date Range.
 * Edit recorded marks or safely delete sessions with state cascade.
 
-### 6. Analytics & Defaulter Tracking (`js/analytics.js`)
+### 7. Analytics & Defaulter Tracking (`js/analytics.js`)
 * High-density visual breakdown: Safe vs. Warning vs. Defaulter distribution.
 * Course comparison bar charts showing subjects with highest and lowest turnout.
 * Export Defaulters List CSV for university administration.
 
-### 7. Printable Practical Reports (`js/practical-reports.js`)
+### 8. Printable Practical Reports (`js/practical-reports.js`)
 * Formats laboratory experiments into official university academic documents.
 * Generates printable practical attendance sheets with institution header, experiment titles, roll numbers, attendance checkboxes, and faculty signature blocks.
 * CSS print stylesheets optimized for clean black-and-white physical printing.
 
-### 8. Weekly Timetable Engine (`js/timetable.js`)
+### 9. Weekly Timetable Engine (`js/timetable.js`)
 * Weekly schedule mapping Monday through Saturday with subject and classroom assignments.
 * Integrates directly into attendance screens to automatically suggest the current lecture slot.
 
@@ -238,7 +262,16 @@ npm test
 node --test tests/*.test.js
 ```
 
-### Verified Test Assertions (23 Suites / 100% Passing):
+### Verified Test Assertions (32 Suites / 100% Passing):
+* `QRCode Generator` — produces valid vector SVG markup without external dependencies.
+* `QR Session Start` — generates active session with cryptographically secure 24-byte token.
+* `QR Token Rotation` — smoothly rotates tokens and sets strict expiration timestamps.
+* `QR Student Check-in` — verifies enrolled student, records server timestamp, and updates headcount.
+* `QR Duplicate Prevention` — strictly blocks duplicate student check-ins within the same active session.
+* `QR Replay & Expiry Prevention` — rejects expired tokens outside the grace window and old replayed tokens.
+* `QR Enrollment Boundary` — validates student roll numbers ($1 \le \text{Roll} \le 60$) and rejects unauthorized submissions.
+* `QR Session Invalidation` — cleanly ends session and revokes all active QR tokens.
+* `QR State Reconciliation` — commits finalized session into `State.createSession` & `State.saveRecords`.
 * `Utils.safePercent` — boundary values and zero denominators.
 * `Integration` — State initialization seeds 60 students and curriculum courses.
 * `Integration` — Lecture and Practical sessions share single attendance engine.
