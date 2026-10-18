@@ -29,10 +29,16 @@ const AnalyticsView = (() => {
       <div class="view-header">
         <div>
           <h1>Batch Analytics</h1>
-          <p class="view-subtitle">SY BSc IT · Real Attendance Performance, Distribution & Trends</p>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:5px; flex-wrap:wrap;">
+            <div class="topbar-badge">
+              <span class="topbar-badge-dot"></span>
+              SY BSc IT Cohort Performance · 60 Students
+            </div>
+            <span style="font-size:12px; color:var(--ink-tertiary);">Distribution, Defaulter Radar & Subject Trends</span>
+          </div>
         </div>
         <div class="view-header-actions">
-          <button class="btn btn-outline" onclick="App.navigateTo('reports')">
+          <button class="btn btn-secondary" onclick="App.navigateTo('reports')">
             ${UI.icon('download')} Reports & Exports
           </button>
         </div>
@@ -40,13 +46,13 @@ const AnalyticsView = (() => {
 
       <!-- Smart Admin Insights Strip (Prompt 19) -->
       ${insights.length > 0 ? `
-        <div class="section">
-          <div style="display:flex; flex-direction:column; gap:8px;">
+        <div class="section" style="margin-bottom:22px;">
+          <div style="display:flex; flex-direction:column; gap:9px;">
             ${insights.map(item => `
-              <div class="card" style="padding:10px 14px; border-left:4px solid ${item.type === 'critical' ? 'var(--critical)' : item.type === 'warn' ? 'var(--warn)' : 'var(--accent)'}; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span style="color:${item.type === 'critical' ? 'var(--critical)' : item.type === 'warn' ? 'var(--warn)' : 'var(--accent)'};">${UI.icon('alert')}</span>
-                  <span style="font-size:12.5px; font-weight:600; color:var(--ink);">${Utils.escapeHTML(item.text)}</span>
+              <div class="card" style="padding:12px 18px; border-left:4px solid ${item.type === 'critical' ? 'var(--critical)' : item.type === 'warn' ? 'var(--warn)' : 'var(--accent)'}; background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="color:${item.type === 'critical' ? 'var(--critical)' : item.type === 'warn' ? 'var(--warn)' : 'var(--accent)'}; font-size:17px;">${UI.icon('alert')}</span>
+                  <span style="font-size:13px; font-weight:650; color:var(--ink); letter-spacing:-0.01em;">${Utils.escapeHTML(item.text)}</span>
                 </div>
                 <button class="btn btn-outline btn-sm insight-action-btn" data-view="${item.actionView}" data-prefill-sub="${item.prefillSubjectId || ''}" data-prefill-time="${item.prefillTime || ''}" data-prefill-type="${item.prefillType || ''}">
                   ${item.actionLabel} →

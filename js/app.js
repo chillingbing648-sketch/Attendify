@@ -3,11 +3,12 @@
    ============================================================ */
 
 const App = (() => {
-  const VIEWS = ['dashboard', 'mark-attendance', 'students', 'subjects', 'history', 'analytics', 'reports', 'practical-reports', 'timetable', 'settings'];
+  const VIEWS = ['dashboard', 'rapid-roll', 'mark-attendance', 'students', 'subjects', 'history', 'analytics', 'reports', 'practical-reports', 'timetable', 'settings'];
   let currentView = 'dashboard';
 
   const VIEW_TITLES = {
     'dashboard': 'Dashboard',
+    'rapid-roll': 'Rapid Roll Call',
     'mark-attendance': 'Mark Attendance',
     'students': 'Students Directory',
     'subjects': 'Curriculum Courses',
@@ -24,6 +25,7 @@ const App = (() => {
       title: 'Overview',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+        { id: 'rapid-roll', label: 'Rapid Roll Call', icon: 'zap', badge: 'FAST' },
         { id: 'mark-attendance', label: 'Mark Attendance', icon: 'plus', highlight: true }
       ]
     },
@@ -60,15 +62,44 @@ const App = (() => {
   function buildShell() {
     const root = document.getElementById('app-root');
     const settings = State.get().settings;
+    const currentTheme = settings.theme || 'light';
 
     root.innerHTML = `
       <div class="sidebar-scrim" id="sidebar-scrim"></div>
       <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-          <div class="brand-mark">A</div>
+        <div class="sidebar-brand" id="sidebar-brand-btn" role="button" tabindex="0" title="Go to Dashboard">
+          <div class="brand-mark" aria-label="Attendify Logo">
+            <svg viewBox="0 0 64 64" width="36" height="36" fill="none" class="brand-logo-svg">
+              <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#attSideBg)"/>
+              <rect x="2" y="2" width="60" height="60" rx="16" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/>
+              <path d="M19 47L29.5 17.2C30.4 14.6 33.6 14.6 34.5 17.2L45 47" stroke="url(#attSidePlum)" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M22 35L29.5 41.5L46 22" stroke="url(#attSideCheck)" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="32" cy="14.5" r="2.2" fill="#FFFFFF" opacity="0.95"/>
+              <defs>
+                <linearGradient id="attSideBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#2D304A"/>
+                  <stop offset="100%" stop-color="#191A2B"/>
+                </linearGradient>
+                <linearGradient id="attSidePlum" x1="16" y1="14" x2="48" y2="50" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#B8A9F8"/>
+                  <stop offset="100%" stop-color="#6F5EB2"/>
+                </linearGradient>
+                <linearGradient id="attSideCheck" x1="20" y1="36" x2="46" y2="28" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#2CD5A4"/>
+                  <stop offset="100%" stop-color="#178568"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
           <div class="brand-info">
-            <div class="brand-name">Attendify</div>
-            <div class="brand-class">${Utils.escapeHTML(settings.className || 'SY BSc IT')}</div>
+            <div class="brand-name-wrap">
+              <span class="brand-name">Attendify</span>
+              <span class="brand-badge">ACADEMIC</span>
+            </div>
+            <div class="brand-class-wrap">
+              <span class="brand-status-dot"></span>
+              <span class="brand-class">${Utils.escapeHTML(settings.className || 'SY BSc IT')} · 60 Students</span>
+            </div>
           </div>
         </div>
 
@@ -79,16 +110,27 @@ const App = (() => {
               <button class="nav-item ${item.highlight ? 'nav-item-highlight' : ''}" data-view="${item.id}">
                 ${UI.icon(item.icon)}
                 <span>${item.label}</span>
+                ${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}
               </button>
             `).join('')}
           `).join('')}
         </nav>
 
         <div class="sidebar-footer">
-          <button class="nav-item" id="theme-toggle-btn">
-            ${UI.icon('sun')}
-            <span>Toggle Theme</span>
-          </button>
+          <div class="sidebar-user-card" id="sidebar-user-card" role="button" tabindex="0" title="View Administrator Profile">
+            <div class="sidebar-user-avatar">AD</div>
+            <div class="sidebar-user-info">
+              <div class="sidebar-user-name">${Utils.escapeHTML(settings.adminName || 'Faculty Admin')}</div>
+              <div class="sidebar-user-role">IT Department</div>
+            </div>
+          </div>
+
+          <div class="sidebar-footer-actions">
+            <button class="sidebar-theme-toggle" id="theme-toggle-btn" aria-label="Toggle light/dark theme" title="Toggle Light/Dark Theme">
+              <span class="theme-icon-wrap">${UI.icon(currentTheme === 'dark' ? 'sun' : 'moon')}</span>
+              <span class="theme-label">${currentTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -100,7 +142,7 @@ const App = (() => {
               ${UI.icon('menu')}
             </button>
             <div class="topbar-breadcrumb">
-              <span>Attendify</span>
+              <span class="topbar-breadcrumb-link" id="breadcrumb-brand" role="button" tabindex="0" title="Go to Dashboard">Attendify</span>
               <span class="topbar-breadcrumb-sep">/</span>
               <span id="topbar-view-title">${VIEW_TITLES[currentView] || 'Dashboard'}</span>
             </div>
@@ -123,12 +165,12 @@ const App = (() => {
 
             <span class="topbar-date">${Utils.formatDate(new Date())}</span>
 
-            <button class="icon-btn" id="topbar-theme-btn" aria-label="Toggle theme" title="Toggle Light/Dark Theme">
-              ${UI.icon('sun')}
+            <button class="icon-btn" id="topbar-theme-btn" aria-label="Toggle theme" title="Toggle Light/Dark Theme" style="border:1px solid var(--border); width:34px; height:34px;">
+              ${UI.icon(currentTheme === 'dark' ? 'sun' : 'moon')}
             </button>
 
             <!-- Admin Profile Indicator -->
-            <button class="icon-btn" id="topbar-profile-btn" style="width:28px; height:28px; border-radius:50%; background:var(--accent-subtle); color:var(--accent); font-weight:700; font-size:11px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--accent-border); cursor:pointer;" title="Faculty Admin Profile">
+            <button class="icon-btn" id="topbar-profile-btn" style="width:34px; height:34px; border-radius:var(--r-sm); background:var(--soft-accent); color:var(--accent); font-weight:700; font-size:12px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--accent-border); cursor:pointer; font-family:var(--font-data);" title="Faculty Admin Profile">
               AD
             </button>
           </div>
@@ -136,6 +178,7 @@ const App = (() => {
 
         <div class="view-scroll">
           <div class="view" id="view-dashboard" data-view="dashboard"></div>
+          <div class="view" id="view-rapid-roll" data-view="rapid-roll"></div>
           <div class="view" id="view-mark-attendance" data-view="mark-attendance"></div>
           <div class="view" id="view-students" data-view="students"></div>
           <div class="view" id="view-subjects" data-view="subjects"></div>
@@ -158,8 +201,29 @@ const App = (() => {
       btn.addEventListener('click', () => navigateTo(btn.dataset.view));
     });
 
-    document.getElementById('theme-toggle-btn').addEventListener('click', cycleTheme);
-    document.getElementById('topbar-theme-btn').addEventListener('click', cycleTheme);
+    const brandBtn = document.getElementById('sidebar-brand-btn');
+    if (brandBtn) {
+      brandBtn.addEventListener('click', () => navigateTo('dashboard'));
+      brandBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigateTo('dashboard'); });
+    }
+
+    const breadcrumbBrand = document.getElementById('breadcrumb-brand');
+    if (breadcrumbBrand) {
+      breadcrumbBrand.addEventListener('click', () => navigateTo('dashboard'));
+      breadcrumbBrand.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigateTo('dashboard'); });
+    }
+
+    const userCard = document.getElementById('sidebar-user-card');
+    if (userCard) {
+      userCard.addEventListener('click', openProfileModal);
+      userCard.addEventListener('keydown', (e) => { if (e.key === 'Enter') openProfileModal(); });
+    }
+
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', cycleTheme);
+    
+    const topbarThemeBtn = document.getElementById('topbar-theme-btn');
+    if (topbarThemeBtn) topbarThemeBtn.addEventListener('click', cycleTheme);
 
     const profileBtn = document.getElementById('topbar-profile-btn');
     if (profileBtn) profileBtn.addEventListener('click', openProfileModal);
@@ -169,11 +233,31 @@ const App = (() => {
       document.getElementById('sidebar-scrim').classList.add('open');
     });
     document.getElementById('sidebar-scrim').addEventListener('click', closeMobileSidebar);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMobileSidebar();
+    });
   }
 
   function closeMobileSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebar-scrim').classList.remove('open');
+    const sidebar = document.getElementById('sidebar');
+    const scrim = document.getElementById('sidebar-scrim');
+    if (sidebar) sidebar.classList.remove('open');
+    if (scrim) scrim.classList.remove('open');
+  }
+
+  function syncThemeIcons(theme) {
+    const isDark = theme === 'dark';
+    const topbarBtn = document.getElementById('topbar-theme-btn');
+    const footerBtn = document.getElementById('theme-toggle-btn');
+    const iconName = isDark ? 'sun' : 'moon';
+    if (topbarBtn) topbarBtn.innerHTML = UI.icon(iconName);
+    if (footerBtn) {
+      const wrap = footerBtn.querySelector('.theme-icon-wrap');
+      const label = footerBtn.querySelector('.theme-label');
+      if (wrap) wrap.innerHTML = UI.icon(iconName);
+      if (label) label.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+    }
   }
 
   function cycleTheme() {
@@ -181,7 +265,8 @@ const App = (() => {
     const next = current === 'light' ? 'dark' : 'light';
     State.updateSettings({ theme: next });
     UI.applyTheme(next);
-    UI.toast(`Theme: ${next.toUpperCase()}`, 'info', 1000);
+    syncThemeIcons(next);
+    UI.toast(`Switched to ${next.toUpperCase()} theme`, 'info', 1000);
   }
 
   function navigateTo(viewId) {
@@ -389,7 +474,8 @@ const App = (() => {
               return `
                 <div class="today-session-row" data-student-id="${s.id}" style="padding:6px 10px; cursor:pointer; border-radius:var(--r-sm); border:1px solid var(--border);">
                   <div style="display:flex; align-items:center; gap:8px;">
-                    <strong style="width:24px; font-size:12px; color:var(--ink); font-variant-numeric:tabular-nums;">${s.rollNumber}</strong>
+                    <span class="roll-cell" style="min-width:24px; padding:1px 5px; font-size:11px;">${s.rollNumber}</span>
+                    <div class="student-avatar" style="${Utils.getAvatarStyle(s.rollNumber)}; width:24px; height:24px; font-size:9.5px;" aria-hidden="true">${Utils.getInitials(s.name)}</div>
                     <span style="font-weight:600; font-size:12.5px; color:var(--ink);">${Utils.escapeHTML(s.name)}</span>
                   </div>
                   <div style="display:flex; align-items:center; gap:6px;">
@@ -513,6 +599,7 @@ const App = (() => {
   function renderView(viewId) {
     switch (viewId) {
       case 'dashboard': Dashboard.render(); break;
+      case 'rapid-roll': RapidRollView.render(); break;
       case 'mark-attendance': MarkAttendanceView.render(); break;
       case 'students': StudentsView.render(); break;
       case 'subjects': Subjects.render(); break;
@@ -527,7 +614,10 @@ const App = (() => {
 
   function init() {
     const { recovered } = State.init();
-    UI.applyTheme(State.get().settings.theme || 'light');
+    const urlParams = new URLSearchParams(window.location.search);
+    const themeParam = urlParams.get('theme');
+    const activeTheme = themeParam || State.get().settings.theme || 'light';
+    UI.applyTheme(activeTheme);
 
     buildShell();
 
@@ -535,7 +625,16 @@ const App = (() => {
       renderView(currentView);
     });
 
-    navigateTo('dashboard');
+    const hash = window.location.hash.replace('#', '');
+    const initialView = VIEWS.includes(hash) ? hash : 'dashboard';
+    navigateTo(initialView);
+
+    window.addEventListener('hashchange', () => {
+      const h = window.location.hash.replace('#', '');
+      if (VIEWS.includes(h) && h !== currentView) {
+        navigateTo(h);
+      }
+    });
 
     if (recovered) {
       UI.toast('Saved data safely recovered from backup', 'info');

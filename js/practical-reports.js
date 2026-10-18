@@ -46,10 +46,16 @@ const PracticalReportsView = (() => {
       <div class="view-header no-print">
         <div>
           <h1>Practical Reports</h1>
-          <p class="view-subtitle">SY BSc IT · Laboratory Sessions, Journal Verifications & Experiment Ledgers</p>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:5px; flex-wrap:wrap;">
+            <div class="topbar-badge">
+              <span class="topbar-badge-dot"></span>
+              Laboratory Journal & Experiment Ledgers
+            </div>
+            <span style="font-size:12px; color:var(--ink-tertiary);">Official Academic Practical Verification</span>
+          </div>
         </div>
         <div class="view-header-actions">
-          <button class="btn btn-outline" id="btn-print-practical" title="Print official academic ledger">
+          <button class="btn btn-secondary" id="btn-print-practical" title="Print official academic ledger">
             ${UI.icon('inbox')} Print Document
           </button>
           <button class="btn btn-primary" id="btn-export-practical-csv">

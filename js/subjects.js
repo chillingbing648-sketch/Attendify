@@ -14,8 +14,14 @@ const Subjects = (() => {
     container.innerHTML = `
       <div class="view-header">
         <div>
-          <h1>Subjects</h1>
-          <p class="view-subtitle">SY BSc IT · Academic Course Management & Curriculum</p>
+          <h1>Curriculum Courses</h1>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:5px; flex-wrap:wrap;">
+            <div class="topbar-badge">
+              <span class="topbar-badge-dot"></span>
+              SY BSc IT Curriculum · ${subjects.length} Active Courses
+            </div>
+            <span style="font-size:12px; color:var(--ink-tertiary);">Semester III & IV Academic Scheme</span>
+          </div>
         </div>
         <div class="view-header-actions">
           <button class="btn btn-primary" id="btn-add-subject-modal">
@@ -151,29 +157,30 @@ const Subjects = (() => {
   function openSubjectForm(existing = null) {
     const isEdit = !!existing;
     const bodyHTML = `
-      <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
         <div class="field-row">
           <div class="field" style="flex:2;">
-            <label>Subject Name *</label>
-            <input type="text" id="modal-sub-name" class="input" placeholder="e.g. Web Designing" value="${existing ? Utils.escapeHTML(existing.name) : ''}">
+            <label for="modal-sub-name">Subject Name *</label>
+            <input type="text" id="modal-sub-name" class="input" placeholder="e.g. Web Designing" value="${existing ? Utils.escapeHTML(existing.name) : ''}" autocomplete="off">
+            <div id="modal-sub-name-error" class="form-error-msg" style="display:none;"></div>
           </div>
           <div class="field" style="flex:1;">
-            <label>Course Code</label>
-            <input type="text" id="modal-sub-code" class="input" placeholder="e.g. IT301" value="${existing ? Utils.escapeHTML(existing.code || getAutoCode(existing.name)) : ''}">
+            <label for="modal-sub-code">Course Code</label>
+            <input type="text" id="modal-sub-code" class="input" placeholder="e.g. IT301" value="${existing ? Utils.escapeHTML(existing.code || getAutoCode(existing.name)) : ''}" autocomplete="off">
           </div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label>Faculty / Teacher</label>
-            <input type="text" id="modal-sub-teacher" class="input" placeholder="e.g. Prof. Sharma" value="${existing ? Utils.escapeHTML(existing.teacher || '') : ''}">
+            <label for="modal-sub-teacher">Faculty / Teacher</label>
+            <input type="text" id="modal-sub-teacher" class="input" placeholder="e.g. Prof. Sharma" value="${existing ? Utils.escapeHTML(existing.teacher || '') : ''}" autocomplete="off">
           </div>
           <div class="field">
-            <label>Room / Lab</label>
-            <input type="text" id="modal-sub-room" class="input" placeholder="e.g. Lab 2" value="${existing ? Utils.escapeHTML(existing.room || '') : ''}">
+            <label for="modal-sub-room">Room / Lab</label>
+            <input type="text" id="modal-sub-room" class="input" placeholder="e.g. Lab 2" value="${existing ? Utils.escapeHTML(existing.room || '') : ''}" autocomplete="off">
           </div>
         </div>
         <div class="field">
-          <label>Course Type</label>
+          <label for="modal-sub-type">Course Type</label>
           <select id="modal-sub-type" class="select">
             <option value="both" ${!existing || existing.type === 'both' ? 'selected' : ''}>Lecture & Practical</option>
             <option value="theory" ${existing && existing.type === 'theory' ? 'selected' : ''}>Lecture Only</option>
@@ -194,13 +201,29 @@ const Subjects = (() => {
         </div>
       `,
       onOpen: (overlay, close) => {
+        const nameInput = overlay.querySelector('#modal-sub-name');
+        const nameError = overlay.querySelector('#modal-sub-name-error');
+
         overlay.querySelector('#modal-sub-cancel').addEventListener('click', close);
         overlay.querySelector('#modal-sub-save').addEventListener('click', () => {
-          const name = overlay.querySelector('#modal-sub-name').value.trim();
-          if (!name) {
-            UI.toast('Subject name is required', 'error');
+          nameInput.classList.remove('is-invalid');
+          nameError.style.display = 'none';
+
+          const name = nameInput.value.trim();
+          const val = Validation.validateSubject({
+            name,
+            existingId: existing ? existing.id : null,
+            subjects: State.get().subjects
+          });
+
+          if (!val.valid) {
+            nameInput.classList.add('is-invalid');
+            nameError.textContent = val.errors.name || 'Invalid subject name';
+            nameError.style.display = 'flex';
+            UI.toast(val.errors.name || 'Please enter a valid subject name', 'error');
             return;
           }
+
           const code = overlay.querySelector('#modal-sub-code').value.trim() || getAutoCode(name);
           const teacher = overlay.querySelector('#modal-sub-teacher').value.trim();
           const room = overlay.querySelector('#modal-sub-room').value.trim();
@@ -208,10 +231,10 @@ const Subjects = (() => {
 
           if (isEdit) {
             State.updateSubject(existing.id, { name, code, teacher, room, type });
-            UI.toast('Subject updated successfully', 'success');
+            UI.toast(`Updated course "${name}"`, 'success');
           } else {
             State.addSubject({ name, code, teacher, room, type });
-            UI.toast('New subject created', 'success');
+            UI.toast(`Created course "${name}"`, 'success');
           }
           close();
           render();
