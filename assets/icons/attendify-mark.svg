@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <linearGradient id="attBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#262840"/>
+      <stop offset="100%" stop-color="#161726"/>
+    </linearGradient>
+    <linearGradient id="attPlum" x1="16" y1="14" x2="48" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#9E8DF0"/>
+      <stop offset="100%" stop-color="#51458A"/>
+    </linearGradient>
+    <linearGradient id="attCheck" x1="20" y1="36" x2="46" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2CD5A4"/>
+      <stop offset="100%" stop-color="#178568"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle Base with Precision Inset Rim -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#attBg)"/>
+  <rect x="2" y="2" width="60" height="60" rx="16" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+
+  <!-- Architectural 'A' Monogram Arch -->
+  <path d="M19 47L29.5 17.2C30.4 14.6 33.6 14.6 34.5 17.2L45 47" 
+        stroke="url(#attPlum)" 
+        stroke-width="5.2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+
+  <!-- Dynamic Verification Tick Bar (Attendance Present) -->
+  <path d="M22 35L29.5 41.5L46 22" 
+        stroke="url(#attCheck)" 
+        stroke-width="4.8" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+
+  <!-- Precision Keystone Dot -->
+  <circle cx="32" cy="14.5" r="2.2" fill="#FFFFFF" opacity="0.95"/>
+</svg>

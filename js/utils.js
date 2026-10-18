@@ -168,12 +168,12 @@ const Utils = (() => {
   }
 
   const AVATAR_PALETTE = [
-    { bg: 'rgba(124, 58, 237, 0.12)', text: '#7C3AED', border: 'rgba(124, 58, 237, 0.25)' },
-    { bg: 'rgba(5, 150, 105, 0.12)',  text: '#059669', border: 'rgba(5, 150, 105, 0.25)' },
-    { bg: 'rgba(217, 119, 6, 0.12)',  text: '#D97706', border: 'rgba(217, 119, 6, 0.25)' },
-    { bg: 'rgba(2, 132, 199, 0.12)',  text: '#0284C7', border: 'rgba(2, 132, 199, 0.25)' },
-    { bg: 'rgba(225, 29, 72, 0.12)',  text: '#E11D48', border: 'rgba(225, 29, 72, 0.25)' },
-    { bg: 'rgba(139, 92, 246, 0.12)', text: '#8B5CF6', border: 'rgba(139, 92, 246, 0.25)' }
+    { bg: 'rgba(81, 69, 138, 0.10)', text: '#51458A', border: 'rgba(81, 69, 138, 0.22)' },
+    { bg: 'rgba(23, 133, 104, 0.10)', text: '#178568', border: 'rgba(23, 133, 104, 0.22)' },
+    { bg: 'rgba(194, 138, 37, 0.10)', text: '#C28A25', border: 'rgba(194, 138, 37, 0.22)' },
+    { bg: 'rgba(79, 93, 149, 0.10)', text: '#4F5D95', border: 'rgba(79, 93, 149, 0.22)' },
+    { bg: 'rgba(201, 75, 80, 0.10)', text: '#C94B50', border: 'rgba(201, 75, 80, 0.22)' },
+    { bg: 'rgba(146, 131, 212, 0.14)', text: '#51458A', border: 'rgba(146, 131, 212, 0.25)' }
   ];
 
   function getInitials(name) {

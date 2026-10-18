@@ -1,12 +1,14 @@
 /* ============================================================
-   ATTENDIFY — students.js (Apple × Academic SaaS Students Directory)
-   Rebuilt from scratch:
-   1. Recomposed Header: Title, Student Count Context, Add Student CTA
-   2. Real-Data Cohort Statistics & Insights Strip
-   3. Cohesive Distinct Floating Toolbar (Search, Sort, Segmented Filter)
-   4. Refined Student List: Monogram Avatars, Roll Badges, Attendance Meters,
-      Semantic Status Pills, Compact Actions & Responsive Mobile Card View
-   5. High-Fidelity Student Academic Profile & Edit Modal
+   ATTENDIFY — students.js (Students Directory)
+   Style: Refined academic SaaS, Apple-inspired simplicity,
+   warm editorial minimalism, and professional productivity software.
+   Features:
+   1. Clean Heading: prominent title, cohort context, Add Student & Export CSV
+   2. Real-Data Attendance Overview Cards (Total, Batch %, Compliant, Defaulters)
+   3. Search & Filter Toolbar with soft lavender selected filters
+   4. High-Density Student Table with Quicksand names & DM Sans figures
+   5. Functional Pagination with page size, prev/next, and active indicators
+   6. Student Academic Profile & Edit Modal
    ============================================================ */
 
 const StudentsView = (() => {
@@ -14,15 +16,16 @@ const StudentsView = (() => {
   let statusFilter = 'all'; // all | safe | warn | critical
   let sortBy = 'rollNumber'; // 'rollNumber' | 'name' | 'pct'
   let sortAsc = true;
+  let currentPage = 1;
+  let pageSize = 15;
 
-  // Apple-Grade Monogram Palette (Plum, Mint, Amber, Cyan, Ruby, Lavender)
   const AVATAR_PALETTE = [
-    { bg: 'rgba(124, 58, 237, 0.12)', text: '#7C3AED', border: 'rgba(124, 58, 237, 0.25)' },
-    { bg: 'rgba(5, 150, 105, 0.12)',  text: '#059669', border: 'rgba(5, 150, 105, 0.25)' },
-    { bg: 'rgba(217, 119, 6, 0.12)',  text: '#D97706', border: 'rgba(217, 119, 6, 0.25)' },
-    { bg: 'rgba(2, 132, 199, 0.12)',  text: '#0284C7', border: 'rgba(2, 132, 199, 0.25)' },
-    { bg: 'rgba(225, 29, 72, 0.12)',  text: '#E11D48', border: 'rgba(225, 29, 72, 0.25)' },
-    { bg: 'rgba(139, 92, 246, 0.12)', text: '#8B5CF6', border: 'rgba(139, 92, 246, 0.25)' }
+    { bg: 'rgba(81, 69, 138, 0.10)', text: '#51458A', border: 'rgba(81, 69, 138, 0.22)' },
+    { bg: 'rgba(23, 133, 104, 0.10)', text: '#178568', border: 'rgba(23, 133, 104, 0.22)' },
+    { bg: 'rgba(194, 138, 37, 0.10)', text: '#C28A25', border: 'rgba(194, 138, 37, 0.22)' },
+    { bg: 'rgba(79, 93, 149, 0.10)', text: '#4F5D95', border: 'rgba(79, 93, 149, 0.22)' },
+    { bg: 'rgba(201, 75, 80, 0.10)', text: '#C94B50', border: 'rgba(201, 75, 80, 0.22)' },
+    { bg: 'rgba(146, 131, 212, 0.14)', text: '#51458A', border: 'rgba(146, 131, 212, 0.25)' }
   ];
 
   function getInitials(name) {
@@ -85,8 +88,18 @@ const StudentsView = (() => {
       critical: studentList.filter(s => s.stats.status === 'critical' && s.stats.total > 0).length
     };
 
+    // Pagination calculations
+    const effectivePageSize = pageSize === 0 ? Math.max(1, filtered.length) : pageSize;
+    const totalPages = Math.max(1, Math.ceil(filtered.length / effectivePageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    const startIndex = (currentPage - 1) * effectivePageSize;
+    const endIndex = Math.min(startIndex + effectivePageSize, filtered.length);
+    const paginatedList = filtered.slice(startIndex, endIndex);
+
     container.innerHTML = `
-      <!-- 1. Recomposed Page Header with Rich Context -->
+      <!-- A. Clean Heading Area with Class Context & Actions -->
       <div class="view-header">
         <div>
           <h1>Students Directory</h1>
@@ -95,12 +108,12 @@ const StudentsView = (() => {
               <span class="topbar-badge-dot"></span>
               SY BSc IT Cohort · ${students.length} Enrolled Students
             </div>
-            <span style="font-size:12px; color:var(--ink-tertiary);">Roll Numbers 1–${students.length} · Academic Term 2026-27</span>
+            <span style="font-size:12px; color:var(--ink-secondary);">Roll Numbers 1–${students.length} · Academic Term 2026-27</span>
           </div>
         </div>
         <div class="view-header-actions">
           <button class="btn btn-secondary" id="btn-export-students-csv">
-            ${UI.icon('download')} Export Roster CSV
+            ${UI.icon('download')} Export CSV
           </button>
           <button class="btn btn-primary" id="btn-add-student-modal">
             ${UI.icon('plus')} Add Student
@@ -108,47 +121,47 @@ const StudentsView = (() => {
         </div>
       </div>
 
-      <!-- 2. Real-Data Cohort Statistics & Insights Cards -->
-      <div class="stat-grid section" style="margin-bottom:18px;">
+      <!-- B. Attendance Overview Cards -->
+      <div class="stat-grid section" style="margin-bottom:20px;">
         <div class="stat-card">
-          <div class="stat-label">${UI.icon('users')} Total Enrolled</div>
+          <div class="stat-label">${UI.icon('users')} Total Students</div>
           <div class="stat-value">${students.length}</div>
-          <div class="stat-sub">100% active roster in SY BSc IT</div>
+          <div class="stat-sub">Enrolled active roster</div>
         </div>
 
         <div class="stat-card">
-          <div class="stat-label">${UI.icon('trendUp')} Batch Attendance</div>
+          <div class="stat-label">${UI.icon('trendUp')} Overall Attendance</div>
           <div class="stat-value" style="color:${batchStats.avgPct >= th.safe ? 'var(--safe)' : 'var(--critical)'};">
             ${batchStats.totalSessions > 0 ? batchStats.avgPct + '%' : '—'}
           </div>
           <div class="stat-sub">${batchStats.totalSessions} conducted sessions recorded</div>
         </div>
 
-        <div class="stat-card" style="cursor:pointer;" id="stat-filter-safe">
-          <div class="stat-label" style="color:var(--safe);">${UI.icon('checkCircle')} Compliant Standing</div>
+        <div class="stat-card" style="cursor:pointer;" id="stat-filter-safe" title="Filter to safe students">
+          <div class="stat-label" style="color:var(--safe);">${UI.icon('checkCircle')} Compliant (≥${th.safe}%)</div>
           <div class="stat-value" style="color:var(--safe);">${counts.safe}</div>
-          <div class="stat-sub">Above university ≥${th.safe}% threshold</div>
+          <div class="stat-sub">Meeting safe attendance threshold</div>
         </div>
 
-        <div class="stat-card" style="cursor:pointer;" id="stat-filter-critical">
-          <div class="stat-label" style="color:var(--critical);">${UI.icon('alert')} At-Risk Defaulters</div>
+        <div class="stat-card" style="cursor:pointer;" id="stat-filter-critical" title="Filter to warning & critical students">
+          <div class="stat-label" style="color:var(--critical);">${UI.icon('alert')} Defaulters (<${th.safe}%)</div>
           <div class="stat-value" style="color:var(--critical);">${counts.critical + counts.warn}</div>
           <div class="stat-sub">${counts.critical} critical (<${th.warn}%) · ${counts.warn} warning</div>
         </div>
       </div>
 
-      <!-- 3. Cohesive, Visually Distinct Floating Toolbar -->
+      <!-- C. Search & Filter Toolbar -->
       <div class="directory-toolbar section">
         <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; flex:1; min-width:280px;">
           <div class="search-box" style="flex:1; max-width:340px;">
             ${UI.icon('search')}
-            <input type="text" id="students-search-input" class="input" placeholder="Search by student name or roll number..." value="${Utils.escapeHTML(searchQuery)}">
+            <input type="text" id="students-search-input" class="input" placeholder="Search by student name or roll number..." value="${Utils.escapeHTML(searchQuery)}" aria-label="Search students by name or roll number">
             ${searchQuery ? `<button class="icon-btn" id="students-clear-search" style="position:absolute; right:6px; width:22px; height:22px; font-size:12px; color:var(--ink-tertiary);" title="Clear search">${UI.icon('x')}</button>` : ''}
           </div>
 
           <div style="display:flex; gap:6px; align-items:center;">
-            <span style="font-size:var(--fs-xs); color:var(--ink-secondary); font-weight:700;">Sort By:</span>
-            <select id="students-sort-select" class="select" style="height:32px; font-size:12px; padding:2px 10px; width:auto;">
+            <label for="students-sort-select" style="font-size:var(--fs-xs); color:var(--ink-secondary); font-weight:600;">Sort By:</label>
+            <select id="students-sort-select" class="select" style="height:34px; font-size:12px; padding:2px 10px; width:auto;">
               <option value="rollNumber-asc" ${sortBy === 'rollNumber' && sortAsc ? 'selected' : ''}>Roll No. (Ascending)</option>
               <option value="rollNumber-desc" ${sortBy === 'rollNumber' && !sortAsc ? 'selected' : ''}>Roll No. (Descending)</option>
               <option value="name-asc" ${sortBy === 'name' && sortAsc ? 'selected' : ''}>Student Name (A–Z)</option>
@@ -159,7 +172,7 @@ const StudentsView = (() => {
           </div>
         </div>
 
-        <div class="segmented-control">
+        <div class="segmented-control" role="group" aria-label="Attendance status filters">
           <button class="segmented-item ${statusFilter === 'all' ? 'active' : ''}" data-status-filter="all">All (${counts.all})</button>
           <button class="segmented-item ${statusFilter === 'safe' ? 'active' : ''}" data-status-filter="safe">Safe ≥${th.safe}% (${counts.safe})</button>
           <button class="segmented-item ${statusFilter === 'warn' ? 'active' : ''}" data-status-filter="warn">Warning (${counts.warn})</button>
@@ -167,14 +180,14 @@ const StudentsView = (() => {
         </div>
       </div>
 
-      <!-- 4. Redesigned Student Roster Surface (Desktop Table & Mobile Cards) -->
+      <!-- D. Refined Student Table -->
       <div class="table-wrap students-table-wrap">
         <table class="data-table workbench-table students-data-table">
           <thead>
             <tr>
-              <th style="width: 90px;">Roll No.</th>
+              <th style="width: 85px;">Roll No.</th>
               <th>Student Roster Profile</th>
-              <th style="width: 220px;">Attendance Progress</th>
+              <th style="width: 230px;">Attendance Progress</th>
               <th style="width: 140px;">Academic Status</th>
               <th style="width: 130px; text-align: right;">Actions</th>
             </tr>
@@ -193,10 +206,10 @@ const StudentsView = (() => {
                   </div>
                 </td>
               </tr>
-            ` : filtered.map(s => {
+            ` : paginatedList.map(s => {
               const hasRecords = s.stats.total > 0;
               const statusClass = hasRecords ? `badge-${s.stats.status}` : 'badge-neutral';
-              const statusLabel = hasRecords ? (s.stats.status === 'safe' ? `Safe (≥${th.safe}%)` : s.stats.status === 'warn' ? `Warning (${th.warn}–${th.safe - 1}%)` : `Critical (<${th.warn}%)`) : 'No Records';
+              const statusLabel = hasRecords ? (s.stats.status === 'safe' ? `Safe (≥${th.safe}%)` : s.stats.status === 'warn' ? `Warning (${th.warn}–${th.safe - 1}%)` : `Critical (<${th.warn}%)`) : 'No records';
               const rollFormatted = s.rollNumber < 10 ? `0${s.rollNumber}` : `${s.rollNumber}`;
               const progressColor = !hasRecords ? 'var(--ink-tertiary)' : s.stats.pct >= th.safe ? 'var(--safe)' : s.stats.pct >= th.warn ? 'var(--warn)' : 'var(--critical)';
               
@@ -209,8 +222,8 @@ const StudentsView = (() => {
                     <div style="display:flex; align-items:center; gap:12px;">
                       <div class="student-avatar" style="${getAvatarStyle(s.rollNumber)}" aria-hidden="true">${getInitials(s.name)}</div>
                       <div>
-                        <div style="font-weight:700; color:var(--ink); font-size:13.5px; letter-spacing:-0.01em;">${Utils.escapeHTML(s.name)}</div>
-                        <div style="font-size:11px; color:var(--ink-secondary); font-family:var(--font-mono); margin-top:1px;">UID: ${s.id} · Batch 2026-27</div>
+                        <div style="font-weight:600; color:var(--ink); font-size:14px; letter-spacing:-0.01em;">${Utils.escapeHTML(s.name)}</div>
+                        <div style="font-size:11.5px; color:var(--ink-secondary); font-family:var(--font-data); margin-top:1px;">UID: ${s.id} · Batch 2026-27</div>
                       </div>
                     </div>
                   </td>
@@ -218,19 +231,22 @@ const StudentsView = (() => {
                     ${hasRecords ? `
                       <div style="display:flex; flex-direction:column; gap:4px;">
                         <div style="display:flex; align-items:baseline; justify-content:space-between;">
-                          <strong style="font-size:13.5px; font-variant-numeric:tabular-nums; color:${progressColor}; letter-spacing:-0.02em;">
+                          <strong style="font-size:13.5px; font-family:var(--font-data); font-variant-numeric:tabular-nums; color:${progressColor};">
                             ${s.stats.pct}%
                           </strong>
-                          <span style="font-size:11px; color:var(--ink-tertiary); font-variant-numeric:tabular-nums;">
+                          <span style="font-size:11.5px; color:var(--ink-secondary); font-family:var(--font-data); font-variant-numeric:tabular-nums;">
                             ${s.stats.present + s.stats.late} / ${s.stats.total} Sessions
                           </span>
                         </div>
-                        <div style="width:100%; height:6px; background:var(--surface-subtle); border-radius:9999px; overflow:hidden; border:1px solid var(--border-subtle);">
-                          <div style="height:100%; width:${s.stats.pct}%; background:${progressColor}; border-radius:9999px; transition:width 0.3s ease;"></div>
+                        <div style="width:100%; height:5px; background:var(--surface-subtle); border-radius:9999px; overflow:hidden; border:1px solid var(--border-subtle);">
+                          <div style="height:100%; width:${s.stats.pct}%; background:${progressColor}; border-radius:9999px; transition:width 0.25s ease;"></div>
                         </div>
                       </div>
                     ` : `
-                      <span style="color:var(--ink-tertiary); font-size:12px; font-style:italic;">No attendance records yet</span>
+                      <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="font-family:var(--font-data); font-weight:600; color:var(--ink-tertiary);">—</span>
+                        <span style="color:var(--ink-secondary); font-size:12px;">No records</span>
+                      </div>
                     `}
                   </td>
                   <td data-label="Status">
@@ -239,7 +255,7 @@ const StudentsView = (() => {
                   <td style="text-align: right;" data-label="Actions">
                     <div style="display:inline-flex; gap:6px; align-items:center;">
                       <button class="btn btn-secondary btn-sm view-student-btn" data-id="${s.id}" title="View Student Academic Profile">
-                        Profile
+                        Detail
                       </button>
                       <button class="icon-btn edit-student-btn" data-id="${s.id}" title="Edit Student Information" style="width:28px; height:28px;">
                         ${UI.icon('edit')}
@@ -251,10 +267,53 @@ const StudentsView = (() => {
             }).join('')}
           </tbody>
         </table>
+
+        <!-- E. Functional Pagination -->
+        ${filtered.length > 0 ? `
+          <div class="pagination-container">
+            <div class="pagination-info">
+              <span>Showing <strong>${filtered.length === 0 ? 0 : startIndex + 1}</strong>–<strong>${endIndex}</strong> of <strong>${filtered.length}</strong> students</span>
+              <div style="display:inline-flex; align-items:center; gap:6px; margin-left:10px;">
+                <label for="pagination-size" style="font-size:12px; color:var(--ink-secondary);">Per page:</label>
+                <select id="pagination-size" class="pagination-size-select">
+                  <option value="15" ${pageSize === 15 ? 'selected' : ''}>15</option>
+                  <option value="30" ${pageSize === 30 ? 'selected' : ''}>30</option>
+                  <option value="60" ${pageSize === 60 ? 'selected' : ''}>60</option>
+                  <option value="0" ${pageSize === 0 ? 'selected' : ''}>All</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="pagination-controls" role="navigation" aria-label="Student directory pagination">
+              <button class="pagination-btn" id="pagination-prev" ${currentPage <= 1 ? 'disabled' : ''} aria-label="Previous page">
+                ← Prev
+              </button>
+              ${renderPaginationButtons(currentPage, totalPages)}
+              <button class="pagination-btn" id="pagination-next" ${currentPage >= totalPages ? 'disabled' : ''} aria-label="Next page">
+                Next →
+              </button>
+            </div>
+          </div>
+        ` : ''}
       </div>
     `;
 
     bindEvents(container);
+  }
+
+  function renderPaginationButtons(current, total) {
+    if (total <= 1) {
+      return `<button class="pagination-btn active" data-page="1">1</button>`;
+    }
+    const btns = [];
+    for (let p = 1; p <= total; p++) {
+      if (p === 1 || p === total || (p >= current - 1 && p <= current + 1)) {
+        btns.push(`<button class="pagination-btn ${p === current ? 'active' : ''}" data-page="${p}" aria-current="${p === current ? 'page' : 'false'}">${p}</button>`);
+      } else if (btns[btns.length - 1] !== '<span style="padding:0 4px; color:var(--ink-tertiary);">…</span>') {
+        btns.push('<span style="padding:0 4px; color:var(--ink-tertiary);">…</span>');
+      }
+    }
+    return btns.join('');
   }
 
   function bindEvents(container) {
@@ -262,6 +321,7 @@ const StudentsView = (() => {
     if (search) {
       search.addEventListener('input', Utils.debounce((e) => {
         searchQuery = e.target.value;
+        currentPage = 1;
         render();
       }, 120));
     }
@@ -270,6 +330,7 @@ const StudentsView = (() => {
     if (clearSearchBtn) {
       clearSearchBtn.addEventListener('click', () => {
         searchQuery = '';
+        currentPage = 1;
         render();
       });
     }
@@ -281,6 +342,7 @@ const StudentsView = (() => {
         statusFilter = 'all';
         sortBy = 'rollNumber';
         sortAsc = true;
+        currentPage = 1;
         render();
       });
     }
@@ -291,6 +353,7 @@ const StudentsView = (() => {
         const [field, dir] = e.target.value.split('-');
         sortBy = field;
         sortAsc = dir === 'asc';
+        currentPage = 1;
         render();
       });
     }
@@ -298,6 +361,7 @@ const StudentsView = (() => {
     container.querySelectorAll('[data-status-filter]').forEach(btn => {
       btn.addEventListener('click', () => {
         statusFilter = btn.dataset.statusFilter;
+        currentPage = 1;
         render();
       });
     });
@@ -306,6 +370,7 @@ const StudentsView = (() => {
     if (statSafe) {
       statSafe.addEventListener('click', () => {
         statusFilter = 'safe';
+        currentPage = 1;
         render();
       });
     }
@@ -314,6 +379,42 @@ const StudentsView = (() => {
     if (statCrit) {
       statCrit.addEventListener('click', () => {
         statusFilter = 'critical';
+        currentPage = 1;
+        render();
+      });
+    }
+
+    // Pagination events
+    const prevBtn = container.querySelector('#pagination-prev');
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          render();
+        }
+      });
+    }
+
+    const nextBtn = container.querySelector('#pagination-next');
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        currentPage++;
+        render();
+      });
+    }
+
+    container.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentPage = parseInt(btn.dataset.page, 10);
+        render();
+      });
+    });
+
+    const pageSizeSelect = container.querySelector('#pagination-size');
+    if (pageSizeSelect) {
+      pageSizeSelect.addEventListener('change', (e) => {
+        pageSize = parseInt(e.target.value, 10);
+        currentPage = 1;
         render();
       });
     }
@@ -510,14 +611,14 @@ const StudentsView = (() => {
             <div class="stat-label" style="justify-content:center; font-size:10px;">Status</div>
             <div class="stat-value" style="font-size:12px; margin-top:4px;">
               <span class="badge ${stats.total === 0 ? 'badge-neutral' : stats.status === 'safe' ? 'badge-safe' : stats.status === 'warn' ? 'badge-warn' : 'badge-critical'}">
-                ${stats.total > 0 ? Utils.statusLabel(stats.status) : 'No Data'}
+                ${stats.total > 0 ? Utils.statusLabel(stats.status) : 'No Records'}
               </span>
             </div>
           </div>
         </div>
 
         <!-- Subject-wise Attendance Breakdown -->
-        <div class="section-title" style="font-size:13px; font-weight:700; margin-top:4px;">Course Curriculum Breakdown</div>
+        <div class="section-title" style="font-size:14px; font-weight:700; margin-top:4px;">Course Curriculum Breakdown</div>
         <div class="table-wrap">
           <table class="data-table" style="font-size:12.5px;">
             <thead>
@@ -535,10 +636,10 @@ const StudentsView = (() => {
                 return `
                   <tr>
                     <td><strong>${Utils.escapeHTML(sub.name)}</strong></td>
-                    <td style="color:var(--safe); font-weight:600; text-align:center;">${subStats.present + subStats.late}</td>
-                    <td style="color:var(--critical); font-weight:600; text-align:center;">${subStats.absent}</td>
-                    <td style="text-align:center;">${subStats.total}</td>
-                    <td style="text-align:center;"><strong style="color:${subStats.total === 0 ? 'var(--ink)' : subStats.pct >= th.safe ? 'var(--safe)' : 'var(--critical)'}; font-variant-numeric:tabular-nums;">${subStats.total > 0 ? subStats.pct + '%' : '—'}</strong></td>
+                    <td style="color:var(--safe); font-weight:600; text-align:center; font-family:var(--font-data); font-variant-numeric:tabular-nums;">${subStats.present + subStats.late}</td>
+                    <td style="color:var(--critical); font-weight:600; text-align:center; font-family:var(--font-data); font-variant-numeric:tabular-nums;">${subStats.absent}</td>
+                    <td style="text-align:center; font-family:var(--font-data); font-variant-numeric:tabular-nums;">${subStats.total}</td>
+                    <td style="text-align:center;"><strong style="color:${subStats.total === 0 ? 'var(--ink)' : subStats.pct >= th.safe ? 'var(--safe)' : 'var(--critical)'}; font-family:var(--font-data); font-variant-numeric:tabular-nums;">${subStats.total > 0 ? subStats.pct + '%' : '—'}</strong></td>
                   </tr>
                 `;
               }).join('')}
@@ -547,7 +648,7 @@ const StudentsView = (() => {
         </div>
 
         <!-- Recent Sessions for this student -->
-        <div class="section-title" style="font-size:13px; font-weight:700; margin-top:6px;">Recent Attendance Records</div>
+        <div class="section-title" style="font-size:14px; font-weight:700; margin-top:6px;">Recent Attendance Records</div>
         <div class="table-wrap">
           <table class="data-table" style="font-size:12.5px;">
             <thead>
@@ -568,7 +669,7 @@ const StudentsView = (() => {
                 const isLate = st === 'late';
                 return `
                   <tr>
-                    <td>${Utils.formatDate(sess.date)}</td>
+                    <td style="font-family:var(--font-data);">${Utils.formatDate(sess.date)}</td>
                     <td><strong>${sub ? Utils.escapeHTML(sub.name) : 'Subject'}</strong></td>
                     <td><span class="badge ${sess.type === 'practical' ? 'badge-safe' : 'badge-neutral'}">${(sess.type || 'theory').toUpperCase()}</span></td>
                     <td style="text-align:right;">
@@ -619,7 +720,7 @@ const StudentsView = (() => {
         stats.present,
         stats.absent,
         stats.late,
-        stats.total > 0 ? stats.pct + '%' : 'N/A',
+        stats.total > 0 ? stats.pct + '%' : '—',
         Utils.statusLabel(stats.status)
       ]);
     });

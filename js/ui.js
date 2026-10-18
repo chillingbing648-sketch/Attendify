@@ -296,8 +296,7 @@ const UI = (() => {
     });
   }
 
-  /* ---------------- Subject colors ---------------- */
-  const SUBJECT_COLORS = ['#C1631A', '#2E7D4F', '#1E66F5', '#B8790A', '#7A4FE0', '#C4351F', '#0E8A82', '#A8437A'];
+  const SUBJECT_COLORS = ['#51458A', '#178568', '#4F5D95', '#C28A25', '#7A64A8', '#C94B50', '#2E7A70', '#855478'];
   function colorForIndex(i) { return SUBJECT_COLORS[i % SUBJECT_COLORS.length]; }
 
   function initials(name) {
