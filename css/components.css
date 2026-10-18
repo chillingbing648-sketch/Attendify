@@ -1023,3 +1023,55 @@
   justify-content: space-between;
   align-items: flex-end;
 }
+
+/* ============================================================
+   14. RAPID ROLL CALL STUDIO COMPONENTS
+   ============================================================ */
+.rapid-jump-row {
+  transition: all 0.16s var(--ease-spring);
+}
+
+.rapid-jump-row:hover {
+  background: var(--surface-subtle);
+  transform: translateX(2px);
+}
+
+.rapid-jump-row.active {
+  background: var(--soft-accent) !important;
+  border-color: var(--accent-border) !important;
+}
+
+.rapid-grid-tile {
+  transition: transform 0.18s var(--ease-spring), box-shadow 0.18s var(--ease-spring), border-color 0.16s ease;
+}
+
+.rapid-grid-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.rapid-grid-tile:active {
+  transform: scale(0.97);
+}
+
+.rapid-grid-tile.present {
+  border-color: var(--safe-border);
+  background: var(--safe-subtle);
+}
+
+.rapid-grid-tile.absent {
+  border-color: var(--critical-border);
+  background: var(--critical-subtle);
+}
+
+.rapid-grid-tile.late {
+  border-color: var(--warn-border);
+  background: var(--warn-subtle);
+}
+
+#btn-mark-present-focus:active,
+#btn-mark-absent-focus:active,
+#btn-mark-late-focus:active {
+  transform: scale(0.96);
+}
+

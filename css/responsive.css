@@ -176,6 +176,12 @@
   .directory-toolbar .search-box {
     max-width: 100% !important;
   }
+
+  /* Rapid Roll Studio Responsive Adaptations */
+  #rapid-mode-container > div[style*="grid-template-columns: 1fr 320px"],
+  #rapid-mode-container > div[style*="grid-template-columns:1fr 320px"] {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* ============================================================

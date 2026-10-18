@@ -3,11 +3,12 @@
    ============================================================ */
 
 const App = (() => {
-  const VIEWS = ['dashboard', 'mark-attendance', 'students', 'subjects', 'history', 'analytics', 'reports', 'practical-reports', 'timetable', 'settings'];
+  const VIEWS = ['dashboard', 'rapid-roll', 'mark-attendance', 'students', 'subjects', 'history', 'analytics', 'reports', 'practical-reports', 'timetable', 'settings'];
   let currentView = 'dashboard';
 
   const VIEW_TITLES = {
     'dashboard': 'Dashboard',
+    'rapid-roll': 'Rapid Roll Call',
     'mark-attendance': 'Mark Attendance',
     'students': 'Students Directory',
     'subjects': 'Curriculum Courses',
@@ -24,6 +25,7 @@ const App = (() => {
       title: 'Overview',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+        { id: 'rapid-roll', label: 'Rapid Roll Call', icon: 'zap', badge: 'FAST' },
         { id: 'mark-attendance', label: 'Mark Attendance', icon: 'plus', highlight: true }
       ]
     },
@@ -108,6 +110,7 @@ const App = (() => {
               <button class="nav-item ${item.highlight ? 'nav-item-highlight' : ''}" data-view="${item.id}">
                 ${UI.icon(item.icon)}
                 <span>${item.label}</span>
+                ${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}
               </button>
             `).join('')}
           `).join('')}
@@ -175,6 +178,7 @@ const App = (() => {
 
         <div class="view-scroll">
           <div class="view" id="view-dashboard" data-view="dashboard"></div>
+          <div class="view" id="view-rapid-roll" data-view="rapid-roll"></div>
           <div class="view" id="view-mark-attendance" data-view="mark-attendance"></div>
           <div class="view" id="view-students" data-view="students"></div>
           <div class="view" id="view-subjects" data-view="subjects"></div>
@@ -595,6 +599,7 @@ const App = (() => {
   function renderView(viewId) {
     switch (viewId) {
       case 'dashboard': Dashboard.render(); break;
+      case 'rapid-roll': RapidRollView.render(); break;
       case 'mark-attendance': MarkAttendanceView.render(); break;
       case 'students': StudentsView.render(); break;
       case 'subjects': Subjects.render(); break;
