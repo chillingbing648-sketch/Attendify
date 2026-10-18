@@ -1,0 +1,507 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" fill="none">
+  <defs>
+    <!-- Drop Shadow Filter for Application Frame -->
+    <filter id="appShadow" x="-20" y="-10" width="1480" height="940" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="18" stdDeviation="28" flood-color="#141728" flood-opacity="0.14" />
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#141728" flood-opacity="0.08" />
+    </filter>
+
+    <!-- Card Shadow -->
+    <filter id="cardShadow" x="-4" y="-2" width="108%" height="116%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#20243A" flood-opacity="0.04" />
+    </filter>
+
+    <!-- Sidebar Gradients -->
+    <linearGradient id="sideBg" x1="0" y1="0" x2="0" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1F213A" />
+      <stop offset="100%" stop-color="#151626" />
+    </linearGradient>
+
+    <linearGradient id="activeItemGrad" x1="0" y1="0" x2="240" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(81, 69, 138, 0.48)" />
+      <stop offset="100%" stop-color="rgba(81, 69, 138, 0.16)" />
+    </linearGradient>
+
+    <linearGradient id="markBtnGrad" x1="0" y1="0" x2="240" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5A4C98" />
+      <stop offset="100%" stop-color="#433775" />
+    </linearGradient>
+
+    <!-- Attendify Logo Gradient -->
+    <linearGradient id="logoBg" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2E314C" />
+      <stop offset="100%" stop-color="#181A2A" />
+    </linearGradient>
+    <linearGradient id="logoArch" x1="8" y1="8" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#B8A9F8" />
+      <stop offset="100%" stop-color="#6F5EB2" />
+    </linearGradient>
+    <linearGradient id="logoCheck" x1="10" y1="20" x2="26" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2CD5A4" />
+      <stop offset="100%" stop-color="#178568" />
+    </linearGradient>
+
+    <!-- Progress Bar Gradients -->
+    <linearGradient id="safeBarGrad" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2CD5A4" />
+      <stop offset="100%" stop-color="#178568" />
+    </linearGradient>
+    <linearGradient id="warnBarGrad" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F2BA4F" />
+      <stop offset="100%" stop-color="#C28A25" />
+    </linearGradient>
+    <linearGradient id="critBarGrad" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#EC7F84" />
+      <stop offset="100%" stop-color="#C94B50" />
+    </linearGradient>
+
+    <!-- Fonts -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&amp;family=Quicksand:wght@500;600;700&amp;display=swap');
+      text { font-family: 'Quicksand', -apple-system, sans-serif; }
+      .data-num { font-family: 'DM Sans', sans-serif; font-variant-numeric: tabular-nums; }
+    </style>
+  </defs>
+
+  <!-- Ambient Backdrop -->
+  <rect width="1440" height="900" fill="#EAE7DF" />
+
+  <!-- App Window Container -->
+  <g filter="url(#appShadow)">
+    <rect x="20" y="20" width="1400" height="860" rx="14" fill="#F7F5F0" stroke="#D5D1C7" stroke-width="1" />
+    <clipPath id="windowClip">
+      <rect x="20" y="20" width="1400" height="860" rx="14" />
+    </clipPath>
+
+    <g clip-path="url(#windowClip)">
+
+      <!-- ========================================== -->
+      <!-- 1. LEFT SIDEBAR (Width: 260px)            -->
+      <!-- ========================================== -->
+      <g id="sidebar">
+        <rect x="20" y="20" width="260" height="860" fill="url(#sideBg)" />
+        <line x1="280" y1="20" x2="280" y2="880" stroke="rgba(184, 169, 248, 0.14)" stroke-width="1" />
+
+        <!-- macOS Traffic Light Controls -->
+        <circle cx="42" cy="42" r="5.5" fill="#ED6A5E" />
+        <circle cx="60" cy="42" r="5.5" fill="#F5BF4F" />
+        <circle cx="78" cy="42" r="5.5" fill="#62C554" />
+
+        <!-- Brand Header Section -->
+        <g transform="translate(38, 70)">
+          <!-- Attendify Logo Mark -->
+          <rect x="0" y="0" width="36" height="36" rx="9" fill="url(#logoBg)" stroke="rgba(255,255,255,0.12)" stroke-width="1.2" />
+          <path d="M10 27L16.5 9.5C17 8 19 8 19.5 9.5L26 27" stroke="url(#logoArch)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M12 20L16.5 24L26.5 12" stroke="url(#logoCheck)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="18" cy="8" r="1.3" fill="#FFFFFF" />
+
+          <!-- Brand Text -->
+          <text x="46" y="18" fill="#FFFFFF" font-size="15.5" font-weight="700" letter-spacing="-0.02em">Attendify</text>
+          <rect x="114" y="8" width="54" height="15" rx="3.5" fill="rgba(184, 169, 248, 0.16)" stroke="rgba(184, 169, 248, 0.3)" stroke-width="1" />
+          <text x="141" y="19" fill="#B8A9F8" font-size="8.5" font-weight="700" letter-spacing="0.08em" text-anchor="middle">ACADEMIC</text>
+
+          <!-- Class & Student Count Pill -->
+          <circle cx="48" cy="30" r="3" fill="#2CD5A4" />
+          <text x="56" y="33" fill="#B4AFD4" font-size="11" font-weight="500">SY BSc IT · 60 Students</text>
+        </g>
+        <line x1="20" y1="126" x2="280" y2="126" stroke="rgba(184, 169, 248, 0.12)" stroke-width="1" />
+
+        <!-- Navigation Section -->
+        <g transform="translate(32, 138)">
+          <!-- CATEGORY: OVERVIEW -->
+          <text x="10" y="12" fill="#A8A3D2" font-size="10" font-weight="700" letter-spacing="0.09em">OVERVIEW</text>
+
+          <!-- Nav Item: Dashboard -->
+          <g transform="translate(0, 22)">
+            <rect x="0" y="0" width="236" height="34" rx="7" fill="transparent" />
+            <path d="M16 11h5v5h-5zM24 11h5v3h-5zM24 17h5v5h-5zM16 19h5v3h-5z" stroke="#B8A9F8" stroke-width="1.6" fill="none" stroke-linejoin="round" />
+            <text x="38" y="22" fill="#D5D2ED" font-size="13" font-weight="600">Dashboard</text>
+          </g>
+
+          <!-- Nav Item: Rapid Roll Call (NEW FEATURE) -->
+          <g transform="translate(0, 60)">
+            <rect x="0" y="0" width="236" height="34" rx="7" fill="rgba(138, 122, 219, 0.12)" stroke="rgba(184, 169, 248, 0.18)" stroke-width="1" />
+            <path d="M21 9l-7 9h5l-1 7 8-10h-5l1-6z" stroke="#2CD5A4" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            <text x="38" y="22" fill="#FFFFFF" font-size="13" font-weight="700">Rapid Roll Call</text>
+            <!-- Green Pill Badge -->
+            <rect x="182" y="9" width="38" height="16" rx="8" fill="rgba(44, 213, 164, 0.2)" stroke="rgba(44, 213, 164, 0.4)" stroke-width="1" />
+            <text x="201" y="20.5" fill="#2CD5A4" font-size="9" font-weight="700" letter-spacing="0.06em" text-anchor="middle">FAST</text>
+          </g>
+
+          <!-- Nav Item: Mark Attendance (Highlight Action) -->
+          <g transform="translate(0, 98)">
+            <rect x="0" y="0" width="236" height="34" rx="7" fill="url(#markBtnGrad)" stroke="rgba(184, 169, 248, 0.32)" stroke-width="1" />
+            <path d="M20 12v10M15 17h10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+            <text x="38" y="22" fill="#FFFFFF" font-size="13" font-weight="700">Mark Attendance</text>
+          </g>
+
+          <!-- CATEGORY: MANAGE -->
+          <text x="10" y="156" fill="#A8A3D2" font-size="10" font-weight="700" letter-spacing="0.09em">MANAGE</text>
+
+          <!-- Nav Item: Students (ACTIVE VIEW) -->
+          <g transform="translate(0, 166)">
+            <rect x="0" y="0" width="236" height="34" rx="7" fill="url(#activeItemGrad)" stroke="rgba(184, 169, 248, 0.28)" stroke-width="1" />
+            <!-- Glowing Active Indicator Pill -->
+            <rect x="0" y="6" width="3.5" height="22" rx="1.75" fill="#B8A9F8" />
+            <path d="M22 23v-1.5a3 3 0 00-3-3h-5a3 3 0 00-3 3V23 M16.5 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" stroke="#FFFFFF" stroke-width="1.6" fill="none" />
+            <text x="38" y="22" fill="#FFFFFF" font-size="13" font-weight="700">Students Directory</text>
+          </g>
+
+          <!-- Nav Item: Subjects -->
+          <g transform="translate(0, 204)">
+            <rect x="0" y="0" width="236" height="34" rx="7" fill="transparent" />
+            <path d="M15 12h8v9h-8z M15 12a2 2 0 00-2 2v7a2 2 0 002-2 M23 12a2 2 0 012 2v7a2 2 0 01-2-2" stroke="#B8A9F8" stroke-width="1.6" fill="none" />
+            <text x="38" y="22" fill="#D5D2ED" font-size="13" font-weight="600">Curriculum Subjects</text>
+          </g>
+
+          <!-- CATEGORY: RECORDS & INSIGHTS -->
+          <text x="10" y="262" fill="#A8A3D2" font-size="10" font-weight="700" letter-spacing="0.09em">RECORDS &amp; INSIGHTS</text>
+
+          <!-- History -->
+          <g transform="translate(0, 272)">
+            <path d="M20 12a6 6 0 100 12 6 6 0 000-12zM20 15v3l2 1" stroke="#B8A9F8" stroke-width="1.6" fill="none" />
+            <text x="38" y="22" fill="#D5D2ED" font-size="13" font-weight="600">Attendance History</text>
+          </g>
+
+          <!-- Analytics -->
+          <g transform="translate(0, 308)">
+            <path d="M15 23V11M20 23V15M25 23V18" stroke="#B8A9F8" stroke-width="1.6" stroke-linecap="round" />
+            <text x="38" y="22" fill="#D5D2ED" font-size="13" font-weight="600">Batch Analytics</text>
+          </g>
+
+          <!-- Practical Reports -->
+          <g transform="translate(0, 344)">
+            <path d="M15 12h10M15 16h10M15 20h6" stroke="#B8A9F8" stroke-width="1.6" stroke-linecap="round" />
+            <text x="38" y="22" fill="#D5D2ED" font-size="13" font-weight="600">Practical Ledgers</text>
+          </g>
+
+          <!-- CATEGORY: SYSTEM -->
+          <text x="10" y="402" fill="#A8A3D2" font-size="10" font-weight="700" letter-spacing="0.09em">SYSTEM</text>
+
+          <!-- Timetable -->
+          <g transform="translate(0, 412)">
+            <rect x="14" y="11" width="12" height="12" rx="2" stroke="#B8A9F8" stroke-width="1.6" fill="none" />
+            <text x="38" y="22" fill="#D5D2ED" font-size="13" font-weight="600">Timetable Schedule</text>
+          </g>
+
+          <!-- Settings -->
+          <g transform="translate(0, 448)">
+            <circle cx="20" cy="17" r="3" stroke="#B8A9F8" stroke-width="1.6" fill="none" />
+            <text x="38" y="22" fill="#D5D2ED" font-size="13" font-weight="600">Settings &amp; Backup</text>
+          </g>
+        </g>
+
+        <!-- Sidebar Footer & Admin Strip -->
+        <g transform="translate(32, 770)">
+          <!-- Faculty Admin Card -->
+          <rect x="0" y="0" width="236" height="46" rx="8" fill="rgba(240, 237, 247, 0.06)" stroke="rgba(240, 237, 247, 0.12)" stroke-width="1" />
+          <circle cx="24" cy="23" r="14" fill="#EAE5F7" />
+          <text x="24" y="27" fill="#51458A" font-size="11" font-weight="700" text-anchor="middle" class="data-num">AD</text>
+          <text x="46" y="19" fill="#FFFFFF" font-size="12" font-weight="700">Dr. V. Sharma</text>
+          <text x="46" y="32" fill="#B4AFD4" font-size="10.5" font-weight="500">IT Department Head</text>
+
+          <!-- Theme Toggle -->
+          <g transform="translate(0, 54)">
+            <rect x="0" y="0" width="236" height="30" rx="6" fill="rgba(240, 237, 247, 0.04)" stroke="rgba(240, 237, 247, 0.12)" stroke-width="1" />
+            <circle cx="24" cy="15" r="5" stroke="#D5D2ED" stroke-width="1.4" fill="none" />
+            <text x="118" y="19" fill="#D5D2ED" font-size="11.5" font-weight="600" text-anchor="middle">Toggle Dark Mode</text>
+          </g>
+        </g>
+      </g>
+
+      <!-- ========================================== -->
+      <!-- 2. TOP NAVIGATION BAR (Height: 56px)       -->
+      <!-- ========================================== -->
+      <g id="topbar">
+        <rect x="280" y="20" width="1140" height="56" fill="#FFFFFF" />
+        <line x1="280" y1="76" x2="1420" y2="76" stroke="#E7E4DE" stroke-width="1" />
+
+        <!-- Breadcrumb -->
+        <text x="308" y="53" fill="#4E526D" font-size="13.5" font-weight="500">Attendify</text>
+        <text x="372" y="53" fill="#989BAA" font-size="13.5">/</text>
+        <text x="386" y="53" fill="#1C1F33" font-size="13.5" font-weight="700">Students Directory</text>
+
+        <!-- Center Badge -->
+        <g transform="translate(680, 36)">
+          <rect x="0" y="0" width="186" height="24" rx="12" fill="#F0EDF7" stroke="#E7E4DE" stroke-width="1" />
+          <circle cx="16" cy="12" r="3.5" fill="#178568" />
+          <text x="98" y="16.5" fill="#4E526D" font-size="11.5" font-weight="600" text-anchor="middle">SY BSc IT · 60 Students</text>
+        </g>
+
+        <!-- Right Side: Search + Date + Profile -->
+        <g transform="translate(1010, 32)">
+          <!-- Search Box -->
+          <rect x="0" y="0" width="220" height="32" rx="7" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+          <circle cx="15" cy="16" r="4.5" stroke="#787D9C" stroke-width="1.4" fill="none" />
+          <line x1="18.5" y1="19.5" x2="23" y2="24" stroke="#787D9C" stroke-width="1.4" stroke-linecap="round" />
+          <text x="30" y="20.5" fill="#787D9C" font-size="12" font-weight="500">Quick Search...</text>
+          <rect x="168" y="7" width="44" height="18" rx="4" fill="#F0EDF7" stroke="#E7E4DE" stroke-width="1" />
+          <text x="190" y="19.5" fill="#787D9C" font-size="9.5" font-weight="700" text-anchor="middle">Ctrl+K</text>
+
+          <!-- Current Date -->
+          <text x="242" y="20" fill="#4E526D" font-size="12" font-weight="600">Oct 18, 2026</text>
+
+          <!-- Admin Avatar -->
+          <circle cx="340" cy="16" r="14" fill="#EAE5F7" stroke="rgba(81, 69, 138, 0.22)" stroke-width="1" />
+          <text x="340" y="20" fill="#51458A" font-size="11" font-weight="700" text-anchor="middle" class="data-num">AD</text>
+        </g>
+      </g>
+
+      <!-- ========================================== -->
+      <!-- 3. MAIN WORKSPACE — STUDENTS DIRECTORY     -->
+      <!-- ========================================== -->
+      <g id="main-content" transform="translate(308, 98)">
+
+        <!-- Page Header & Action Controls -->
+        <g id="page-header">
+          <text x="0" y="28" fill="#1C1F33" font-size="25" font-weight="700" letter-spacing="-0.02em">Students Directory</text>
+          <text x="0" y="48" fill="#4E526D" font-size="13.5" font-weight="500">SY BSc IT · Enrolled Roster &amp; Academic Attendance Standing (60 Students)</text>
+
+          <!-- Action Buttons -->
+          <g transform="translate(860, 10)">
+            <!-- Secondary Export CSV -->
+            <rect x="0" y="0" width="108" height="36" rx="8" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1.2" />
+            <text x="54" y="22.5" fill="#1C1F33" font-size="13" font-weight="600" text-anchor="middle">Export CSV</text>
+
+            <!-- Primary Add Student -->
+            <g transform="translate(118, 0)">
+              <rect x="0" y="0" width="124" height="36" rx="8" fill="#51458A" />
+              <path d="M18 18h12M24 12v12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+              <text x="68" y="22.5" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">+ Add Student</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- Attendance Metric Summary Cards (4 Columns) -->
+        <g id="metric-cards" transform="translate(0, 68)">
+          <!-- Card 1: Total Enrolled -->
+          <g transform="translate(0, 0)">
+            <rect x="0" y="0" width="258" height="88" rx="10" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="16" y="24" fill="#4E526D" font-size="11.5" font-weight="700" letter-spacing="0.04em">TOTAL STUDENTS</text>
+            <text x="16" y="56" fill="#1C1F33" font-size="28" font-weight="700" class="data-num">60</text>
+            <text x="16" y="74" fill="#787D9C" font-size="11.5">Single SY BSc IT Batch</text>
+          </g>
+
+          <!-- Card 2: Safe Standing -->
+          <g transform="translate(274, 0)">
+            <rect x="0" y="0" width="258" height="88" rx="10" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="16" y="24" fill="#178568" font-size="11.5" font-weight="700" letter-spacing="0.04em">SAFE STANDING (≥75%)</text>
+            <text x="16" y="56" fill="#1C1F33" font-size="28" font-weight="700" class="data-num">48</text>
+            <!-- Progress Bar -->
+            <rect x="16" y="66" width="180" height="5" rx="2.5" fill="#F0EDF7" />
+            <rect x="16" y="66" width="144" height="5" rx="2.5" fill="url(#safeBarGrad)" />
+            <text x="204" y="72" fill="#178568" font-size="11" font-weight="700" class="data-num">80.0%</text>
+          </g>
+
+          <!-- Card 3: Warning Zone -->
+          <g transform="translate(548, 0)">
+            <rect x="0" y="0" width="258" height="88" rx="10" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="16" y="24" fill="#C28A25" font-size="11.5" font-weight="700" letter-spacing="0.04em">WARNING ZONE (65–74%)</text>
+            <text x="16" y="56" fill="#1C1F33" font-size="28" font-weight="700" class="data-num">8</text>
+            <!-- Progress Bar -->
+            <rect x="16" y="66" width="180" height="5" rx="2.5" fill="#F0EDF7" />
+            <rect x="16" y="66" width="24" height="5" rx="2.5" fill="url(#warnBarGrad)" />
+            <text x="204" y="72" fill="#C28A25" font-size="11" font-weight="700" class="data-num">13.3%</text>
+          </g>
+
+          <!-- Card 4: Critical Defaulters -->
+          <g transform="translate(822, 0)">
+            <rect x="0" y="0" width="280" height="88" rx="10" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="16" y="24" fill="#C94B50" font-size="11.5" font-weight="700" letter-spacing="0.04em">CRITICAL DEFAULTERS (&lt;65%)</text>
+            <text x="16" y="56" fill="#C94B50" font-size="28" font-weight="700" class="data-num">4</text>
+            <!-- Progress Bar -->
+            <rect x="16" y="66" width="180" height="5" rx="2.5" fill="#F0EDF7" />
+            <rect x="16" y="66" width="12" height="5" rx="2.5" fill="url(#critBarGrad)" />
+            <text x="204" y="72" fill="#C94B50" font-size="11" font-weight="700" class="data-num">6.7%</text>
+          </g>
+        </g>
+
+        <!-- Search and Filter Toolbar -->
+        <g id="filter-toolbar" transform="translate(0, 172)">
+          <rect x="0" y="0" width="1102" height="48" rx="9" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+
+          <!-- Search Input -->
+          <g transform="translate(14, 8)">
+            <rect x="0" y="0" width="300" height="32" rx="6" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <circle cx="14" cy="16" r="4.5" stroke="#787D9C" stroke-width="1.3" fill="none" />
+            <line x1="17.5" y1="19.5" x2="21" y2="23" stroke="#787D9C" stroke-width="1.3" />
+            <text x="28" y="20" fill="#4E526D" font-size="12" font-weight="500">Filter student name or roll...</text>
+          </g>
+
+          <!-- Filter Pills -->
+          <g transform="translate(330, 8)">
+            <!-- Pill: All -->
+            <rect x="0" y="0" width="70" height="32" rx="6" fill="#51458A" />
+            <text x="35" y="20" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">All (60)</text>
+
+            <!-- Pill: Safe -->
+            <rect x="76" y="0" width="76" height="32" rx="6" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="114" y="20" fill="#4E526D" font-size="12" font-weight="600" text-anchor="middle">Safe (48)</text>
+
+            <!-- Pill: Warning -->
+            <rect x="158" y="0" width="94" height="32" rx="6" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="205" y="20" fill="#4E526D" font-size="12" font-weight="600" text-anchor="middle">Warning (8)</text>
+
+            <!-- Pill: Defaulter -->
+            <rect x="258" y="0" width="102" height="32" rx="6" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="309" y="20" fill="#4E526D" font-size="12" font-weight="600" text-anchor="middle">Defaulter (4)</text>
+          </g>
+
+          <!-- Sort Selector -->
+          <g transform="translate(930, 8)">
+            <rect x="0" y="0" width="158" height="32" rx="6" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="14" y="20" fill="#4E526D" font-size="12" font-weight="600">Sort: Roll No. (Asc)</text>
+            <path d="M140 14l3 3 3-3" stroke="#787D9C" stroke-width="1.5" stroke-linecap="round" fill="none" />
+          </g>
+        </g>
+
+        <!-- Professional Student Roster Table -->
+        <g id="students-table" transform="translate(0, 234)">
+          <rect x="0" y="0" width="1102" height="490" rx="10" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+
+          <!-- Table Header -->
+          <rect x="0" y="0" width="1102" height="38" rx="10" fill="#F0EDF7" />
+          <line x1="0" y1="38" x2="1102" y2="38" stroke="#E7E4DE" stroke-width="1" />
+          <text x="24" y="24" fill="#4E526D" font-size="11" font-weight="700" letter-spacing="0.05em">ROLL NO.</text>
+          <text x="110" y="24" fill="#4E526D" font-size="11" font-weight="700" letter-spacing="0.05em">STUDENT NAME</text>
+          <text x="460" y="24" fill="#4E526D" font-size="11" font-weight="700" letter-spacing="0.05em">ATTENDED / HELD</text>
+          <text x="640" y="24" fill="#4E526D" font-size="11" font-weight="700" letter-spacing="0.05em">PERCENTAGE</text>
+          <text x="820" y="24" fill="#4E526D" font-size="11" font-weight="700" letter-spacing="0.05em">STANDING</text>
+          <text x="980" y="24" fill="#4E526D" font-size="11" font-weight="700" letter-spacing="0.05em">ACTIONS</text>
+
+          <!-- ROW 1: Roll 01 - Aarav Patel -->
+          <g transform="translate(0, 38)">
+            <line x1="0" y1="44" x2="1102" y2="44" stroke="#EFECE6" stroke-width="1" />
+            <rect x="24" y="11" width="34" height="22" rx="5" fill="#F0EDF7" stroke="#E7E4DE" stroke-width="1" />
+            <text x="41" y="26" fill="#1C1F33" font-size="11.5" font-weight="700" text-anchor="middle" class="data-num">01</text>
+            <!-- Avatar AP -->
+            <rect x="110" y="8" width="28" height="28" rx="7" fill="#EAE5F7" />
+            <text x="124" y="26" fill="#51458A" font-size="11" font-weight="700" text-anchor="middle" class="data-num">AP</text>
+            <text x="148" y="26" fill="#1C1F33" font-size="13.5" font-weight="600">Aarav Patel</text>
+            <text x="460" y="26" fill="#4E526D" font-size="13" class="data-num">22 / 24 Lectures</text>
+            <text x="640" y="26" fill="#178568" font-size="13.5" font-weight="700" class="data-num">91.7%</text>
+            <rect x="820" y="12" width="60" height="20" rx="10" fill="rgba(23, 133, 104, 0.12)" stroke="rgba(23, 133, 104, 0.25)" stroke-width="1" />
+            <circle cx="830" cy="22" r="3" fill="#178568" />
+            <text x="854" y="26" fill="#178568" font-size="10.5" font-weight="700" text-anchor="middle">SAFE</text>
+            <rect x="980" y="10" width="70" height="24" rx="5" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="1015" y="26" fill="#4E526D" font-size="11.5" font-weight="600" text-anchor="middle">Details</text>
+          </g>
+
+          <!-- ROW 2: Roll 02 - Ananya Sharma -->
+          <g transform="translate(0, 82)">
+            <line x1="0" y1="44" x2="1102" y2="44" stroke="#EFECE6" stroke-width="1" />
+            <rect x="24" y="11" width="34" height="22" rx="5" fill="#F0EDF7" stroke="#E7E4DE" stroke-width="1" />
+            <text x="41" y="26" fill="#1C1F33" font-size="11.5" font-weight="700" text-anchor="middle" class="data-num">02</text>
+            <!-- Avatar AS -->
+            <rect x="110" y="8" width="28" height="28" rx="7" fill="#E3F7F0" />
+            <text x="124" y="26" fill="#178568" font-size="11" font-weight="700" text-anchor="middle" class="data-num">AS</text>
+            <text x="148" y="26" fill="#1C1F33" font-size="13.5" font-weight="600">Ananya Sharma</text>
+            <text x="460" y="26" fill="#4E526D" font-size="13" class="data-num">21 / 24 Lectures</text>
+            <text x="640" y="26" fill="#178568" font-size="13.5" font-weight="700" class="data-num">87.5%</text>
+            <rect x="820" y="12" width="60" height="20" rx="10" fill="rgba(23, 133, 104, 0.12)" stroke="rgba(23, 133, 104, 0.25)" stroke-width="1" />
+            <circle cx="830" cy="22" r="3" fill="#178568" />
+            <text x="854" y="26" fill="#178568" font-size="10.5" font-weight="700" text-anchor="middle">SAFE</text>
+            <rect x="980" y="10" width="70" height="24" rx="5" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="1015" y="26" fill="#4E526D" font-size="11.5" font-weight="600" text-anchor="middle">Details</text>
+          </g>
+
+          <!-- ROW 3: Roll 03 - Rohan Gupta (Warning Zone) -->
+          <g transform="translate(0, 126)">
+            <line x1="0" y1="44" x2="1102" y2="44" stroke="#EFECE6" stroke-width="1" />
+            <rect x="24" y="11" width="34" height="22" rx="5" fill="#F0EDF7" stroke="#E7E4DE" stroke-width="1" />
+            <text x="41" y="26" fill="#1C1F33" font-size="11.5" font-weight="700" text-anchor="middle" class="data-num">03</text>
+            <!-- Avatar RG -->
+            <rect x="110" y="8" width="28" height="28" rx="7" fill="#FFF3DE" />
+            <text x="124" y="26" fill="#C28A25" font-size="11" font-weight="700" text-anchor="middle" class="data-num">RG</text>
+            <text x="148" y="26" fill="#1C1F33" font-size="13.5" font-weight="600">Rohan Gupta</text>
+            <text x="460" y="26" fill="#4E526D" font-size="13" class="data-num">17 / 24 Lectures</text>
+            <text x="640" y="26" fill="#C28A25" font-size="13.5" font-weight="700" class="data-num">70.8%</text>
+            <rect x="820" y="12" width="78" height="20" rx="10" fill="rgba(194, 138, 37, 0.12)" stroke="rgba(194, 138, 37, 0.25)" stroke-width="1" />
+            <circle cx="830" cy="22" r="3" fill="#C28A25" />
+            <text x="864" y="26" fill="#C28A25" font-size="10.5" font-weight="700" text-anchor="middle">WARNING</text>
+            <rect x="980" y="10" width="70" height="24" rx="5" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="1015" y="26" fill="#4E526D" font-size="11.5" font-weight="600" text-anchor="middle">Details</text>
+          </g>
+
+          <!-- ROW 4: Roll 04 - Priya Nair -->
+          <g transform="translate(0, 170)">
+            <line x1="0" y1="44" x2="1102" y2="44" stroke="#EFECE6" stroke-width="1" />
+            <rect x="24" y="11" width="34" height="22" rx="5" fill="#F0EDF7" stroke="#E7E4DE" stroke-width="1" />
+            <text x="41" y="26" fill="#1C1F33" font-size="11.5" font-weight="700" text-anchor="middle" class="data-num">04</text>
+            <!-- Avatar PN -->
+            <rect x="110" y="8" width="28" height="28" rx="7" fill="#EAE5F7" />
+            <text x="124" y="26" fill="#51458A" font-size="11" font-weight="700" text-anchor="middle" class="data-num">PN</text>
+            <text x="148" y="26" fill="#1C1F33" font-size="13.5" font-weight="600">Priya Nair</text>
+            <text x="460" y="26" fill="#4E526D" font-size="13" class="data-num">23 / 24 Lectures</text>
+            <text x="640" y="26" fill="#178568" font-size="13.5" font-weight="700" class="data-num">95.8%</text>
+            <rect x="820" y="12" width="60" height="20" rx="10" fill="rgba(23, 133, 104, 0.12)" stroke="rgba(23, 133, 104, 0.25)" stroke-width="1" />
+            <circle cx="830" cy="22" r="3" fill="#178568" />
+            <text x="854" y="26" fill="#178568" font-size="10.5" font-weight="700" text-anchor="middle">SAFE</text>
+            <rect x="980" y="10" width="70" height="24" rx="5" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="1015" y="26" fill="#4E526D" font-size="11.5" font-weight="600" text-anchor="middle">Details</text>
+          </g>
+
+          <!-- ROW 5: Roll 05 - Aditya Verma (Critical Defaulter) -->
+          <g transform="translate(0, 214)">
+            <line x1="0" y1="44" x2="1102" y2="44" stroke="#EFECE6" stroke-width="1" />
+            <rect x="24" y="11" width="34" height="22" rx="5" fill="#F0EDF7" stroke="#E7E4DE" stroke-width="1" />
+            <text x="41" y="26" fill="#1C1F33" font-size="11.5" font-weight="700" text-anchor="middle" class="data-num">05</text>
+            <!-- Avatar AV -->
+            <rect x="110" y="8" width="28" height="28" rx="7" fill="#FDE8E9" />
+            <text x="124" y="26" fill="#C94B50" font-size="11" font-weight="700" text-anchor="middle" class="data-num">AV</text>
+            <text x="148" y="26" fill="#1C1F33" font-size="13.5" font-weight="600">Aditya Verma</text>
+            <text x="460" y="26" fill="#4E526D" font-size="13" class="data-num">15 / 24 Lectures</text>
+            <text x="640" y="26" fill="#C94B50" font-size="13.5" font-weight="700" class="data-num">62.5%</text>
+            <rect x="820" y="12" width="78" height="20" rx="10" fill="rgba(201, 75, 80, 0.12)" stroke="rgba(201, 75, 80, 0.25)" stroke-width="1" />
+            <circle cx="830" cy="22" r="3" fill="#C94B50" />
+            <text x="864" y="26" fill="#C94B50" font-size="10.5" font-weight="700" text-anchor="middle">DEFAULTER</text>
+            <rect x="980" y="10" width="70" height="24" rx="5" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="1015" y="26" fill="#4E526D" font-size="11.5" font-weight="600" text-anchor="middle">Details</text>
+          </g>
+
+          <!-- ROW 6: Roll 06 - Sneha Kulkarni -->
+          <g transform="translate(0, 258)">
+            <line x1="0" y1="44" x2="1102" y2="44" stroke="#EFECE6" stroke-width="1" />
+            <rect x="24" y="11" width="34" height="22" rx="5" fill="#F0EDF7" stroke="#E7E4DE" stroke-width="1" />
+            <text x="41" y="26" fill="#1C1F33" font-size="11.5" font-weight="700" text-anchor="middle" class="data-num">06</text>
+            <!-- Avatar SK -->
+            <rect x="110" y="8" width="28" height="28" rx="7" fill="#EAE5F7" />
+            <text x="124" y="26" fill="#51458A" font-size="11" font-weight="700" text-anchor="middle" class="data-num">SK</text>
+            <text x="148" y="26" fill="#1C1F33" font-size="13.5" font-weight="600">Sneha Kulkarni</text>
+            <text x="460" y="26" fill="#4E526D" font-size="13" class="data-num">20 / 24 Lectures</text>
+            <text x="640" y="26" fill="#178568" font-size="13.5" font-weight="700" class="data-num">83.3%</text>
+            <rect x="820" y="12" width="60" height="20" rx="10" fill="rgba(23, 133, 104, 0.12)" stroke="rgba(23, 133, 104, 0.25)" stroke-width="1" />
+            <circle cx="830" cy="22" r="3" fill="#178568" />
+            <text x="854" y="26" fill="#178568" font-size="10.5" font-weight="700" text-anchor="middle">SAFE</text>
+            <rect x="980" y="10" width="70" height="24" rx="5" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+            <text x="1015" y="26" fill="#4E526D" font-size="11.5" font-weight="600" text-anchor="middle">Details</text>
+          </g>
+
+          <!-- Table Footer Pagination -->
+          <g transform="translate(0, 440)">
+            <rect x="0" y="0" width="1102" height="50" rx="10" fill="#FFFFFF" />
+            <line x1="0" y1="0" x2="1102" y2="0" stroke="#E7E4DE" stroke-width="1" />
+            <text x="24" y="30" fill="#4E526D" font-size="13" class="data-num">Showing 1–10 of 60 students (Page 1 of 6)</text>
+            <!-- Pagination Controls -->
+            <g transform="translate(930, 10)">
+              <rect x="0" y="0" width="28" height="28" rx="6" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+              <text x="14" y="19" fill="#989BAA" font-size="12" font-weight="600" text-anchor="middle">&lt;</text>
+
+              <rect x="34" y="0" width="28" height="28" rx="6" fill="#51458A" />
+              <text x="48" y="19" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">1</text>
+
+              <rect x="68" y="0" width="28" height="28" rx="6" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+              <text x="82" y="19" fill="#4E526D" font-size="12" font-weight="600" text-anchor="middle">2</text>
+
+              <rect x="102" y="0" width="28" height="28" rx="6" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+              <text x="116" y="19" fill="#4E526D" font-size="12" font-weight="600" text-anchor="middle">3</text>
+
+              <rect x="136" y="0" width="28" height="28" rx="6" fill="#FFFFFF" stroke="#E7E4DE" stroke-width="1" />
+              <text x="150" y="19" fill="#4E526D" font-size="12" font-weight="600" text-anchor="middle">&gt;</text>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

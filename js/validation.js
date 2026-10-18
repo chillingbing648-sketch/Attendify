@@ -121,7 +121,50 @@ const Validation = (() => {
     };
   }
 
-  return { validateImport };
+  function validateStudent({ rollNumber, name, existingId = null, students = [] }) {
+    const errors = {};
+    const parsedRoll = parseInt(rollNumber, 10);
+
+    if (isNaN(parsedRoll) || parsedRoll <= 0 || parsedRoll > 9999) {
+      errors.rollNumber = 'Roll number must be a valid integer between 1 and 9999.';
+    } else {
+      const isDuplicate = students.some(s => s.id !== existingId && s.rollNumber === parsedRoll);
+      if (isDuplicate) {
+        errors.rollNumber = `Roll number ${parsedRoll} is already assigned to another student.`;
+      }
+    }
+
+    const cleanName = (name || '').trim();
+    if (!cleanName || cleanName.length < 2) {
+      errors.name = 'Student full name must be at least 2 characters.';
+    }
+
+    return {
+      valid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  function validateSubject({ name, teacher, room, existingId = null, subjects = [] }) {
+    const errors = {};
+    const cleanName = (name || '').trim();
+
+    if (!cleanName || cleanName.length < 2) {
+      errors.name = 'Subject name must be at least 2 characters.';
+    } else {
+      const isDuplicate = subjects.some(s => s.id !== existingId && s.name.toLowerCase() === cleanName.toLowerCase());
+      if (isDuplicate) {
+        errors.name = `A subject named "${cleanName}" already exists.`;
+      }
+    }
+
+    return {
+      valid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  return { validateImport, validateStudent, validateSubject };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = Validation;

@@ -6,6 +6,7 @@
 const HistoryView = (() => {
   let subjectFilter = 'all';
   let typeFilter = 'all'; // all | lecture | practical
+  let dateFilter = '';
 
   function render(containerId = 'view-history') {
     const container = document.getElementById(containerId);
@@ -21,15 +22,24 @@ const HistoryView = (() => {
     if (typeFilter !== 'all') {
       filtered = filtered.filter(s => (s.type || 'theory') === typeFilter || (typeFilter === 'lecture' && s.type === 'theory'));
     }
+    if (dateFilter) {
+      filtered = filtered.filter(s => s.date === dateFilter);
+    }
 
     container.innerHTML = `
       <div class="view-header">
         <div>
           <h1>Attendance History</h1>
-          <p class="view-subtitle">Audit log of all recorded SY BSc IT attendance sessions</p>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:5px; flex-wrap:wrap;">
+            <div class="topbar-badge">
+              <span class="topbar-badge-dot"></span>
+              Audit Ledger · ${sessions.length} Recorded Sessions
+            </div>
+            <span style="font-size:12px; color:var(--ink-tertiary);">SY BSc IT Batch Attendance Archive</span>
+          </div>
         </div>
         <div class="view-header-actions">
-          <button class="btn btn-outline" id="btn-export-history-csv">
+          <button class="btn btn-secondary" id="btn-export-history-csv">
             ${UI.icon('download')} Export History CSV
           </button>
           <button class="btn btn-primary" onclick="App.openMarkChoiceModal()">
@@ -38,25 +48,32 @@ const HistoryView = (() => {
         </div>
       </div>
 
-      <!-- Controls & Filters -->
-      <div class="section" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
-        <div style="min-width: 180px;">
-          <select id="history-subject-filter" class="select">
-            <option value="all">All Subjects</option>
-            ${subjects.map(s => `
-              <option value="${s.id}" ${s.id === subjectFilter ? 'selected' : ''}>${Utils.escapeHTML(s.name)}</option>
-            `).join('')}
-          </select>
+      <!-- Controls & Filters in Distinct Floating Toolbar -->
+      <div class="directory-toolbar section">
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; flex:1;">
+          <div style="min-width: 200px;">
+            <select id="history-subject-filter" class="select" style="height:32px; font-size:12px;">
+              <option value="all">All Curriculum Courses</option>
+              ${subjects.map(s => `
+                <option value="${s.id}" ${s.id === subjectFilter ? 'selected' : ''}>${Utils.escapeHTML(s.name)}</option>
+              `).join('')}
+            </select>
+          </div>
+
+          <div class="segmented-control">
+            <button class="segmented-item ${typeFilter === 'all' ? 'active' : ''}" data-type-filter="all">All Types</button>
+            <button class="segmented-item ${typeFilter === 'lecture' ? 'active' : ''}" data-type-filter="lecture">Lectures</button>
+            <button class="segmented-item ${typeFilter === 'practical' ? 'active' : ''}" data-type-filter="practical">Practicals</button>
+          </div>
+
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="date" id="history-date-filter" class="input" style="height:32px; font-size:12px; padding:2px 8px; width:auto;" value="${dateFilter}" title="Filter by session date">
+            ${dateFilter ? `<button class="btn btn-ghost btn-sm" id="history-clear-date" style="padding:2px 6px; font-size:11px;">Clear</button>` : ''}
+          </div>
         </div>
 
-        <div style="display:flex; gap:4px;">
-          <button class="btn btn-sm ${typeFilter === 'all' ? 'btn-secondary' : 'btn-outline'}" data-type-filter="all">All Types</button>
-          <button class="btn btn-sm ${typeFilter === 'lecture' ? 'btn-secondary' : 'btn-outline'}" data-type-filter="lecture">Lectures</button>
-          <button class="btn btn-sm ${typeFilter === 'practical' ? 'btn-secondary' : 'btn-outline'}" data-type-filter="practical">Practicals</button>
-        </div>
-
-        <div style="font-size:var(--fs-xs); color:var(--ink-tertiary); margin-left:auto;">
-          ${filtered.length} session${filtered.length === 1 ? '' : 's'} on record
+        <div style="font-size:var(--fs-xs); color:var(--ink-secondary); font-weight:600;">
+          Showing <strong>${filtered.length}</strong> of ${sessions.length} sessions
         </div>
       </div>
 
@@ -135,6 +152,22 @@ const HistoryView = (() => {
     if (filterSelect) {
       filterSelect.addEventListener('change', (e) => {
         subjectFilter = e.target.value;
+        render();
+      });
+    }
+
+    const dateInput = container.querySelector('#history-date-filter');
+    if (dateInput) {
+      dateInput.addEventListener('change', (e) => {
+        dateFilter = e.target.value;
+        render();
+      });
+    }
+
+    const clearDateBtn = container.querySelector('#history-clear-date');
+    if (clearDateBtn) {
+      clearDateBtn.addEventListener('click', () => {
+        dateFilter = '';
         render();
       });
     }
@@ -311,7 +344,7 @@ const HistoryView = (() => {
     subjectFilter = subId;
   }
 
-  return { render, setSubjectFilter };
+  return { render, setSubjectFilter, openSessionDetailModal };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = HistoryView;

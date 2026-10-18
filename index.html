@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Attendify — SY BSc IT Attendance Portal</title>
 <meta name="description" content="Admin attendance management system for 60 students of SY BSc IT batch.">
-<meta name="theme-color" content="#4F46E5">
+<meta name="theme-color" content="#51458A">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/components.css">
@@ -22,8 +27,11 @@
     .view { display: none !important; max-width: 100% !important; }
     .view.active { display: block !important; }
     .card { border: 1px solid #D1D5DB !important; box-shadow: none !important; }
+    .practical-document { border: 1px solid #000000 !important; box-shadow: none !important; padding: 12px 16px !important; margin: 0 !important; max-width: 100% !important; background: #FFFFFF !important; color: #000000 !important; }
+    .document-meta-strip { background: #F8FAFC !important; border: 1px solid #CBD5E1 !important; color: #000000 !important; }
+    .document-signature-block { break-inside: avoid; page-break-inside: avoid; border-top: 1px solid #000000 !important; }
     table { width: 100% !important; border-collapse: collapse !important; }
-    th, td { border: 1px solid #E5E7EB !important; padding: 4px 8px !important; font-size: 11px !important; }
+    th, td { border: 1px solid #CBD5E1 !important; padding: 4px 8px !important; font-size: 11px !important; color: #000000 !important; }
     tr { break-inside: avoid; page-break-inside: avoid; }
   }
 </style>
@@ -31,9 +39,11 @@
 <script>
   (function () {
     try {
+      var urlParams = new URLSearchParams(window.location.search);
+      var themeParam = urlParams.get('theme');
       var raw = localStorage.getItem('attendify:v2');
-      var theme = 'light';
-      if (raw) {
+      var theme = themeParam || 'light';
+      if (!themeParam && raw) {
         var parsed = JSON.parse(raw);
         if (parsed && parsed.settings && parsed.settings.theme) theme = parsed.settings.theme;
       }
@@ -61,6 +71,7 @@
 <script src="js/ui.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/mark-attendance.js"></script>
+<script src="js/rapid-roll.js"></script>
 <script src="js/students.js"></script>
 <script src="js/subjects.js"></script>
 <script src="js/history.js"></script>

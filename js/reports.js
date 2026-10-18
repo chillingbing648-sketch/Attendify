@@ -29,7 +29,13 @@ const ReportsView = (() => {
       <div class="view-header">
         <div>
           <h1>Attendance Reports</h1>
-          <p class="view-subtitle">SY BSc IT · Academic Ledgers, Summaries & Presets</p>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:5px; flex-wrap:wrap;">
+            <div class="topbar-badge">
+              <span class="topbar-badge-dot"></span>
+              Academic Ledgers & Presets
+            </div>
+            <span style="font-size:12px; color:var(--ink-tertiary);">Batch Summaries, Defaulter Notice & CSV Exports</span>
+          </div>
         </div>
         <div class="view-header-actions">
           <button class="btn btn-primary" id="btn-quick-generate-today" ${todaySessions.length === 0 ? 'disabled' : ''} title="Export CSV for today's classes">
@@ -195,6 +201,9 @@ const ReportsView = (() => {
   }
 
   function bindEvents(container) {
+    const quickTodayBtn = container.querySelector('#btn-quick-generate-today');
+    if (quickTodayBtn) quickTodayBtn.addEventListener('click', exportTodayCSV);
+
     const todayBtn = container.querySelector('#btn-export-today-csv');
     if (todayBtn) todayBtn.addEventListener('click', exportTodayCSV);
 

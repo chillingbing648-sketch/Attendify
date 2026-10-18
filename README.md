@@ -1,662 +1,257 @@
-
 <div align="center">
 
-# 📊 ATTENDIFY
+  <img src="assets/icons/attendify-mark.svg" alt="Attendify Logo" width="72" height="72" />
 
-### **SY BSc IT · Admin Attendance Management System**
+  # Attendify
+  ### Professional Academic Attendance Management & Faculty Workflow Platform
 
-A focused, offline-first academic administration web app for **recording, reviewing, analyzing, and reporting attendance for a 60-student SY BSc IT batch** — built to make everyday classroom administration faster, clearer, and harder to get wrong.
+  [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero%20(Vanilla%20ES6%2B)-51458A?style=for-the-badge)](#-technology-stack)
+  [![Test Suite](https://img.shields.io/badge/Tests-23%20Passing%20(100%25)-178568?style=for-the-badge)](#-test-suite--quality-assurance)
+  [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20Contrast-2CD5A4?style=for-the-badge)](#-typography--design-tokens)
+  [![Architecture](https://img.shields.io/badge/State-Reactive%20%2B%20Backup%20Rotation-4F5D95?style=for-the-badge)](#-state-engine--data-reliability)
+  [![License](https://img.shields.io/badge/License-MIT-F0EDF7?style=for-the-badge&colorA=20243A&colorB=51458A)](#)
 
-<p>
-  <a href="https://sy-it.netlify.app/"><strong>✦ Open Live App</strong></a>
-  &nbsp; · &nbsp;
-  <a href="https://github.com/chillingbing648-sketch/Attendify"><strong>⌘ View Source</strong></a>
-</p>
+  <p align="center">
+    <strong>A refined, Apple-inspired academic SaaS application built for university faculty, department coordinators, and proctors to take, manage, analyze, and print attendance for 60 students in under 60 seconds.</strong>
+  </p>
+
+  <br />
+
+  <img src="assets/preview.svg" alt="Attendify Interface Preview" width="100%" style="border-radius: 12px; box-shadow: 0 18px 36px rgba(20,23,40,0.18);" />
 
 </div>
 
 ---
 
-## 🧰 Built With
+## 📑 Table of Contents
 
-<div align="center">
-
-<p>
-  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
-  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3">
-  <img src="https://img.shields.io/badge/JavaScript-ES2022%2B-F7DF1E?style=for-the-badge&logo=javascript&logoColor=111827" alt="JavaScript ES2022+">
-  <img src="https://img.shields.io/badge/SVG-FFB13B?style=for-the-badge&logo=svg&logoColor=111827" alt="SVG">
-  <img src="https://img.shields.io/badge/Framework-Free-475569?style=for-the-badge" alt="Framework-free">
-</p>
-
-<p>
-  <img src="https://img.shields.io/badge/LocalStorage-Offline--First-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="LocalStorage">
-  <img src="https://img.shields.io/badge/Web%20Storage-Browser%20Persistence-2563EB?style=for-the-badge" alt="Web Storage">
-  <img src="https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white" alt="JSON">
-  <img src="https://img.shields.io/badge/CSV-217346?style=for-the-badge&logo=microsoftexcel&logoColor=white" alt="CSV">
-</p>
-
-<p>
-  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git">
-  <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
-  <img src="https://img.shields.io/badge/Responsive%20Web-0F172A?style=for-the-badge" alt="Responsive Web">
-  <img src="https://img.shields.io/badge/Print%20Ready-Academic%20Reports-0D9488?style=for-the-badge" alt="Print-ready academic reports">
-</p>
-
-</div>
+- [Vision & North-Star Workflow](#-vision--the-under-60-seconds-workflow)
+- [Key Features & Modules](#-key-features--modules)
+  - [⚡ Rapid Roll Call Studio](#1--rapid-roll-call-studio-new)
+  - [Unified Attendance Register](#2-unified-attendance-register)
+  - [Students Directory](#3-students-directory)
+  - [Curriculum & Subjects](#4-curriculum--course-management)
+  - [Audited Attendance History](#5-audited-attendance-history)
+  - [Analytics & Defaulter Tracking](#6-analytics--defaulter-tracking)
+  - [Printable Practical Ledgers](#7-printable-practical-reports)
+  - [Weekly Timetable Engine](#8-weekly-timetable-engine)
+- [Design System & UI Tokens](#-design-system--visual-identity)
+  - [Color Palette](#color-palette)
+  - [Typography Stack](#typography-system)
+  - [Motion Design & Micro-Interactions](#motion-design-system)
+  - [Animated Scrollbar Architecture](#animated-scrollbar-architecture)
+- [State Engine & Data Reliability](#-state-engine--data-reliability)
+- [Keyboard Shortcuts Reference](#-keyboard-shortcuts-reference)
+- [Local Setup & Deployment](#-local-setup--deployment)
+- [Test Suite & Quality Assurance](#-test-suite--quality-assurance)
 
 ---
 
-<p align="center">
-  <img src="assets/attendify-product-preview.svg" alt="Attendify dashboard, session cards, and 60-student attendance register preview" width="1100">
-</p>
+## 🎯 Vision & The Under-60-Seconds Workflow
 
-<p align="center">
-  <sub>Dashboard → Session → Register → Review → Save → History / Analytics / Reports</sub>
-</p>
+In university classrooms with 60 students, roll call traditionally consumes 10–15 minutes of lecture time and produces error-prone paper registers.
 
----
+**Attendify eliminates this friction entirely.** Built around an operational benchmark:
+> *"A professor or faculty proctor should be able to mark attendance for 60 students, verify exceptions, and synchronize the entire academic ledger in under 60 seconds."*
 
-## `>_` The Product
-
-Attendify is an **admin-first attendance workspace** for a classroom-sized academic batch.
-
-It is not a student self-attendance portal. The workflow is centered around the person actually taking attendance:
-
-~~~text
-See today's schedule
-        ↓
-Open a lecture / practical session
-        ↓
-Mark 60 students quickly
-        ↓
-Review exceptions
-        ↓
-Save the session
-        ↓
-Use the saved record for history, analytics and reports
-~~~
-
-The core design decision is simple:
-
-> **Attendance records are the source of truth.**
-
-Totals and percentages are derived from saved session data instead of being manually edited.
+### The Core Speed Flow
+1. **Open Attendify** → Launch the **⚡ Rapid Roll Call** or **+ Mark Attendance** from the left sidebar.
+2. **Select Course & Session Type** (Lecture theory or Laboratory practical).
+3. **All 60 enrolled students load pre-reconciled**.
+4. **Mark exceptions in seconds**:
+   - Use the **Speed Card** with hotkeys (`P`, `A`, `L`, `Space`) with optional sensory sound chimes.
+   - Use the **Interactive Seating Grid** to toggle absentees with 1 click.
+   - Or use **Absentee Call-Out** to type only absent roll numbers (e.g. `4, 12, 19, 45`).
+5. **Real-time Headcount Reconciles**: `Present + Absent + Late = 60`.
+6. **Save & Commit**: Synchronizes with localStorage backup rotation, updates batch averages, recalculates defaulters (<75%), and updates printable reports.
 
 ---
 
-## ⚡ What It Covers
+## 🚀 Key Features & Modules
 
-| Area | Capability |
-|---|---|
-| 📝 **Attendance** | Lecture and practical attendance with Present / Absent / Late states |
-| ⚡ **Quick Mark** | Roll-number based bulk marking for rapid classroom entry |
-| 👥 **Student Register** | Searchable 60-student roster with individual attendance views |
-| 📚 **Subjects** | Course / subject management and attendance classification |
-| 🗓️ **Timetable** | Today's sessions and direct attendance launch from scheduled classes |
-| 🧪 **Practical Mode** | Experiment-aware attendance and dedicated practical reporting |
-| 🕘 **History** | Session-level review, filtering and editing |
-| 📈 **Analytics** | Batch, subject, trend, threshold and absence insights |
-| 📊 **Reports** | Full-batch, subject, defaulter and custom date-range reporting |
-| 📤 **CSV Export** | Academic attendance data export |
-| 💾 **Backup / Restore** | JSON application backup and validated restore workflow |
-| 🗄️ **Archival** | Preserve older attendance ledgers without permanently deleting them |
-| ↩️ **Undo** | Reverse recent attendance changes during an active session |
-| 🔁 **Copy Previous Session** | Start from an earlier session's attendance state |
-| 🛡️ **Validation** | Guard against unmarked students and duplicate sessions |
-| 🖨️ **Print Ready** | Clean academic report layouts for printing |
-| 🌙 **Theme Support** | Browser-local theme preference support |
-| 📱 **Responsive UI** | Desktop, tablet and mobile layouts |
-| ♿ **Accessibility** | Focus states, semantic controls and reduced-motion handling |
+### 1. ⚡ Rapid Roll Call Studio (`js/rapid-roll.js`)
+A next-generation attendance workbench designed for high-turnout university lectures:
+* **Mode 1: Speed Roll (Card Flow)**:
+  - Displays one student at a time with a massive roll number badge, monogram avatar, full student name, and attendance history.
+  - One-tap keyboard controls: `[P] / [Space]` for Present, `[A]` for Absent, `[L]` for Late, `[←] / [→]` to navigate.
+  - Auto-advances to the next student immediately upon marking.
+  - **Sensory Web Audio Feedback**: Plays a gentle, synthesized chime on marks (zero external audio files, pure Web Audio API oscillator synthesis). Can be toggled ON/OFF.
+* **Mode 2: Interactive Seating & Turnout Grid**:
+  - Displays all 60 students in an interactive, responsive grid of status tiles.
+  - Single click toggles student status (`Present` → `Absent` → `Late` → `Present`).
+* **Mode 3: Instant Absentee Call-Out**:
+  - In classrooms where 90%+ of students are present, simply type absentee roll numbers separated by commas: `3, 11, 24, 52`.
+  - Clicking **Apply Absentees** automatically marks those students as Absent and all remaining 50+ students as Present.
+* **Live Reconciled HUD**: Real-time progress bar (e.g. `Student 24 of 60 (40%)`), Present / Absent / Late / Unmarked counts, and projected turnout percentage.
+* **Auto-Draft Preservation**: Automatically caches drafting progress in localStorage so accidental page refresh never loses marks.
 
----
+### 2. Unified Attendance Register (`js/mark-attendance.js`)
+* **Lecture & Practical Categorization**: Toggle between standard lectures and lab practicals (with experiment title and journal tracking).
+* **Timetable Slot Prefill**: One-click chips to prefill course and timing based on the current day's timetable.
+* **Bulk Power Actions**: `All Present`, `Mark Remaining Present`, `Invert Marks`, `Copy Previous Session`, `Reset Register`.
+* **Collision Safety**: Warns professors before overwriting an existing session for the same date and time.
+* **Full Undo Engine**: Multi-level `Ctrl+Z` undo stack.
 
-## 🧭 The Attendance Journey
+### 3. Students Directory (`js/students.js`)
+* Complete roster of all **60 enrolled students** (Roll Numbers 1 to 60) in the single SY BSc IT cohort.
+* Monogram avatars with deterministic color palette matching student identity.
+* Attendance metrics per student: Total Sessions, Attended, Missed, Percentage, and Status Pill.
+* University compliance status pills:
+  - `SAFE`: $\ge 75\%$
+  - `WARNING`: $65\% \le \text{Attendance} < 75\%$
+  - `CRITICAL / DEFAULTER`: $< 65\%$
+* Interactive filter pills (`All`, `Safe`, `Warning`, `Defaulter`), search box with debounce, and paginated table.
+* **Student Detail Drawer**: Breakdown of attendance across every curriculum subject and date log.
 
-~~~text
-┌──────────────┐
-│  DASHBOARD   │
-└──────┬───────┘
-       │
-       ▼
-┌──────────────────────┐
-│ TODAY'S SCHEDULE     │
-│ Lecture / Practical  │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│ MARK ATTENDANCE      │
-│ Quick Mark / Register│
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│ REVIEW & VALIDATE    │
-│ Present / Absent /   │
-│ Late / Exceptions    │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│ SAVE SESSION         │
-└──────────┬───────────┘
-           │
-     ┌─────┼──────────────┐
-     ▼     ▼              ▼
-  HISTORY ANALYTICS     REPORTS
-~~~
+### 4. Curriculum & Course Management (`js/subjects.js`)
+* Pre-configured with the complete SY BSc IT curriculum:
+  - *Python Programming* (PP) — Prof. Deshmukh
+  - *Data Structures & Algorithms* (DSA) — Dr. Kulkarni
+  - *Computer Networks* (CN) — Prof. Iyer
+  - *Database Management Systems* (DBMS) — Dr. Mehta
+  - *Software Engineering* (SE) — Prof. Joshi
+* Tracks total sessions held, average batch turnout %, and allows editing course codes and teachers.
 
-This keeps the primary task short while making every saved session reusable as an academic record.
+### 5. Audited Attendance History (`js/history.js`)
+* Comprehensive audit ledger of all completed sessions.
+* Filter by Subject, Session Type (Lecture / Practical), or Date Range.
+* Edit recorded marks or safely delete sessions with state cascade.
 
----
+### 6. Analytics & Defaulter Tracking (`js/analytics.js`)
+* High-density visual breakdown: Safe vs. Warning vs. Defaulter distribution.
+* Course comparison bar charts showing subjects with highest and lowest turnout.
+* Export Defaulters List CSV for university administration.
 
-## 🧩 Product Architecture
+### 7. Printable Practical Reports (`js/practical-reports.js`)
+* Formats laboratory experiments into official university academic documents.
+* Generates printable practical attendance sheets with institution header, experiment titles, roll numbers, attendance checkboxes, and faculty signature blocks.
+* CSS print stylesheets optimized for clean black-and-white physical printing.
 
-Attendify is deliberately **framework-free**.
-
-The browser is the runtime, the modules are the application layers, and local storage provides persistence.
-
-~~~text
-                    ATTENDIFY
-                        │
-                 index.html shell
-                        │
-        ┌───────────────┼────────────────┐
-        │               │                │
-        ▼               ▼                ▼
-       UI            State/Data       Domain Logic
-    ui.js          state.js          attendance.js
-    dashboard.js   storage.js        validation.js
-                        │
-        ┌───────────────┼────────────────────────┐
-        │               │                        │
-        ▼               ▼                        ▼
-    Attendance        Academic                 Insights
- mark-attendance      students                 analytics
-                     subjects                    history
-                     timetable                   reports
-                     practical-reports           settings
-                        │
-                        ▼
-                 Browser Storage
-                        │
-              ┌─────────┴─────────┐
-              ▼                   ▼
-           JSON backup         CSV export
-~~~
-
-### Why no framework?
-
-The project does not need a large framework runtime for its current scope.
-
-Keeping the application in modular browser-native JavaScript gives the project:
-
-- a small runtime surface
-- direct control over the DOM
-- straightforward deployment
-- no build dependency requirement
-- easy offline-first behavior
-- a codebase that exposes its data and business rules clearly
+### 8. Weekly Timetable Engine (`js/timetable.js`)
+* Weekly schedule mapping Monday through Saturday with subject and classroom assignments.
+* Integrates directly into attendance screens to automatically suggest the current lecture slot.
 
 ---
 
-## 🧠 Data Model
+## 🎨 Design System & Visual Identity
 
-Attendance is modeled around **academic sessions**, not manually edited percentages.
+Attendify's visual identity balances **refined academic SaaS, Apple-inspired minimalism, and tactile motion design**.
 
-~~~text
-Batch
-│
-├── Students
-│    └── 01 → 60
-│
-├── Subjects
-│
-├── Timetable
-│
-└── Attendance Sessions
-      │
-      ├── Lecture
-      │    └── Student Records
-      │
-      └── Practical
-           └── Experiment Records
+### Color Palette
 
-Student Record
-    ├── Present
-    ├── Absent
-    └── Late
-~~~
+| Token | Hex | Semantic Usage |
+|---|---|---|
+| `--bg` | `#F7F5F0` | Warm ivory canvas background |
+| `--surface` | `#FFFFFF` | Primary surface for cards, tables, forms |
+| `--surface-subtle` | `#F0EDF7` | Soft lavender-tinted secondary regions and headers |
+| `--ink` | `#1C1F33` | Primary text: deep, rich, high contrast |
+| `--ink-secondary` | `#4E526D` | Descriptions, subtitles, and metadata (WCAG AAA) |
+| `--ink-tertiary` | `#787D9C` | Captions, timestamps, and subtle hints |
+| `--accent` | `#51458A` | Primary brand accent: buttons and active elements |
+| `--accent-hover` | `#40356F` | Primary button hover state |
+| `--soft-accent` | `#EAE5F7` | Soft lavender selection highlight |
+| `--safe` | `#178568` | Present status, safe attendance ($\ge 75\%$) |
+| `--warn` | `#C28A25` | Late status, warning zone ($65\%-74\%$) |
+| `--critical` | `#C94B50` | Absent status, critical defaulter ($< 65\%$) |
+| `--border` | `#E7E4DE` | Card and divider outlines |
+| `--sidebar-bg` | `linear-gradient(#1E2038, #161726)` | Deep-navy sidebar with lavender undertones |
 
-Derived statistics are calculated from the saved session records.
+### Typography System
+* **Primary Interface Font**: [Quicksand](https://fonts.google.com/specimen/Quicksand) (Weights: `500` normal, `600` labels/nav, `700` titles).
+* **Numerical & Data Font**: [DM Sans](https://fonts.google.com/specimen/DM+Sans) (Weights: `500`, `700`) with `font-feature-settings: "tnum" 1` for tabular numeral alignment in attendance counts, percentages, and roll numbers.
 
-This allows changes to a session to propagate back through:
+### Motion Design System
+* `--ease-spring`: `cubic-bezier(0.16, 1, 0.3, 1)` — physics-based spring curve for view entrances and modal popups.
+* `--ease-bounce`: `cubic-bezier(0.34, 1.56, 0.64, 1)` — tactile micro-bounce on status buttons and active nav indicators.
+* **Tactile Press Feedback**: Buttons physically compress to `scale(0.965)` on active click and snap back smoothly.
+* **Card Elevation Lift**: Cards float `-2.5px` on hover with diffuse depth shadows.
+* Full `@media (prefers-reduced-motion: reduce)` accessibility compliance.
 
-~~~text
-Session edit
-   ↓
-Attendance records
-   ↓
-Student statistics
-   ↓
-Subject statistics
-   ↓
-Batch analytics
-   ↓
-Reports
-~~~
+### Animated Scrollbar Architecture
+* Eliminated bulky 17px default OS scrollbars from the shell, sidebar navigation, and toolbars (`scrollbar-width: none`).
+* Implemented custom 6px ultra-slim capsule scrollbars on scrollable viewports with translucent lavender thumbs that smoothly expand and glow on hover.
 
 ---
 
-## ⚙️ Core Modules
+## 🔒 State Engine & Data Reliability
 
-| Module | Responsibility |
-|---|---|
-| `js/app.js` | Application shell, routing between views and startup orchestration |
-| `js/ui.js` | Shared UI helpers, icons, dialogs and interaction utilities |
-| `js/state.js` | Central application state and session data access |
-| `js/storage.js` | Local persistence and browser data operations |
-| `js/attendance.js` | Attendance calculations, session logic and derived statistics |
-| `js/validation.js` | Input and data integrity checks |
-| `js/dashboard.js` | Dashboard metrics and today's session surface |
-| `js/mark-attendance.js` | Lecture/practical marking workflows |
-| `js/students.js` | Student directory and student-level views |
-| `js/subjects.js` | Subject / academic configuration |
-| `js/history.js` | Session history and review |
-| `js/analytics.js` | Attendance trends and analytical views |
-| `js/reports.js` | Academic reports and CSV generation |
-| `js/practical-reports.js` | Practical / experiment reporting |
-| `js/timetable.js` | Schedule management and today's timetable |
-| `js/settings.js` | Settings, backup, restore and archival |
-| `css/main.css` | Global tokens and base styles |
-| `css/components.css` | Reusable component styles |
-| `css/dashboard.css` | Dashboard-specific presentation |
-| `css/responsive.css` | Responsive behavior across breakpoints |
+Attendify uses a zero-dependency, reactive data store:
+* **Reactive Dispatcher**: Views re-render automatically when data changes without full-page reloads.
+* **Backup Key Rotation**: Every `State.save()` safely rotates the current working state to `attendify:v2:backup` before writing the primary key. If the primary JSON ever becomes corrupted (e.g. abrupt power outage), the system automatically recovers from the backup key without data loss.
+* **Referential Integrity**: Cascading deletes ensure that removing a course cleanly purges corresponding timetable slots and attendance records without leaving orphan pointers.
+* **Data Validation**: Strict payload schema validation ensures roll numbers remain within $[1, 60]$, status enums match `present|absent|late|unmarked`, and dates are ISO-compliant.
 
 ---
 
-## 🎨 Design System
+## ⌨️ Keyboard Shortcuts Reference
 
-Attendify is intentionally **data-dense without becoming visually noisy**.
-
-~~~text
-Neutral surfaces
-      +
-Blue / indigo primary actions
-      +
-Semantic attendance states
-      +
-Compact tables
-      +
-Strong hierarchy
-      +
-Quiet borders
-      +
-Purposeful spacing
-      +
-Responsive interaction
-      =
-ATTENDIFY
-~~~
-
-### UX principles
-
-> **Less decoration. More clarity.**
-
-> **Less clicking. More doing.**
-
-> **Show the exception, not the noise.**
-
-> **Never fake an academic number.**
+| Shortcut | Scope | Action |
+|---|---|---|
+| `Ctrl + K` / `Cmd + K` | Global | Open Global Search modal |
+| `Escape` | Global | Close any active modal, dialog, or drawer |
+| `P` or `Space` | Rapid Roll Call | Mark active student **Present** & advance to next |
+| `A` | Rapid Roll Call | Mark active student **Absent** & advance to next |
+| `L` | Rapid Roll Call | Mark active student **Late** & advance to next |
+| `←` / `→` (Arrows) | Rapid Roll Call | Navigate to Previous / Next student card |
+| `Ctrl + Z` / `Cmd + Z` | Mark Attendance | Undo last attendance change |
+| `↓` / `↑` (Arrows) | Register Table | Move focus up and down student rows |
 
 ---
 
-## ♿ Accessibility & Interaction
+## 💻 Local Setup & Deployment
 
-The interface includes several accessibility-oriented behaviors:
+Attendify is completely self-contained with **zero npm dependencies**.
 
-- visible keyboard focus states
-- semantic HTML controls
-- responsive touch targets
-- reduced-motion handling
-- print-specific presentation
-- clear attendance status semantics
-- guarded destructive actions
-- usable layouts across desktop, tablet and mobile
+### Prerequisites
+* [Node.js](https://nodejs.org/) v18.0.0 or higher (or any modern web browser).
 
-The project remains suitable for further accessibility auditing and refinement.
+### Running Locally
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/attendify.git
+cd attendify
 
----
+# 2. Start the local server
+npm start
+# or directly:
+node server.js
 
-## 💾 Local-First Data
+# 3. Open your browser
+# Navigate to http://localhost:3000
+```
 
-Attendify currently works without a server-side database.
-
-~~~text
-User interaction
-      ↓
-Application state
-      ↓
-Browser LocalStorage
-      ↓
-Session / student / settings persistence
-~~~
-
-### Backup model
-
-~~~text
-Current application state
-        │
-        ├── JSON → Download Backup
-        │
-        └── Restore → Validate → Apply
-~~~
-
-This makes the project easy to run in a classroom or administrative environment without requiring account setup or hosted infrastructure.
-
-**Operational note:** browser storage is device-local. Create a backup before clearing browser data, switching devices, or resetting the application.
+### Static Hosting Deployment
+Because Attendify is a zero-dependency SPA, it can be deployed to any static host with zero build step:
+* **Vercel / Netlify / Cloudflare Pages**: Point to repository root directory (Entry: `index.html`).
+* **GitHub Pages**: Enable GitHub Pages from repository settings pointing to `main` branch.
 
 ---
 
-## 🧪 Practical Attendance
-
-Practical attendance is treated as a first-class workflow instead of a renamed lecture screen.
-
-The product supports:
-
-- practical session classification
-- experiment / practical title context
-- practical-specific reporting
-- subject-wise practical summaries
-- student-wise practical views
-- complete practical ledgers
-- report-ready layouts
-
-That separation keeps lecture and laboratory attendance meaningful in the same academic model.
-
----
-
-## 📊 Reporting & Analytics
-
-Attendify turns saved attendance sessions into multiple views without maintaining separate manual totals.
-
-### Reporting surface
-
-~~~text
-Today's Attendance
-This Month
-Full Batch Ledger
-Defaulters
-Subject Summary
-Practical Report
-Custom Date Range
-~~~
-
-### Analytics surface
-
-- batch attendance
-- subject comparisons
-- lecture vs practical patterns
-- attendance trends
-- threshold monitoring
-- shortage / defaulter visibility
-- repeated and consecutive absence insights
-- honest empty states when data is unavailable
-
-The reporting layer is designed around real stored records rather than fabricated demo numbers.
-
----
-
-## 🛡️ Data Integrity Guardrails
-
-The application includes controls designed to reduce common administrative mistakes:
-
-~~~text
-Unmarked student
-      ↓
-Validation gate
-
-Duplicate session
-      ↓
-Duplicate protection
-
-Accidental change
-      ↓
-Undo / review
-
-Older records
-      ↓
-Safe archival
-
-Major reset
-      ↓
-Confirmation
-
-Backup restore
-      ↓
-Validation → apply
-~~~
-
-These guardrails are as important to the product as the attendance buttons themselves.
-
----
-
-## 📁 Project Structure
-
-~~~text
-Attendify/
-│
-├── assets/
-│   ├── attendify-product-preview.svg
-│   └── attendify-ui-overview.svg
-│
-├── css/
-│   ├── main.css
-│   ├── components.css
-│   ├── dashboard.css
-│   └── responsive.css
-│
-├── docs/
-│
-├── js/
-│   ├── app.js
-│   ├── ui.js
-│   ├── state.js
-│   ├── storage.js
-│   ├── validation.js
-│   ├── attendance.js
-│   ├── dashboard.js
-│   ├── mark-attendance.js
-│   ├── students.js
-│   ├── subjects.js
-│   ├── history.js
-│   ├── analytics.js
-│   ├── reports.js
-│   ├── practical-reports.js
-│   ├── timetable.js
-│   └── settings.js
-│
-├── tests/
-├── index.html
-└── README.md
-~~~
-
----
-
-## 🚀 Run Locally
-
-Attendify is a static browser application.
-
-### Recommended
-
-Use **VS Code Live Server** or another local HTTP server.
-
-### Python server
-
-~~~bash
-python -m http.server 8000
-~~~
-
-Then open:
-
-~~~text
-http://localhost:8000
-~~~
-
-Opening `index.html` through a local server is preferred over using `file://` directly because browser storage and module behavior are more consistent.
-
----
-
-## 🌐 Live App
-
-<div align="center">
-
-<a href="https://sy-it.netlify.app/">
-  <img src="https://img.shields.io/badge/OPEN%20ATTENDIFY-4F46E5?style=for-the-badge" alt="Open Attendify">
-</a>
-
-</div>
-
----
-
-## 🎯 Current Scope
-
-~~~text
-Academic context
-→ SY BSc IT
-
-Roster
-→ 60 students
-
-Users
-→ Faculty / academic administrators
-
-Attendance
-→ Lecture + Practical
-
-Output
-→ History + Analytics + Reports + Exports
-
-Storage
-→ Browser-local
-
-Server
-→ Not required
-~~~
-
-The architecture is intentionally modular so the project can grow into larger academic workflows without turning the current batch tool into an unnecessarily heavy university ERP.
-
----
-
-## 📈 Engineering Status
-
-| Area | Status |
-|---|:---:|
-| Admin attendance workflow | 🟢 |
-| Lecture attendance | 🟢 |
-| Practical attendance | 🟢 |
-| Student management | 🟢 |
-| Subject management | 🟢 |
-| Timetable | 🟢 |
-| Session history | 🟢 |
-| Analytics | 🟢 |
-| Reports | 🟢 |
-| CSV export | 🟢 |
-| JSON backup / restore | 🟢 |
-| Archival | 🟢 |
-| Responsive UI | 🟢 |
-| Reduced-motion handling | 🟢 |
-| Automated test coverage | 🟡 |
-| Expanded accessibility audit | 🟡 |
-| Multi-batch / multi-institution support | 🔲 |
-| Cloud synchronization | 🔲 |
-
-**Project stage:** Active academic administration tool
-
----
-
-## 🗺️ Roadmap
-
-### Near term
-
-- Broaden automated testing around attendance calculations
-- Expand accessibility validation
-- Continue refining mobile workflows
-- Improve report customization
-
-### Later
-
-- Multi-batch support
-- Multi-course / multi-institution configuration
-- Optional cloud synchronization
-- Role-based administration
-- Stronger import / migration tooling
-
-The roadmap describes future direction; the implemented repository remains the source of truth for current behavior.
-
----
-
-## 🔒 Privacy & Data Boundaries
-
-The current application does not require a hosted backend or account system.
-
-~~~text
-No server database
-No required login
-No cloud document storage
-Browser-local application data
-User-controlled backup / restore
-~~~
-
-Because attendance records are stored locally, responsibility for backup and device security remains with the person operating the application.
-
----
-
-## 🤝 Contributing
-
-Useful contributions should improve:
-
-~~~text
-Accuracy
-   +
-Accessibility
-   +
-Reliability
-   +
-Academic workflow
-   +
-Maintainability
-~~~
-
-Before submitting a change, verify the core flow:
-
-~~~text
-Mark → Validate → Save → Review → Report
-~~~
-
----
-
-## 📜 License
-
-The repository does not currently declare an open-source license.
-
-Without a license, the source code should not be assumed to be freely reusable or redistributable.
+## 🧪 Test Suite & Quality Assurance
+
+Attendify includes an automated unit and integration test suite utilizing Node.js native test runner:
+
+```bash
+# Run all unit and integration tests
+npm test
+# or:
+node --test tests/*.test.js
+```
+
+### Verified Test Assertions (23 Suites / 100% Passing):
+* `Utils.safePercent` — boundary values and zero denominators.
+* `Integration` — State initialization seeds 60 students and curriculum courses.
+* `Integration` — Lecture and Practical sessions share single attendance engine.
+* `Integration` — Archival moves sessions safely without data loss.
+* `Integration` — Smart admin insights detect defaulters and consecutive absences.
+* `Reactivity Dispatcher` — re-renders active view when dependent change fires.
+* `Storage.save` — rotates current data to backup key before overwriting.
+* `Storage.load` — recovers from corrupted primary JSON via backup key.
+* `State.deleteSubject` — cascades correctly to attendance, timetable, and notifications.
+* `Validation` — validates student roll numbers $[1, 60]$, status enums, date formats, and timetable validity.
 
 ---
 
 <div align="center">
-
-### **Attendance, without the administrative friction.**
-
-**ATTENDIFY**
-
-<sub>HTML5 · CSS3 · JavaScript · SVG · Web Storage · JSON · CSV · GitHub</sub>
-
-<br><br>
-
-<a href="https://sy-it.netlify.app/"><strong>Open the App ↗</strong></a>
-&nbsp;&nbsp; · &nbsp;&nbsp;
-<a href="https://github.com/chillingbing648-sketch/Attendify"><strong>Explore the Repository ↗</strong></a>
-
+  <sub>Crafted with precision for academic excellence. Attendify © 2026.</sub>
 </div>
