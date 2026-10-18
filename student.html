@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Attendify — Student Attendance Portal</title>
+<meta name="description" content="Dedicated student portal for SY BSc IT cohort to submit attendance and view personal academic records.">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,500;0,9..40,700;1,9..40,500&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface-subtle: #F0EDF7;
+    --surface-accent: #EAE5F7;
+    --ink: #1C1F33;
+    --ink-secondary: #4E526D;
+    --ink-tertiary: #787D9C;
+    --accent: #51458A;
+    --accent-hover: #40356F;
+    --soft-accent: #EAE5F7;
+    --safe: #178568;
+    --safe-subtle: rgba(23, 133, 104, 0.12);
+    --warn: #C28A25;
+    --warn-subtle: rgba(194, 138, 37, 0.12);
+    --critical: #C94B50;
+    --critical-subtle: rgba(201, 75, 80, 0.12);
+    --border: #E7E4DE;
+    --border-strong: #D5D1C7;
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 16px;
+    --font-ui: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-data: 'DM Sans', -apple-system, monospace;
+    --shadow-sm: 0 1px 3px rgba(32, 36, 58, 0.05);
+    --shadow-md: 0 4px 16px rgba(32, 36, 58, 0.08);
+  }
+
+  [data-theme="dark"] {
+    --bg: #141522;
+    --surface: #1C1E30;
+    --surface-subtle: #25283F;
+    --surface-accent: rgba(184, 169, 248, 0.15);
+    --ink: #F6F4FD;
+    --ink-secondary: #B4B9D6;
+    --ink-tertiary: #878CAE;
+    --border: rgba(255, 255, 255, 0.09);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-ui);
+    background-color: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .data-num {
+    font-family: var(--font-data);
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* Navigation Bar */
+  .portal-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .brand-logo { width: 34px; height: 34px; }
+  .brand-title { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; }
+  .badge-portal {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    background: var(--surface-subtle);
+    color: var(--accent);
+    border-radius: 6px;
+    border: 1px solid rgba(81, 69, 138, 0.2);
+  }
+
+  .nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-icon {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--ink-secondary);
+    transition: all 0.2s ease;
+  }
+  .btn-icon:hover {
+    color: var(--ink);
+    background: var(--surface-subtle);
+    border-color: var(--border-strong);
+  }
+
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 12px 4px 6px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  .avatar-pill {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .portal-container {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+    flex: 1;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--ink-secondary);
+    margin-top: 2px;
+  }
+
+  /* Form Elements */
+  .form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  input, select {
+    height: 44px;
+    padding: 0 14px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(81, 69, 138, 0.15);
+  }
+
+  .btn {
+    height: 44px;
+    padding: 0 20px;
+    border-radius: var(--r-md);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #FFFFFF;
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(81, 69, 138, 0.25);
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--border-strong);
+  }
+  .btn-outline:hover {
+    background: var(--surface-subtle);
+    border-color: var(--accent);
+  }
+
+  /* Status Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .badge-safe { background: var(--safe-subtle); color: var(--safe); border: 1px solid rgba(23, 133, 104, 0.3); }
+  .badge-warn { background: var(--warn-subtle); color: var(--warn); border: 1px solid rgba(194, 138, 37, 0.3); }
+  .badge-critical { background: var(--critical-subtle); color: var(--critical); border: 1px solid rgba(201, 75, 80, 0.3); }
+
+  /* Login Card */
+  .login-box {
+    max-width: 440px;
+    margin: 40px auto;
+  }
+
+  /* Active Class Box */
+  .class-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .class-box::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--accent);
+  }
+
+  .class-box.submitted::before {
+    background: var(--safe);
+  }
+
+  .class-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .class-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .class-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 13px;
+    color: var(--ink-secondary);
+    margin-top: 4px;
+  }
+
+  .class-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Locked Container */
+  .locked-container {
+    background: var(--surface);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--r-lg);
+    padding: 36px 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .lock-icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .locked-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .locked-text {
+    font-size: 13.5px;
+    color: var(--ink-secondary);
+    max-width: 480px;
+    line-height: 1.5;
+  }
+
+  /* Unlocked Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .stat-val {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  /* Subject Cards */
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .subject-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .progress-bar-bg {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+
+  /* Table */
+  .table-responsive {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    text-align: left;
+  }
+
+  th {
+    background: var(--surface-subtle);
+    padding: 10px 14px;
+    font-weight: 700;
+    color: var(--ink-secondary);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(240, 237, 247, 0.4); }
+
+  .status-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .status-pill.present { background: var(--safe-subtle); color: var(--safe); }
+  .status-pill.late { background: var(--warn-subtle); color: var(--warn); }
+  .status-pill.absent { background: var(--critical-subtle); color: var(--critical); }
+
+  .banner {
+    padding: 12px 16px;
+    border-radius: var(--r-md);
+    font-size: 13.5px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .banner.error { display: block; background: var(--critical-subtle); color: var(--critical); border: 1px solid rgba(201, 75, 80, 0.3); }
+  .banner.success { display: block; background: var(--safe-subtle); color: var(--safe); border: 1px solid rgba(23, 133, 104, 0.3); }
+  .banner.info { display: block; background: var(--surface-subtle); color: var(--accent); border: 1px solid rgba(81, 69, 138, 0.25); }
+
+  @media (max-width: 640px) {
+    .portal-nav { padding: 0 16px; }
+    .portal-container { padding: 20px 12px 36px; }
+    .card { padding: 18px 16px; }
+    .class-top { flex-direction: column; align-items: flex-start; }
+    .stat-val { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="portal-nav">
+  <div class="nav-brand">
+    <svg class="brand-logo" viewBox="0 0 64 64" fill="none">
+      <rect x="2" y="2" width="60" height="60" rx="16" fill="#1C1D30"/>
+      <path d="M19 47L29.5 17.2C30.4 14.6 33.6 14.6 34.5 17.2L45 47" stroke="#B8A9F8" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M22 35L29.5 41.5L46 22" stroke="#2CD5A4" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="32" cy="14.5" r="2.2" fill="#FFFFFF"/>
+    </svg>
+    <span class="brand-title">Attendify</span>
+    <span class="badge-portal">STUDENT PORTAL</span>
+  </div>
+
+  <div class="nav-controls">
+    <button class="btn-icon" id="theme-toggle" title="Toggle Dark/Light Mode">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+      </svg>
+    </button>
+    <div id="nav-user-area" style="display:none;">
+      <div class="user-badge">
+        <div class="avatar-pill" id="nav-user-avatar">--</div>
+        <span id="nav-user-name" style="font-weight:600;">Student</span>
+      </div>
+      <button class="btn btn-outline" id="btn-logout" style="height:32px; padding:0 10px; font-size:12px; margin-left:8px;">
+        Sign Out
+      </button>
+    </div>
+    <a href="index.html" class="btn btn-outline" id="link-faculty" style="height:34px; padding:0 12px; font-size:12.5px;" title="Switch to Faculty Application">
+      Faculty View ↗
+    </a>
+  </div>
+</nav>
+
+<main class="portal-container">
+
+  <!-- ========================================== -->
+  <!-- 1. LOGIN VIEW                              -->
+  <!-- ========================================== -->
+  <div id="view-login" style="display:none;">
+    <div class="card login-box">
+      <div style="text-align:center; margin-bottom:22px;">
+        <h1 style="font-size:22px; font-weight:700; margin-bottom:6px;">Student Sign In</h1>
+        <p style="font-size:13.5px; color:var(--ink-secondary);">
+          SY BSc IT Cohort (Roll Numbers 1 to 60)
+        </p>
+      </div>
+
+      <div class="banner error" id="login-error"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-roll">Your Enrolled Roll Number</label>
+          <input type="number" id="login-roll" min="1" max="60" placeholder="Enter Roll Number (1–60)" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="login-pin">Student Access PIN</label>
+          <input type="password" id="login-pin" placeholder="Enter 4-digit PIN" required>
+          <span style="font-size:11.5px; color:var(--ink-tertiary); margin-top:2px;">
+            Default University PIN: <strong>1000 + Roll No.</strong> (e.g. 1001 for Roll 1)
+          </span>
+        </div>
+
+        <div style="margin: 12px 0 18px; display:flex; gap:8px;">
+          <button type="button" class="btn btn-outline" id="btn-quick-demo" style="height:32px; font-size:11.5px; width:100%;">
+            ⚡ Quick Demo Fill (Roll #1 · PIN: 1001)
+          </button>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-login-submit" style="width:100%;">
+          Sign In to Student Portal
+        </button>
+      </form>
+
+      <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--ink-tertiary);">
+        Protected by University Cryptographic Authentication.
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. STUDENT DASHBOARD VIEW                  -->
+  <!-- ========================================== -->
+  <div id="view-dashboard" style="display:none;">
+
+    <!-- Welcome Header Strip -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:22px; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h1 style="font-size:24px; font-weight:700;" id="dash-greeting">Welcome, Student</h1>
+        <p style="font-size:13.5px; color:var(--ink-secondary);" id="dash-cohort-info">
+          Roll #-- · SY BSc IT Cohort · Academic Term 2026
+        </p>
+      </div>
+      <button class="btn btn-outline" id="btn-refresh" style="height:34px; font-size:12.5px;">
+        ↻ Refresh Status
+      </button>
+    </div>
+
+    <!-- Feedback Banner -->
+    <div class="banner" id="dash-banner"></div>
+
+    <!-- SECTION 1: Active Class Check-In -->
+    <section class="card" id="section-active-classes">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+            </svg>
+            Active Class Attendance Submission
+          </h2>
+          <p class="card-desc">Classes currently authorized by faculty for attendance verification</p>
+        </div>
+      </div>
+
+      <div id="active-classes-container">
+        <!-- Rendered dynamically -->
+        <p style="color:var(--ink-secondary); font-size:13.5px;">Checking campus attendance servers...</p>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Personal Attendance Summary & Records (CRITICAL VISIBILITY RULE) -->
+    <section class="card" id="section-summary">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Your Attendance Statistics &amp; Academic Ledger
+          </h2>
+          <p class="card-desc">Personal compliance records for university examination eligibility (75% Minimum Requirement)</p>
+        </div>
+      </div>
+
+      <!-- State A: Locked (Before Submission) -->
+      <div id="summary-locked" class="locked-container" style="display:none;">
+        <div class="lock-icon-wrap">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0110 0v4"></path>
+          </svg>
+        </div>
+        <h3 class="locked-title">Attendance Summary &amp; History Locked</h3>
+        <p class="locked-text">
+          Under academic board regulations, overall attendance percentages and historical ledgers remain locked until you successfully verify your presence by submitting attendance for the active class.
+        </p>
+        <span class="badge badge-warn" style="margin-top:6px;">
+          Submission Required to Unlock
+        </span>
+      </div>
+
+      <!-- State B: Unlocked (After Server Confirms Submission) -->
+      <div id="summary-unlocked" style="display:none;">
+        <!-- High-level Metric Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Semester Attendance</span>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span class="stat-val data-num" id="stat-pct">--%</span>
+              <span class="badge" id="stat-badge">SAFE</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Attended Sessions</span>
+            <span class="stat-val data-num" id="stat-attended" style="color:var(--safe);">--</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Missed Sessions</span>
+            <span class="stat-val data-num" id="stat-missed" style="color:var(--critical);">--</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Total Held Sessions</span>
+            <span class="stat-val data-num" id="stat-total">--</span>
+          </div>
+        </div>
+
+        <!-- Subject-Wise Breakdown -->
+        <h3 style="font-size:15px; font-weight:700; margin-bottom:12px; color:var(--ink);">
+          Course-by-Course Attendance
+        </h3>
+        <div class="subjects-grid" id="subjects-container"></div>
+
+        <!-- Chronological Personal Attendance Ledger -->
+        <h3 style="font-size:15px; font-weight:700; margin:24px 0 12px; color:var(--ink);">
+          Your Recent Session Records
+        </h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Course</th>
+                <th>Type</th>
+                <th>Scheduled Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="records-table-body">
+              <tr>
+                <td colspan="5" style="text-align:center; color:var(--ink-secondary);">No records recorded yet</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+</main>
+
+<script>
+  // Theme management
+  const savedTheme = localStorage.getItem('attendify:theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('attendify:theme', next);
+  });
+
+  // State
+  let authToken = sessionStorage.getItem('attendify:student_token') || localStorage.getItem('attendify:student_token') || '';
+  let currentStudent = null;
+
+  // Read URL params (for QR code auto-fill)
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramSessionId = urlParams.get('s') || urlParams.get('session') || '';
+  const paramToken = urlParams.get('t') || urlParams.get('token') || '';
+
+  // DOM Elements
+  const viewLogin = document.getElementById('view-login');
+  const viewDashboard = document.getElementById('view-dashboard');
+  const loginForm = document.getElementById('login-form');
+  const loginRoll = document.getElementById('login-roll');
+  const loginPin = document.getElementById('login-pin');
+  const loginError = document.getElementById('login-error');
+  const btnQuickDemo = document.getElementById('btn-quick-demo');
+  const btnLogout = document.getElementById('btn-logout');
+  const btnRefresh = document.getElementById('btn-refresh');
+  const navUserArea = document.getElementById('nav-user-area');
+  const navUserAvatar = document.getElementById('nav-user-avatar');
+  const navUserName = document.getElementById('nav-user-name');
+  const dashGreeting = document.getElementById('dash-greeting');
+  const dashCohortInfo = document.getElementById('dash-cohort-info');
+  const dashBanner = document.getElementById('dash-banner');
+  const activeClassesContainer = document.getElementById('active-classes-container');
+  const summaryLocked = document.getElementById('summary-locked');
+  const summaryUnlocked = document.getElementById('summary-unlocked');
+
+  // Quick demo button
+  btnQuickDemo.addEventListener('click', () => {
+    loginRoll.value = '1';
+    loginPin.value = '1001';
+  });
+
+  // Login handler
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.style.display = 'none';
+    const roll = parseInt(loginRoll.value, 10);
+    const pin = loginPin.value.trim();
+
+    try {
+      const res = await fetch('/api/student/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rollNumber: roll, pin })
+      });
+      const data = await res.json();
+      if (data.success && data.token) {
+        authToken = data.token;
+        currentStudent = data.student;
+        sessionStorage.setItem('attendify:student_token', authToken);
+        showDashboard();
+      } else {
+        loginError.textContent = data.message || 'Login failed. Please check your Roll Number and PIN.';
+        loginError.style.display = 'block';
+      }
+    } catch (err) {
+      loginError.textContent = 'Network error connecting to campus server. Please try again.';
+      loginError.style.display = 'block';
+    }
+  });
+
+  // Logout handler
+  btnLogout.addEventListener('click', async () => {
+    if (authToken) {
+      try {
+        await fetch('/api/student/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+      } catch {}
+    }
+    authToken = '';
+    currentStudent = null;
+    sessionStorage.removeItem('attendify:student_token');
+    localStorage.removeItem('attendify:student_token');
+    showLogin();
+  });
+
+  btnRefresh.addEventListener('click', () => {
+    loadDashboardData();
+  });
+
+  function showLogin() {
+    viewDashboard.style.display = 'none';
+    navUserArea.style.display = 'none';
+    viewLogin.style.display = 'block';
+  }
+
+  async function showDashboard() {
+    viewLogin.style.display = 'none';
+    navUserArea.style.display = 'flex';
+    viewDashboard.style.display = 'block';
+
+    if (currentStudent) {
+      const initials = currentStudent.name.split(' ').map(n => n[0]).slice(0, 2).join('');
+      navUserAvatar.textContent = initials;
+      navUserName.textContent = currentStudent.name;
+      dashGreeting.textContent = `Welcome, ${currentStudent.name}`;
+      dashCohortInfo.textContent = `Roll #${String(currentStudent.rollNumber).padStart(2, '0')} · SY BSc IT Cohort · Academic Term 2026`;
+    }
+
+    loadDashboardData();
+  }
+
+  // Fetch classes and attendance summary
+  async function loadDashboardData() {
+    if (!authToken) {
+      showLogin();
+      return;
+    }
+
+    // 1. Fetch available classes
+    try {
+      const classRes = await fetch('/api/student/available-classes', {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (classRes.status === 401) {
+        showLogin();
+        return;
+      }
+      const classData = await classRes.json();
+      renderActiveClasses(classData.classes || []);
+    } catch {
+      activeClassesContainer.innerHTML = '<p style="color:var(--critical);">Unable to reach attendance server.</p>';
+    }
+
+    // 2. Fetch Attendance Summary (Enforces visibility rule on backend)
+    try {
+      const sumRes = await fetch('/api/student/attendance-summary', {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (sumRes.status === 401) {
+        showLogin();
+        return;
+      }
+      const sumData = await sumRes.json();
+      renderSummarySection(sumData);
+    } catch {
+      summaryLocked.style.display = 'block';
+      summaryUnlocked.style.display = 'none';
+    }
+  }
+
+  // Render Active Classes
+  function renderActiveClasses(classes) {
+    if (!classes || classes.length === 0) {
+      activeClassesContainer.innerHTML = `
+        <div style="background:var(--surface-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:16px 20px; text-align:center;">
+          <p style="font-weight:700; color:var(--ink); margin-bottom:4px;">No Active Lecture Roll Call Right Now</p>
+          <p style="font-size:13px; color:var(--ink-secondary);">
+            There are currently no attendance check-in sessions opened by your instructors. Classes will appear here automatically when faculty initiates roll call.
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    classes.forEach(cls => {
+      const isSub = cls.hasSubmitted;
+      const autoToken = (cls.sessionId === paramSessionId && paramToken) ? paramToken : '';
+
+      html += `
+        <div class="class-box ${isSub ? 'submitted' : ''}">
+          <div class="class-top">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <h3 class="class-title">${cls.subjectName}</h3>
+                <span class="badge ${cls.sessionType === 'practical' ? 'badge-warn' : 'badge-safe'}">
+                  ${cls.sessionType.toUpperCase()}
+                </span>
+              </div>
+              ${cls.experimentTitle ? `<p style="font-size:12.5px; color:var(--accent); font-weight:600; margin-top:2px;">🔬 ${cls.experimentTitle}</p>` : ''}
+              <div class="class-meta">
+                <span class="class-meta-item">👨‍🏫 ${cls.teacher}</span>
+                <span class="class-meta-item">📍 ${cls.room}</span>
+                <span class="class-meta-item">🕒 Scheduled: ${cls.startTime}</span>
+              </div>
+            </div>
+            <div>
+              ${isSub ? `
+                <span class="badge badge-safe">✓ Confirmed Present</span>
+              ` : `
+                <span class="badge badge-warn">● Submission Open</span>
+              `}
+            </div>
+          </div>
+
+          <div>
+            ${isSub ? `
+              <div style="background:var(--safe-subtle); border:1px solid rgba(23,133,104,0.3); border-radius:var(--r-sm); padding:10px 14px; font-size:13px; color:var(--safe);">
+                <strong>✓ Attendance Recorded by Server</strong><br>
+                Your presence was verified at ${cls.submittedAt ? new Date(cls.submittedAt).toLocaleTimeString() : 'Current Session'}.
+              </div>
+            ` : `
+              <form class="submit-class-form" data-session-id="${cls.sessionId}" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <input type="text" class="input-token" placeholder="Enter QR Rotation Code / Token" value="${autoToken}" required style="flex:1; min-width:200px;">
+                <button type="submit" class="btn btn-primary btn-submit-att">
+                  Confirm My Attendance
+                </button>
+              </form>
+            `}
+          </div>
+        </div>
+      `;
+    });
+
+    activeClassesContainer.innerHTML = html;
+
+    // Attach event listeners to submit forms
+    activeClassesContainer.querySelectorAll('.submit-class-form').forEach(form => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const sessionId = form.getAttribute('data-session-id');
+        const tokenInput = form.querySelector('.input-token');
+        const submitBtn = form.querySelector('.btn-submit-att');
+        const token = tokenInput.value.trim();
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verifying with server...';
+        showBanner('', 'none');
+
+        try {
+          const res = await fetch('/api/student/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ sessionId, token })
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            showBanner(`✓ Attendance Verified & Confirmed! Your presence has been recorded by faculty.`, 'success');
+            loadDashboardData();
+          } else {
+            showBanner(`Submission Rejected: ${data.message || data.error}`, 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Confirm My Attendance';
+          }
+        } catch (err) {
+          showBanner('Network error submitting attendance. Please ensure campus network connectivity.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Confirm My Attendance';
+        }
+      });
+    });
+  }
+
+  // Render Summary Section according to CRITICAL VISIBILITY RULE
+  function renderSummarySection(data) {
+    if (!data.visibilityGranted) {
+      // RULE: BEFORE SUBMISSION, HIDE ALL TOTALS & METRICS
+      summaryLocked.style.display = 'block';
+      summaryUnlocked.style.display = 'none';
+      return;
+    }
+
+    // RULE: AFTER SERVER-CONFIRMED SUBMISSION, REVEAL ALL TOTALS
+    summaryLocked.style.display = 'none';
+    summaryUnlocked.style.display = 'block';
+
+    const stats = data.stats;
+    document.getElementById('stat-pct').textContent = `${stats.percentage}%`;
+    document.getElementById('stat-attended').textContent = `${stats.attendedSessions} Sessions`;
+    document.getElementById('stat-missed').textContent = `${stats.missedSessions} Sessions`;
+    document.getElementById('stat-total').textContent = `${stats.totalSessions} Sessions`;
+
+    const badge = document.getElementById('stat-badge');
+    if (stats.status === 'safe') {
+      badge.className = 'badge badge-safe';
+      badge.textContent = 'SAFE (≥75%)';
+    } else if (stats.status === 'warn') {
+      badge.className = 'badge badge-warn';
+      badge.textContent = 'WARNING (65-74%)';
+    } else {
+      badge.className = 'badge badge-critical';
+      badge.textContent = 'DEFAULTER (<65%)';
+    }
+
+    // Subjects
+    const subContainer = document.getElementById('subjects-container');
+    if (data.subjectBreakdown && data.subjectBreakdown.length > 0) {
+      subContainer.innerHTML = data.subjectBreakdown.map(s => `
+        <div class="subject-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <h4 style="font-size:14.5px; font-weight:700; color:var(--ink);">${s.name}</h4>
+              <p style="font-size:12px; color:var(--ink-secondary);">${s.teacher} · ${s.room}</p>
+            </div>
+            <span class="badge ${s.status === 'safe' ? 'badge-safe' : s.status === 'warn' ? 'badge-warn' : 'badge-critical'}">
+              ${s.percentage}%
+            </span>
+          </div>
+
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width:${s.percentage}%; background:${s.status === 'safe' ? 'var(--safe)' : s.status === 'warn' ? 'var(--warn)' : 'var(--critical)'};"></div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--ink-secondary);">
+            <span>Attended: <strong style="color:var(--ink);" class="data-num">${s.attended}</strong></span>
+            <span>Missed: <strong style="color:var(--ink);" class="data-num">${s.missed}</strong></span>
+            <span>Total: <strong style="color:var(--ink);" class="data-num">${s.total}</strong></span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Records Table
+    const tbody = document.getElementById('records-table-body');
+    if (data.records && data.records.length > 0) {
+      tbody.innerHTML = data.records.map(r => `
+        <tr>
+          <td class="data-num">${r.date || 'N/A'}</td>
+          <td><strong>${r.subjectName}</strong></td>
+          <td><span style="font-size:12px; text-transform:capitalize;">${r.sessionType}</span></td>
+          <td class="data-num">${r.startTime || '--:--'}</td>
+          <td><span class="status-pill ${r.status}">${r.status}</span></td>
+        </tr>
+      `).join('');
+    } else {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--ink-secondary);">No previous records found</td></tr>`;
+    }
+  }
+
+  function showBanner(text, type) {
+    if (type === 'none') {
+      dashBanner.style.display = 'none';
+      return;
+    }
+    dashBanner.className = `banner ${type}`;
+    dashBanner.textContent = text;
+    dashBanner.style.display = 'block';
+  }
+
+  // Initial Boot
+  if (authToken) {
+    // Verify token validity
+    fetch('/api/student/me', {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    }).then(res => {
+      if (res.ok) return res.json();
+      throw new Error('Invalid token');
+    }).then(data => {
+      currentStudent = data.student;
+      showDashboard();
+    }).catch(() => {
+      authToken = '';
+      sessionStorage.removeItem('attendify:student_token');
+      showLogin();
+    });
+  } else {
+    showLogin();
+  }
+</script>
+
+</body>
+</html>

@@ -6,8 +6,8 @@
   ### Professional Academic Attendance Management & Faculty Workflow Platform
 
   [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero%20(Vanilla%20ES6%2B)-51458A?style=for-the-badge)](#-technology-stack)
-  [![Test Suite](https://img.shields.io/badge/Tests-32%20Passing%20(100%25)-178568?style=for-the-badge)](#-test-suite--quality-assurance)
-  [![Security](https://img.shields.io/badge/Security-Server--Validated%20Rotating%20Tokens-51458A?style=for-the-badge)](#3--rotating-qr-attendance--server-validated-security-new)
+  [![Test Suite](https://img.shields.io/badge/Tests-42%20Passing%20(100%25)-178568?style=for-the-badge)](#-test-suite--quality-assurance)
+  [![Security](https://img.shields.io/badge/Security-Server--Gated%20Bearer%20Tokens-51458A?style=for-the-badge)](#4--dedicated-student-only-portal--strict-visibility-rule-new)
   [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20Contrast-2CD5A4?style=for-the-badge)](#-typography--design-tokens)
   [![Architecture](https://img.shields.io/badge/State-Reactive%20%2B%20Backup%20Rotation-4F5D95?style=for-the-badge)](#-state-engine--data-reliability)
   [![License](https://img.shields.io/badge/License-MIT-F0EDF7?style=for-the-badge&colorA=20243A&colorB=51458A)](#)
@@ -31,12 +31,13 @@
   - [⚡ Rapid Roll Call Studio](#1--rapid-roll-call-studio-new)
   - [Unified Attendance Register](#2-unified-attendance-register)
   - [📱 Rotating QR Attendance (Server-Validated Security)](#3--rotating-qr-attendance--server-validated-security-new)
-  - [Students Directory](#4-students-directory)
-  - [Curriculum & Subjects](#5-curriculum--course-management)
-  - [Audited Attendance History](#6-audited-attendance-history)
-  - [Analytics & Defaulter Tracking](#7-analytics--defaulter-tracking)
-  - [Printable Practical Ledgers](#8-printable-practical-reports)
-  - [Weekly Timetable Engine](#9-weekly-timetable-engine)
+  - [🎓 Dedicated Student-Only Portal (Strict Visibility Rule)](#4--dedicated-student-only-portal--strict-visibility-rule-new)
+  - [Students Directory](#5-students-directory)
+  - [Curriculum & Subjects](#6-curriculum--course-management)
+  - [Audited Attendance History](#7-audited-attendance-history)
+  - [Analytics & Defaulter Tracking](#8-analytics--defaulter-tracking)
+  - [Printable Practical Ledgers](#9-printable-practical-reports)
+  - [Weekly Timetable Engine](#10-weekly-timetable-engine)
 - [Design System & UI Tokens](#-design-system--visual-identity)
   - [Color Palette](#color-palette)
   - [Typography Stack](#typography-system)
@@ -116,7 +117,22 @@ A university-grade touchless attendance module positioned in the primary sidebar
 * **Direct State Engine Integration**:
   - Finalizing attendance cleanly commits to `State.createSession` and `State.saveRecords`, synchronizing with History, Analytics, and Reports with zero duplicate schema or orphan records.
 
-### 4. Students Directory (`js/students.js`)
+### 4. 🎓 Dedicated Student-Only Portal (`student.html`, `student-backend.js`)
+A lightweight, separate portal built specifically for students to submit attendance and monitor personal compliance:
+* **Strict Student Permissions**:
+  - Authenticated via cryptographically random 28-byte bearer tokens (`POST /api/student/login` with Roll Number + 4-digit PIN).
+  - Students can **only** view classes currently active for attendance submission, submit their presence, and review their own personal record.
+  - No access to faculty views, mark alteration controls, or other students' attendance records.
+* **Critical Attendance Visibility Rule (Enforced on Backend & UI)**:
+  - **Before Confirmed Submission**: All attendance totals, percentages, subject breakdowns, and past records are **strictly withheld by the server** (`GET /api/student/attendance-summary` returns `visibilityGranted: false` and omits all metrics).
+  - The UI displays a clear locked state banner explaining that university policy requires confirmed attendance for the active class before semester percentages are revealed.
+  - **After Confirmed Submission**: The server validates the check-in, unlocks the record, and transmits the student's personal attendance statistics (`visibilityGranted: true`).
+  - Totals are **never** revealed merely because a student opened the page or logged in; the server-confirmed submission is the sole unlock trigger.
+* **Single Student Identity Validation**:
+  - Roll numbers and identities are strictly bound to the authenticated server token (`req.student.id`), completely preventing URL spoofing or roll number manipulation.
+  - Duplicate submissions for the same class are rejected on the server.
+
+### 5. Students Directory (`js/students.js`)
 * Complete roster of all **60 enrolled students** (Roll Numbers 1 to 60) in the single SY BSc IT cohort.
 * Monogram avatars with deterministic color palette matching student identity.
 * Attendance metrics per student: Total Sessions, Attended, Missed, Percentage, and Status Pill.
@@ -127,7 +143,7 @@ A university-grade touchless attendance module positioned in the primary sidebar
 * Interactive filter pills (`All`, `Safe`, `Warning`, `Defaulter`), search box with debounce, and paginated table.
 * **Student Detail Drawer**: Breakdown of attendance across every curriculum subject and date log.
 
-### 5. Curriculum & Course Management (`js/subjects.js`)
+### 6. Curriculum & Course Management (`js/subjects.js`)
 * Pre-configured with the complete SY BSc IT curriculum:
   - *Python Programming* (PP) — Prof. Deshmukh
   - *Data Structures & Algorithms* (DSA) — Dr. Kulkarni
@@ -136,22 +152,22 @@ A university-grade touchless attendance module positioned in the primary sidebar
   - *Software Engineering* (SE) — Prof. Joshi
 * Tracks total sessions held, average batch turnout %, and allows editing course codes and teachers.
 
-### 6. Audited Attendance History (`js/history.js`)
+### 7. Audited Attendance History (`js/history.js`)
 * Comprehensive audit ledger of all completed sessions.
 * Filter by Subject, Session Type (Lecture / Practical), or Date Range.
 * Edit recorded marks or safely delete sessions with state cascade.
 
-### 7. Analytics & Defaulter Tracking (`js/analytics.js`)
+### 8. Analytics & Defaulter Tracking (`js/analytics.js`)
 * High-density visual breakdown: Safe vs. Warning vs. Defaulter distribution.
 * Course comparison bar charts showing subjects with highest and lowest turnout.
 * Export Defaulters List CSV for university administration.
 
-### 8. Printable Practical Reports (`js/practical-reports.js`)
+### 9. Printable Practical Reports (`js/practical-reports.js`)
 * Formats laboratory experiments into official university academic documents.
 * Generates printable practical attendance sheets with institution header, experiment titles, roll numbers, attendance checkboxes, and faculty signature blocks.
 * CSS print stylesheets optimized for clean black-and-white physical printing.
 
-### 9. Weekly Timetable Engine (`js/timetable.js`)
+### 10. Weekly Timetable Engine (`js/timetable.js`)
 * Weekly schedule mapping Monday through Saturday with subject and classroom assignments.
 * Integrates directly into attendance screens to automatically suggest the current lecture slot.
 
@@ -262,7 +278,15 @@ npm test
 node --test tests/*.test.js
 ```
 
-### Verified Test Assertions (32 Suites / 100% Passing):
+### Verified Test Assertions (42 Suites / 100% Passing):
+* `Student Portal Login` — authenticates enrolled roll numbers ($1 \le \text{Roll} \le 60$) with PIN and generates cryptographically secure 28-byte bearer tokens.
+* `Student Portal Auth Guard` — rejects invalid PINs, out-of-bounds roll numbers, and forged authorization headers.
+* `Student Active Classes` — displays only active classes authorized by faculty, withholding other students' attendance details.
+* `Student Critical Visibility Rule (Before Submit)` — **strictly withholds attendance totals, percentages, and records** on the server before confirmed submission.
+* `Student Submission Verification` — validates active session status, QR rotation token freshness, and student enrollment on the server.
+* `Student Duplicate Prevention` — strictly blocks duplicate attendance submissions for the same student and session.
+* `Student Critical Visibility Rule (After Submit)` — **reveals personal attendance percentage, breakdown, and ledger** only upon server-confirmed submission.
+* `Student Privacy Isolation` — guarantees students can access only their own records, strictly isolating identities via bearer token.
 * `QRCode Generator` — produces valid vector SVG markup without external dependencies.
 * `QR Session Start` — generates active session with cryptographically secure 24-byte token.
 * `QR Token Rotation` — smoothly rotates tokens and sets strict expiration timestamps.

@@ -132,6 +132,9 @@ const App = (() => {
               <span class="theme-icon-wrap">${UI.icon(currentTheme === 'dark' ? 'sun' : 'moon')}</span>
               <span class="theme-label">${currentTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
             </button>
+            <a href="student.html" target="_blank" class="sidebar-student-portal-link" style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:8px; padding:7px 10px; font-size:11.5px; font-weight:600; color:#B4AFD4; text-decoration:none; border:1px solid rgba(184, 169, 248, 0.16); border-radius:6px; background:rgba(240, 237, 247, 0.05); transition:all 0.2s ease;" title="Open Separate Student Portal">
+              🎓 Student Portal ↗
+            </a>
           </div>
         </div>
       </aside>
@@ -158,6 +161,11 @@ const App = (() => {
           </div>
 
           <div class="topbar-right">
+            <!-- Student Portal Link -->
+            <a href="student.html" target="_blank" class="btn btn-outline btn-sm" style="height:32px; font-size:11.5px; display:inline-flex; align-items:center; gap:5px; text-decoration:none;" title="Open Separate Student Portal">
+              🎓 Student Portal ↗
+            </a>
+
             <!-- Global Search Trigger -->
             <button class="topbar-search-trigger" id="topbar-search-btn" title="Quick Search (Ctrl+K)">
               ${UI.icon('search')}

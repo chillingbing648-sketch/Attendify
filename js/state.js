@@ -15,7 +15,23 @@ const State = (() => {
     return { recovered: result.recovered, usedFallback };
   }
 
-  function persist() { Storage.save(data); }
+  function persist() {
+    Storage.save(data);
+    if (typeof fetch !== 'undefined' && typeof window !== 'undefined' && window.location) {
+      try {
+        fetch('/api/state/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessions: data.sessions || [],
+            records: data.records || [],
+            subjects: data.subjects || [],
+            students: data.students || []
+          })
+        }).catch(() => {});
+      } catch {}
+    }
+  }
   function get() { return data; }
   function subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); }
   function emit(changeType) {

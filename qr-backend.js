@@ -459,5 +459,8 @@ module.exports = {
   manualOverride,
   endSession,
   handleApiRequest,
+  getActiveSessions: () => Array.from(sessions.values()).filter(s => s.status === 'active' && Date.now() <= s.expiresAt),
+  getSession: (id) => sessions.get(id),
+  sessions,
   _resetStore: () => { sessions.clear(); rateLimits.clear(); }
 };

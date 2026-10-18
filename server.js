@@ -18,6 +18,7 @@ const MIME_TYPES = {
 };
 
 const qrBackend = require('./qr-backend.js');
+const studentBackend = require('./student-backend.js');
 
 const server = http.createServer((req, res) => {
   // Normalize URL and remove query params
@@ -28,6 +29,17 @@ const server = http.createServer((req, res) => {
   if (pathname.startsWith('/api/qr/')) {
     qrBackend.handleApiRequest(req, res, parsedUrl);
     return;
+  }
+
+  // Intercept Student Portal API routes & State Sync
+  if (pathname.startsWith('/api/student/') || pathname === '/api/state/sync') {
+    studentBackend.handleApiRequest(req, res, parsedUrl);
+    return;
+  }
+
+  // Route /student to student.html
+  if (pathname === '/student' || pathname === '/student/') {
+    pathname = '/student.html';
   }
 
   if (pathname === '/' || pathname === '') {
