@@ -106,10 +106,10 @@ const StudentsView = (() => {
           <thead>
             <tr>
               <th style="width: 80px;">Roll No.</th>
-              <th>Name</th>
-              <th style="width: 140px;">Overall %</th>
-              <th style="width: 120px;">Status</th>
-              <th style="width: 140px; text-align: right;">Action</th>
+              <th>Student</th>
+              <th style="width: 170px;">Attendance %</th>
+              <th style="width: 110px;">Status</th>
+              <th style="width: 130px; text-align: right;">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -129,10 +129,19 @@ const StudentsView = (() => {
                     <div style="font-weight:600; color:var(--ink);">${Utils.escapeHTML(s.name)}</div>
                   </td>
                   <td>
-                    <strong style="font-variant-numeric: tabular-nums; color:${s.stats.total === 0 ? 'var(--ink-secondary)' : s.stats.pct >= th.safe ? 'var(--safe)' : 'var(--critical)'};">
-                      ${s.stats.total > 0 ? s.stats.pct + '%' : '—'}
-                    </strong>
-                    ${s.stats.total > 0 ? `<span style="font-size:11px; color:var(--ink-secondary); margin-left:4px;">(${s.stats.present + s.stats.late}/${s.stats.total})</span>` : ''}
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <div style="min-width:44px;">
+                        <strong style="font-variant-numeric: tabular-nums; color:${s.stats.total === 0 ? 'var(--ink-secondary)' : s.stats.pct >= th.safe ? 'var(--safe)' : 'var(--critical)'};">
+                          ${s.stats.total > 0 ? s.stats.pct + '%' : '—'}
+                        </strong>
+                      </div>
+                      ${s.stats.total > 0 ? `
+                        <div class="progress-bar-container" style="flex:1; height:5px; background:var(--surface-subtle); border:1px solid var(--border); border-radius:3px; overflow:hidden; min-width:48px;">
+                          <div style="height:100%; width:${s.stats.pct}%; background:${s.stats.pct >= th.safe ? 'var(--safe)' : s.stats.pct >= th.warn ? 'var(--warn)' : 'var(--critical)'}; border-radius:2px;"></div>
+                        </div>
+                      ` : ''}
+                    </div>
+                    ${s.stats.total > 0 ? `<div style="font-size:10.5px; color:var(--ink-secondary); margin-top:1px;">${s.stats.present + s.stats.late} of ${s.stats.total} sessions</div>` : ''}
                   </td>
                   <td><span class="badge ${statusClass}">${statusLabel}</span></td>
                   <td style="text-align: right;">

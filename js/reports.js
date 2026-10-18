@@ -195,6 +195,9 @@ const ReportsView = (() => {
   }
 
   function bindEvents(container) {
+    const quickTodayBtn = container.querySelector('#btn-quick-generate-today');
+    if (quickTodayBtn) quickTodayBtn.addEventListener('click', exportTodayCSV);
+
     const todayBtn = container.querySelector('#btn-export-today-csv');
     if (todayBtn) todayBtn.addEventListener('click', exportTodayCSV);
 

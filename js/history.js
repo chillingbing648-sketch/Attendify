@@ -6,6 +6,7 @@
 const HistoryView = (() => {
   let subjectFilter = 'all';
   let typeFilter = 'all'; // all | lecture | practical
+  let dateFilter = '';
 
   function render(containerId = 'view-history') {
     const container = document.getElementById(containerId);
@@ -20,6 +21,9 @@ const HistoryView = (() => {
     }
     if (typeFilter !== 'all') {
       filtered = filtered.filter(s => (s.type || 'theory') === typeFilter || (typeFilter === 'lecture' && s.type === 'theory'));
+    }
+    if (dateFilter) {
+      filtered = filtered.filter(s => s.date === dateFilter);
     }
 
     container.innerHTML = `
@@ -53,6 +57,11 @@ const HistoryView = (() => {
           <button class="btn btn-sm ${typeFilter === 'all' ? 'btn-secondary' : 'btn-outline'}" data-type-filter="all">All Types</button>
           <button class="btn btn-sm ${typeFilter === 'lecture' ? 'btn-secondary' : 'btn-outline'}" data-type-filter="lecture">Lectures</button>
           <button class="btn btn-sm ${typeFilter === 'practical' ? 'btn-secondary' : 'btn-outline'}" data-type-filter="practical">Practicals</button>
+        </div>
+
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="date" id="history-date-filter" class="input" style="height:32px; font-size:12px; padding:2px 8px; width:auto;" value="${dateFilter}" title="Filter by session date">
+          ${dateFilter ? `<button class="btn btn-ghost btn-sm" id="history-clear-date" style="padding:2px 6px; font-size:11px;">Clear</button>` : ''}
         </div>
 
         <div style="font-size:var(--fs-xs); color:var(--ink-tertiary); margin-left:auto;">
@@ -135,6 +144,22 @@ const HistoryView = (() => {
     if (filterSelect) {
       filterSelect.addEventListener('change', (e) => {
         subjectFilter = e.target.value;
+        render();
+      });
+    }
+
+    const dateInput = container.querySelector('#history-date-filter');
+    if (dateInput) {
+      dateInput.addEventListener('change', (e) => {
+        dateFilter = e.target.value;
+        render();
+      });
+    }
+
+    const clearDateBtn = container.querySelector('#history-clear-date');
+    if (clearDateBtn) {
+      clearDateBtn.addEventListener('click', () => {
+        dateFilter = '';
         render();
       });
     }

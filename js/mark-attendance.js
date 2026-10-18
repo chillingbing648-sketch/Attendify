@@ -463,18 +463,27 @@ const MarkAttendanceView = (() => {
       if (!btn) return;
       const group = btn.closest('.status-btn-group');
       const stuId = group.dataset.studentId;
-      const newStatus = btn.dataset.val;
+      const currentStatus = studentStatusMap[stuId];
+      let newStatus = btn.dataset.val;
+
+      // Toggle to unmarked if clicking the already active status button
+      if (currentStatus === newStatus) {
+        newStatus = 'unmarked';
+      }
 
       setStudentStatus(stuId, newStatus, true);
 
       group.querySelectorAll('.status-btn').forEach(b => {
         b.className = 'status-btn';
       });
-      btn.classList.add(`active-${newStatus}`);
+      if (newStatus !== 'unmarked') {
+        btn.classList.add(`active-${newStatus}`);
+      }
 
       const row = btn.closest('.register-row');
       if (row) {
         row.classList.toggle('row-absent', newStatus === 'absent');
+        row.classList.toggle('row-late', newStatus === 'late');
         row.classList.toggle('row-unmarked', newStatus === 'unmarked');
       }
 

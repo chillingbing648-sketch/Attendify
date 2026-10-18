@@ -1,15 +1,36 @@
 /* ============================================================
    ATTENDIFY — responsive.css (Mobile, Tablet & Desktop Layouts)
+   Apple-level polish & Linear precision across all viewports:
+   360px, 390px, 768px, 1024px, 1280px, 1440px+
    ============================================================ */
 
-/* Large Desktop screens (1280px+) */
-@media (min-width: 1280px) {
+/* 1440px+ Extra-Wide Workstations */
+@media (min-width: 1440px) {
   .view {
-    max-width: 1180px;
+    max-width: 1260px;
+  }
+  #view-mark-attendance,
+  #view-students,
+  #view-history,
+  #view-subjects {
+    max-width: 1360px;
   }
 }
 
-/* Tablet screens (861px - 1024px) */
+/* 1280px Desktop screens */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .view {
+    max-width: 1180px;
+  }
+  #view-mark-attendance,
+  #view-students,
+  #view-history,
+  #view-subjects {
+    max-width: 1240px;
+  }
+}
+
+/* 1024px Tablets & Smaller Laptops */
 @media (max-width: 1024px) {
   .stat-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -17,9 +38,14 @@
   .chart-grid {
     grid-template-columns: 1fr;
   }
+  .status-btn {
+    width: 34px;
+    height: 28px;
+    font-size: 11.5px;
+  }
 }
 
-/* Mobile & Small Tablet (<= 860px) */
+/* Tablet & Mobile Breakpoint (<= 860px) */
 @media (max-width: 860px) {
   .app-shell {
     flex-direction: column;
@@ -34,6 +60,7 @@
     transform: translateX(-100%);
     transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: var(--shadow-popover);
+    z-index: 40;
   }
 
   .sidebar.open {
@@ -75,6 +102,16 @@
     display: none;
   }
 
+  /* Today's Lecture + Practical grid stacks cleanly on mobile */
+  .today-sections-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .document-meta-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .register-bar {
     flex-direction: column;
     align-items: stretch;
@@ -102,6 +139,7 @@
 
   .count-pills {
     flex-wrap: wrap;
+    justify-content: flex-start;
   }
 
   .register-footer {
@@ -119,14 +157,23 @@
   }
 }
 
-/* Small Smartphone screens (<= 420px) */
+/* Tablet specific touch-friendly tweaks (641px - 768px) */
+@media (min-width: 641px) and (max-width: 768px) {
+  .status-btn {
+    width: 36px;
+    height: 30px;
+    font-size: 12px;
+  }
+}
+
+/* Smartphone screens (<= 420px / 390px) */
 @media (max-width: 420px) {
   .topbar {
-    padding: 0 12px;
+    padding: 0 10px;
   }
 
   .view-scroll {
-    padding: 10px 12px;
+    padding: 10px 10px;
   }
 
   .stat-grid {
@@ -136,20 +183,64 @@
   .view-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
   }
 
   .view-header-actions {
     width: 100%;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .view-header-actions .btn {
-    flex: 1;
+    width: 100%;
   }
 
-  /* Status button group comfortable on narrow screens */
+  .document-meta-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-dialog {
+    max-width: calc(100vw - 20px) !important;
+    margin: 10px auto;
+  }
+
   .status-btn {
-    width: 28px;
+    width: 30px;
+    height: 26px;
+    font-size: 10.5px;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Ultra-compact screens (<= 360px) */
+@media (max-width: 360px) {
+  .topbar-title {
+    font-size: 13px;
+  }
+
+  .count-pills {
+    gap: 4px;
+  }
+
+  .pill {
+    padding: 2px 5px;
+    font-size: 10.5px;
+  }
+
+  .status-btn {
+    width: 27px;
     height: 24px;
     font-size: 10px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 6px 8px;
+    font-size: 11.5px;
   }
 }

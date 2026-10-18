@@ -88,7 +88,7 @@ const Timetable = (() => {
               ${pendingSlots.length === 0 ? `
                 <tr>
                   <td colspan="6" style="text-align:center; padding: 20px; color:var(--ink-secondary);">
-                    ${todaySlots.length === 0 ? 'No lectures scheduled for today on the timetable.' : '✓ All classes scheduled for today have completed attendance records.'}
+                    ${todaySlots.length === 0 ? 'No lectures scheduled for today on the timetable.' : 'All classes scheduled for today have completed attendance records.'}
                   </td>
                 </tr>
               ` : pendingSlots.map(({ slot }) => {
