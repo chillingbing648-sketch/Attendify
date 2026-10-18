@@ -1,54 +1,76 @@
 /* ============================================================
-   ATTENDIFY — main.css (Apple-Inspired Admin System)
-   Locked 50px Topbar, Crisp Neutral System, Strict 16px SVG
+   ATTENDIFY — main.css
+   Art Direction: Apple × Premium Academic SaaS
+   Palette: Warm Ivory, Deep Ink, Muted Lavender, Sophisticated Plum,
+   Subtle Mint & Amber Accents, Layered macOS Translucency
    ============================================================ */
 
 :root {
-  /* Apple/Linear Neutral Canvas */
-  --bg: #F5F6F8;
+  /* Warm Ivory / Alabaster Canvas & Layered Surfaces */
+  --bg: #FAF7F2;
+  --sidebar-bg: #F1ECE1;
+  --sidebar-border: rgba(58, 43, 73, 0.08);
+  
   --surface: #FFFFFF;
-  --surface-subtle: #F0F2F5;
-  --surface-hover: #F8F9FA;
-  --surface-active: #E4E7EC;
+  --surface-subtle: #F6F2EA;
+  --surface-hover: #ECE5D8;
+  --surface-active: #E1D9C9;
 
-  --ink: #111827;
-  --ink-secondary: #4B5563;
-  --ink-tertiary: #9CA3AF;
+  /* Typography: Deep Ink, Warm Charcoal Slate & Stone */
+  --ink: #1B1824;
+  --ink-secondary: #635C70;
+  --ink-tertiary: #958E9F;
   --ink-inverse: #FFFFFF;
 
-  --border: #E5E7EB;
-  --border-strong: #D1D5DB;
-  --border-focus: #2563EB;
+  /* Hairline Borders with Subtle Plum Warmth */
+  --border: rgba(58, 43, 73, 0.08);
+  --border-subtle: rgba(58, 43, 73, 0.04);
+  --border-strong: rgba(58, 43, 73, 0.16);
+  --border-focus: #7C3AED;
 
-  /* Refined Apple Indigo/Blue Accent */
-  --accent: #2563EB;
-  --accent-hover: #1D4ED8;
-  --accent-active: #1E40AF;
-  --accent-subtle: #EFF6FF;
-  --accent-ink: #1E3A8A;
-  --accent-border: #BFDBFE;
+  /* Primary Accent: Sophisticated Royal Plum & Amethyst */
+  --accent: #7C3AED;
+  --accent-hover: #6D28D9;
+  --accent-active: #5B21B6;
+  --accent-subtle: rgba(124, 58, 237, 0.08);
+  --accent-ink: #7C3AED;
+  --accent-border: rgba(124, 58, 237, 0.22);
+  --accent-gradient: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  --accent-shadow: 0 2px 10px rgba(124, 58, 237, 0.28);
 
-  /* Distinct Visual Treatment for Practical Sessions (Emerald/Teal) */
-  --practical: #0D9488;
-  --practical-subtle: #F0FDFA;
-  --practical-ink: #115E59;
-  --practical-border: #99F6E4;
+  /* Muted Lavender Tone */
+  --lavender: #A78BFA;
+  --lavender-subtle: rgba(167, 139, 250, 0.12);
+  --lavender-border: rgba(167, 139, 250, 0.28);
 
-  /* Status Colors */
-  --safe: #10B981;
-  --safe-subtle: #ECFDF5;
-  --safe-ink: #065F46;
-  --safe-border: #A7F3D0;
+  /* Semantic Status: Apple Emerald Mint (Safe / Compliant) */
+  --safe: #059669;
+  --safe-hover: #047857;
+  --safe-subtle: rgba(5, 150, 105, 0.09);
+  --safe-ink: #047857;
+  --safe-border: rgba(5, 150, 105, 0.24);
 
-  --warn: #F59E0B;
-  --warn-subtle: #FFFBEB;
-  --warn-ink: #92400E;
-  --warn-border: #FDE68A;
+  /* Warm Amber (Attendance Warning 65-74%) */
+  --warn: #D97706;
+  --warn-hover: #B45309;
+  --warn-subtle: rgba(217, 119, 6, 0.09);
+  --warn-ink: #B45309;
+  --warn-border: rgba(217, 119, 6, 0.24);
 
-  --critical: #EF4444;
-  --critical-subtle: #FEF2F2;
-  --critical-ink: #991B1B;
-  --critical-border: #FECACA;
+  /* Rose Coral / Deep Plum Red (Critical Defaulters <65%) */
+  --critical: #E11D48;
+  --critical-hover: #BE123C;
+  --critical-subtle: rgba(225, 29, 72, 0.09);
+  --critical-ink: #BE123C;
+  --critical-border: rgba(225, 29, 72, 0.24);
+
+  /* Specialized Practical Lab Sessions (Sky Cyan) */
+  --practical: #0284C7;
+  --practical-hover: #0369A1;
+  --practical-subtle: rgba(2, 132, 199, 0.09);
+  --practical-ink: #0369A1;
+  --practical-border: rgba(2, 132, 199, 0.24);
 
   /* 8px Spacing Rhythm */
   --sp-1: 4px;
@@ -58,77 +80,114 @@
   --sp-5: 20px;
   --sp-6: 24px;
   --sp-8: 32px;
+  --sp-10: 40px;
 
-  /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Apple SF Pro / Inter System Stack */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Menlo", "Monaco", "Consolas", monospace;
 
   --fs-xs: 11px;
   --fs-sm: 12.5px;
   --fs-base: 13.5px;
   --fs-md: 15px;
   --fs-lg: 18px;
-  --fs-xl: 21px;
+  --fs-xl: 22px;
+  --fs-2xl: 28px;
 
-  /* Radii */
-  --r-xs: 4px;
-  --r-sm: 6px;
-  --r-md: 8px;
-  --r-lg: 10px;
+  /* Apple Squircle Corner Radii */
+  --r-xs: 5px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-2xl: 26px;
   --r-full: 9999px;
 
-  /* Restrained Shadows */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-popover: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  /* Layered Diffused Micro-Shadows */
+  --shadow-xs: 0 1px 2px rgba(35, 25, 45, 0.04);
+  --shadow-sm: 0 2px 6px -1px rgba(35, 25, 45, 0.06), 0 1px 2px rgba(35, 25, 45, 0.03);
+  --shadow-md: 0 6px 16px -2px rgba(35, 25, 45, 0.07), 0 2px 4px rgba(35, 25, 45, 0.04);
+  --shadow-lg: 0 14px 32px -4px rgba(35, 25, 45, 0.09), 0 4px 10px rgba(35, 25, 45, 0.04);
+  --shadow-popover: 0 24px 52px -12px rgba(25, 18, 35, 0.22), 0 0 1px rgba(25, 18, 35, 0.12);
 
-  /* Layout */
-  --sidebar-w: 236px;
-  --topbar-h: 52px;
+  /* Transitions */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-fast: 130ms var(--ease-spring);
+  --t-base: 220ms var(--ease-spring);
+
+  /* Layout Constants */
+  --sidebar-w: 248px;
+  --topbar-h: 54px;
 }
 
 [data-theme="dark"] {
-  --bg: #0B0F19;
-  --surface: #111827;
-  --surface-subtle: #1F2937;
-  --surface-hover: #1E293B;
-  --surface-active: #374151;
+  /* Apple Music Midnight Obsidian & Deep Ink Plum */
+  --bg: #0E0C13;
+  --sidebar-bg: #15131C;
+  --sidebar-border: rgba(255, 255, 255, 0.07);
 
-  --ink: #F9FAFB;
-  --ink-secondary: #9CA3AF;
-  --ink-tertiary: #6B7280;
-  --ink-inverse: #0B0F19;
+  --surface: #1C1924;
+  --surface-subtle: #262232;
+  --surface-hover: #312C40;
+  --surface-active: #3D3750;
 
-  --border: #1F2937;
-  --border-strong: #374151;
+  --ink: #FAF8FC;
+  --ink-secondary: #A39CB0;
+  --ink-tertiary: #726B7E;
+  --ink-inverse: #0E0C13;
 
-  --accent-subtle: rgba(37, 99, 235, 0.16);
-  --accent-ink: #93C5FD;
-  --accent-border: rgba(37, 99, 235, 0.35);
+  --border: rgba(255, 255, 255, 0.09);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --border-focus: #A78BFA;
 
-  --practical-subtle: rgba(13, 148, 136, 0.16);
-  --practical-ink: #5EEAD4;
-  --practical-border: rgba(13, 148, 136, 0.35);
+  /* Luminous Electric Amethyst / Lavender Accent */
+  --accent: #A78BFA;
+  --accent-hover: #C084FC;
+  --accent-active: #9333EA;
+  --accent-subtle: rgba(167, 139, 250, 0.16);
+  --accent-ink: #C084FC;
+  --accent-border: rgba(167, 139, 250, 0.35);
+  --accent-gradient: linear-gradient(135deg, #A855F7 0%, #7E22CE 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #C084FC 0%, #9333EA 100%);
+  --accent-shadow: 0 2px 14px rgba(168, 85, 247, 0.36);
 
+  --lavender: #C084FC;
+  --lavender-subtle: rgba(192, 132, 252, 0.18);
+  --lavender-border: rgba(192, 132, 252, 0.36);
+
+  --safe: #10B981;
+  --safe-hover: #34D399;
   --safe-subtle: rgba(16, 185, 129, 0.16);
   --safe-ink: #6EE7B7;
   --safe-border: rgba(16, 185, 129, 0.35);
 
+  --warn: #F59E0B;
+  --warn-hover: #FBBF24;
   --warn-subtle: rgba(245, 158, 11, 0.16);
-  --warn-ink: #FDE68A;
+  --warn-ink: #FCD34D;
   --warn-border: rgba(245, 158, 11, 0.35);
 
-  --critical-subtle: rgba(239, 68, 68, 0.16);
-  --critical-ink: #FCA5A5;
-  --critical-border: rgba(239, 68, 68, 0.35);
+  --critical: #FB7185;
+  --critical-hover: #FDA4AF;
+  --critical-subtle: rgba(251, 113, 133, 0.16);
+  --critical-ink: #FECDD3;
+  --critical-border: rgba(251, 113, 133, 0.35);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
-  --shadow-popover: 0 12px 24px rgba(0, 0, 0, 0.6);
+  --practical: #38BDF8;
+  --practical-hover: #7DD3FC;
+  --practical-subtle: rgba(56, 189, 248, 0.16);
+  --practical-ink: #BAE6FD;
+  --practical-border: rgba(56, 189, 248, 0.35);
+
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.58);
+  --shadow-md: 0 8px 22px rgba(0, 0, 0, 0.65);
+  --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.78);
+  --shadow-popover: 0 32px 64px rgba(0, 0, 0, 0.88);
 }
 
-/* Reset */
+/* Reset & Baseline */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -145,8 +204,8 @@ body {
   background-color: var(--bg);
   color: var(--ink);
   font-size: var(--fs-base);
-  line-height: 1.45;
-  letter-spacing: -0.01em;
+  line-height: 1.5;
+  letter-spacing: -0.012em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
@@ -157,41 +216,56 @@ body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  background-color: var(--bg);
 }
 
-/* Sidebar */
+/* ============================================================
+   SIDEBAR — macOS Intentional Visual Treatment
+   Warm linen / muted stone surface in Light, Midnight in Dark.
+   Never generic white. Distinct layered surface with satin border.
+   ============================================================ */
 .sidebar {
   width: var(--sidebar-w);
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   z-index: 40;
+  transition: transform var(--t-base), background-color var(--t-fast);
 }
 
 .sidebar-brand {
   height: var(--topbar-h);
-  padding: 0 16px;
+  padding: 0 18px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  border-bottom: 1px solid var(--sidebar-border);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--t-fast);
 }
 
+.sidebar-brand:hover {
+  background-color: rgba(124, 58, 237, 0.04);
+}
+
+/* Apple Squircle Brand Mark (Plum Gradient & Inset Specular) */
 .brand-mark {
-  width: 26px;
-  height: 26px;
-  background: var(--accent);
+  width: 30px;
+  height: 30px;
+  background: var(--accent-gradient);
   color: #FFFFFF;
-  border-radius: var(--r-md);
+  border-radius: var(--r-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: -0.02em;
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.3);
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: -0.03em;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
 }
 
 .brand-info {
@@ -201,27 +275,27 @@ body {
 }
 
 .brand-name {
-  font-weight: 700;
-  font-size: 13.5px;
+  font-weight: 750;
+  font-size: 14.5px;
   color: var(--ink);
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 .brand-class {
   font-size: 11px;
   color: var(--ink-secondary);
-  font-weight: 500;
+  font-weight: 550;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .sidebar-nav {
-  padding: 10px 8px;
+  padding: 12px 10px;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
   flex: 1;
   overflow-y: auto;
 }
@@ -230,19 +304,21 @@ body {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--ink-tertiary);
-  padding: 8px 10px 4px 10px;
+  padding: 12px 10px 4px 10px;
   margin-top: 4px;
 }
 .nav-section-title:first-child { margin-top: 0; }
 
+/* Refined macOS Nav Item with Elegant Accent Indicator */
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 6.5px 10px;
-  border-radius: var(--r-md);
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: var(--r-sm);
   border: 1px solid transparent;
   background: transparent;
   color: var(--ink-secondary);
@@ -250,44 +326,80 @@ body {
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all var(--t-fast);
   width: 100%;
   user-select: none;
 }
 
 .nav-item:hover {
-  background: var(--surface-subtle);
+  background: rgba(124, 58, 237, 0.05);
   color: var(--ink);
 }
 
+.nav-item:active {
+  transform: scale(0.985);
+}
+
+/* Elegant Selected State — NOT A BRIGHT BLUE BLOCK */
 .nav-item.active {
-  background: var(--surface-subtle);
+  background: var(--surface);
   color: var(--accent);
-  font-weight: 600;
-  border-color: var(--border);
+  font-weight: 650;
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-xs);
 }
 
-.nav-item.active svg { stroke: var(--accent); }
-
-.nav-item.nav-item-highlight {
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 3.5px;
   background: var(--accent);
-  color: #FFFFFF;
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.25);
-  margin: 2px 0 5px 0;
+  border-radius: 0 3px 3px 0;
 }
-.nav-item.nav-item-highlight:hover { background: var(--accent-hover); color: #FFFFFF; }
-.nav-item.nav-item-highlight svg { stroke: #FFFFFF; }
+
+.nav-item.active svg {
+  stroke: var(--accent);
+  filter: drop-shadow(0 1px 2px rgba(124, 58, 237, 0.25));
+}
+
+/* Primary Fast-Action Pill (Mark Attendance Highlight) */
+.nav-item.nav-item-highlight {
+  background: var(--accent-gradient);
+  color: #FFFFFF;
+  font-weight: 650;
+  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  margin: 4px 0 8px 0;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.nav-item.nav-item-highlight:hover {
+  background: var(--accent-gradient-hover);
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: #FFFFFF;
+}
+
+.nav-item.nav-item-highlight:active {
+  transform: scale(0.98);
+}
+
+.nav-item.nav-item-highlight svg {
+  stroke: #FFFFFF;
+}
 
 .sidebar-footer {
-  padding: 10px 12px;
-  border-top: 1px solid var(--border);
+  padding: 12px 14px;
+  border-top: 1px solid var(--sidebar-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* App Main & Apple-Inspired Taskbar */
+/* ============================================================
+   APP MAIN & TRANSLUCENT FROSTED TOPBAR
+   ============================================================ */
 .app-main {
   flex: 1;
   display: flex;
@@ -300,13 +412,20 @@ body {
 .topbar {
   height: var(--topbar-h);
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: rgba(250, 247, 242, 0.82);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 18px;
+  padding: 0 22px;
   flex-shrink: 0;
   z-index: 30;
+  transition: background-color var(--t-fast);
+}
+
+[data-theme="dark"] .topbar {
+  background: rgba(14, 12, 19, 0.85);
 }
 
 .topbar-left {
@@ -316,19 +435,37 @@ body {
   min-width: 0;
 }
 
+.topbar-menu-btn {
+  display: none;
+}
+
 .topbar-breadcrumb {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--ink);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+}
+
+.topbar-breadcrumb-link {
+  color: var(--ink-secondary);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  transition: all var(--t-fast);
+}
+
+.topbar-breadcrumb-link:hover {
+  color: var(--accent);
+  background-color: var(--accent-subtle);
 }
 
 .topbar-breadcrumb-sep {
   color: var(--ink-tertiary);
   font-weight: 400;
+  opacity: 0.6;
 }
 
 .topbar-center {
@@ -337,68 +474,82 @@ body {
   justify-content: center;
 }
 
+/* Apple Live Status Pill */
 .topbar-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 500;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
   color: var(--ink-secondary);
-  background: var(--surface-subtle);
+  background: var(--surface);
   border: 1px solid var(--border);
-  padding: 3px 10px;
+  padding: 3.5px 14px;
   border-radius: var(--r-full);
   letter-spacing: -0.01em;
+  box-shadow: var(--shadow-xs);
 }
 
 .topbar-badge-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--safe);
+  box-shadow: 0 0 0 2.5px var(--safe-subtle);
+  animation: pulseSafe 2.8s infinite ease-in-out;
+}
+
+@keyframes pulseSafe {
+  0%, 100% { box-shadow: 0 0 0 2px var(--safe-subtle); }
+  50% { box-shadow: 0 0 0 4.5px rgba(5, 150, 105, 0.22); }
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
 }
 
-/* Global Quick Search (Ctrl+K) in Taskbar */
+/* Omnibar Quick Search (Ctrl+K) */
 .topbar-search-trigger {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 30px;
-  padding: 0 10px;
-  background: var(--surface-subtle);
+  height: 32px;
+  padding: 0 12px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-full);
   color: var(--ink-secondary);
-  font-size: 11.5px;
+  font-size: 12px;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all var(--t-fast);
   user-select: none;
+  box-shadow: var(--shadow-xs);
 }
+
 .topbar-search-trigger:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-strong);
+  background: var(--surface);
+  border-color: var(--accent-border);
   color: var(--ink);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
 }
 
 .kbd-shortcut {
   font-family: var(--font-mono);
   font-size: 10px;
-  background: var(--surface);
+  background: var(--surface-subtle);
   border: 1px solid var(--border);
   border-radius: var(--r-xs);
-  padding: 1px 4px;
+  padding: 1px 6px;
   color: var(--ink-tertiary);
+  font-weight: 650;
+  letter-spacing: -0.02em;
 }
 
 .topbar-date {
   font-size: 11.5px;
-  font-weight: 500;
+  font-weight: 550;
   color: var(--ink-secondary);
   padding: 0 6px;
 }
@@ -406,36 +557,36 @@ body {
 .view-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 18px 22px 32px 22px;
+  padding: 24px 28px 44px 28px;
+  scroll-behavior: smooth;
 }
 
-/* ============================================================
-   WORKBENCH & COMMAND CENTER DENSITY MODES
-   Command Center: Dashboard, Analytics, Reports (more breathing room)
-   Workbench: Mark Attendance, Students, History (compact, high-density)
-   ============================================================ */
+/* Workbench & View Width Containers */
 .view {
   display: none;
-  max-width: 1140px;
+  max-width: 1180px;
   margin: 0 auto;
 }
 
 .view.active {
   display: block;
+  animation: fadeIn 160ms var(--ease-spring);
 }
 
-/* Workbench density specialization */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* High-Density Workbenches */
 #view-mark-attendance,
 #view-students,
 #view-history,
 #view-subjects {
-  max-width: 1240px;
+  max-width: 1300px;
 }
 
-/* ============================================================
-   PRECISE ICONOGRAPHY (CONSTRAINED AT 16-18px)
-   Charts and data visualizations (.chart-svg) are responsive.
-   ============================================================ */
+/* Constrained Iconography */
 .ui-icon,
 .btn .ui-icon,
 .btn svg,
@@ -467,7 +618,7 @@ body {
   flex: 0 0 16px;
 }
 
-/* Responsive Charts & Data Visualizations */
+/* Responsive SVG Charts */
 svg.chart-svg,
 svg.svg-chart,
 .chart-container svg,
@@ -485,7 +636,7 @@ svg.svg-chart,
 
 :focus-visible {
   outline: 2px solid var(--border-focus);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

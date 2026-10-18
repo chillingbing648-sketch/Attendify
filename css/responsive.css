@@ -1,32 +1,33 @@
 /* ============================================================
-   ATTENDIFY — responsive.css (Mobile, Tablet & Desktop Layouts)
-   Apple-level polish & Linear precision across all viewports:
-   360px, 390px, 768px, 1024px, 1280px, 1440px+
+   ATTENDIFY — responsive.css
+   Apple × Academic SaaS Responsive Experience
+   Fluid Breakpoints: 360px, 480px, 680px, 860px, 1024px, 1280px, 1440px+
+   Native Mobile Card Presentation for Student Directory
    ============================================================ */
 
 /* 1440px+ Extra-Wide Workstations */
 @media (min-width: 1440px) {
   .view {
-    max-width: 1260px;
+    max-width: 1320px;
   }
   #view-mark-attendance,
   #view-students,
   #view-history,
   #view-subjects {
-    max-width: 1360px;
+    max-width: 1420px;
   }
 }
 
 /* 1280px Desktop screens */
 @media (min-width: 1280px) and (max-width: 1439px) {
   .view {
-    max-width: 1180px;
+    max-width: 1220px;
   }
   #view-mark-attendance,
   #view-students,
   #view-history,
   #view-subjects {
-    max-width: 1240px;
+    max-width: 1280px;
   }
 }
 
@@ -39,9 +40,9 @@
     grid-template-columns: 1fr;
   }
   .status-btn {
-    width: 34px;
-    height: 28px;
-    font-size: 11.5px;
+    width: 36px;
+    height: 30px;
+    font-size: 12px;
   }
 }
 
@@ -56,11 +57,10 @@
     top: 0;
     bottom: 0;
     left: 0;
-    width: 250px;
+    width: 270px;
     transform: translateX(-100%);
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: var(--shadow-popover);
-    z-index: 40;
+    z-index: 50;
   }
 
   .sidebar.open {
@@ -70,11 +70,13 @@
   .sidebar-scrim {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.45);
-    z-index: 35;
+    background: rgba(14, 12, 19, 0.45);
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    z-index: 45;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--t-fast);
   }
 
   .sidebar-scrim.open {
@@ -82,8 +84,12 @@
     pointer-events: auto;
   }
 
+  .topbar-menu-btn {
+    display: inline-flex;
+  }
+
   .view-scroll {
-    padding: 14px 16px;
+    padding: 18px 18px 40px 18px;
   }
 
   .topbar-center {
@@ -95,17 +101,24 @@
   }
 
   .topbar-search-trigger {
-    padding: 0 8px;
+    padding: 0 10px;
   }
 
   .topbar-date {
     display: none;
   }
 
+  .segmented-control {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+  }
+
   /* Today's Lecture + Practical grid stacks cleanly on mobile */
   .today-sections-grid {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 16px;
   }
 
   .document-meta-strip {
@@ -134,7 +147,7 @@
   .register-counts-sticky {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 10px;
   }
 
   .count-pills {
@@ -145,35 +158,122 @@
   .register-footer {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 12px;
   }
 
   .register-footer .btn {
     width: 100%;
   }
 
-  .stat-grid {
-    grid-template-columns: 1fr 1fr;
+  .directory-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .directory-toolbar > div {
+    width: 100%;
+  }
+
+  .directory-toolbar .search-box {
+    max-width: 100% !important;
   }
 }
 
-/* Tablet specific touch-friendly tweaks (641px - 768px) */
+/* ============================================================
+   RESPONSIVE STUDENTS DIRECTORY MOBILE CARD PRESENTATION (<= 680px)
+   Transforms desktop table into native spacious mobile cards
+   ============================================================ */
+@media (max-width: 680px) {
+  .students-table-wrap {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .students-data-table {
+    border-collapse: separate !important;
+    border-spacing: 0 12px !important;
+  }
+
+  .students-data-table thead {
+    display: none;
+  }
+
+  .students-data-table,
+  .students-data-table tbody,
+  .students-data-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .students-data-table tr {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-xs);
+    position: relative;
+    transition: transform var(--t-fast), box-shadow var(--t-fast);
+  }
+
+  .students-data-table tr:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--border-strong);
+  }
+
+  .students-data-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0 !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+  }
+
+  .students-data-table td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-secondary);
+  }
+
+  .students-data-table td:first-child {
+    padding-top: 0 !important;
+  }
+
+  .students-data-table td:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    padding-top: 12px !important;
+    justify-content: flex-end;
+  }
+
+  .students-data-table td:last-child::before {
+    display: none;
+  }
+}
+
+/* Tablet touch-friendly status buttons */
 @media (min-width: 641px) and (max-width: 768px) {
   .status-btn {
-    width: 36px;
-    height: 30px;
-    font-size: 12px;
+    width: 38px;
+    height: 32px;
+    font-size: 12.5px;
   }
 }
 
-/* Smartphone screens (<= 420px / 390px) */
-@media (max-width: 420px) {
+/* Smartphone screens (<= 520px) */
+@media (max-width: 520px) {
   .topbar {
-    padding: 0 10px;
+    padding: 0 14px;
   }
 
   .view-scroll {
-    padding: 10px 10px;
+    padding: 14px 14px 34px 14px;
   }
 
   .stat-grid {
@@ -183,44 +283,51 @@
   .view-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 14px;
   }
 
   .view-header-actions {
     width: 100%;
     flex-direction: column;
-    gap: 6px;
+    align-items: stretch;
+    gap: 8px;
   }
 
   .view-header-actions .btn {
     width: 100%;
+    height: 38px;
   }
 
   .document-meta-strip {
     grid-template-columns: 1fr;
   }
 
-  .modal-dialog {
+  .modal-card, .modal {
     max-width: calc(100vw - 20px) !important;
     margin: 10px auto;
   }
 
   .status-btn {
-    width: 30px;
-    height: 26px;
-    font-size: 10.5px;
+    width: 38px;
+    height: 32px;
+    font-size: 12px;
   }
 
   .table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  .search-box {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 /* Ultra-compact screens (<= 360px) */
 @media (max-width: 360px) {
-  .topbar-title {
-    font-size: 13px;
+  .topbar-breadcrumb {
+    font-size: 12px;
   }
 
   .count-pills {
@@ -228,19 +335,19 @@
   }
 
   .pill {
-    padding: 2px 5px;
+    padding: 2px 8px;
     font-size: 10.5px;
   }
 
   .status-btn {
-    width: 27px;
-    height: 24px;
-    font-size: 10px;
+    width: 32px;
+    height: 28px;
+    font-size: 11px;
   }
 
   .data-table th,
   .data-table td {
-    padding: 6px 8px;
-    font-size: 11.5px;
+    padding: 8px 12px;
+    font-size: 12px;
   }
 }

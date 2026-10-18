@@ -35,7 +35,13 @@ const Timetable = (() => {
       <div class="view-header">
         <div>
           <h1>Class Timetable</h1>
-          <p class="view-subtitle">SY BSc IT · Schedule & Attendance Intelligence · ${Utils.formatDate(new Date())}</p>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:5px; flex-wrap:wrap;">
+            <div class="topbar-badge">
+              <span class="topbar-badge-dot"></span>
+              Weekly Academic Schedule · ${allSlots.length} Total Slots
+            </div>
+            <span style="font-size:12px; color:var(--ink-tertiary);">${Utils.formatDate(new Date())}</span>
+          </div>
         </div>
       </div>
 

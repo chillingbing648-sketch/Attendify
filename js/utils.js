@@ -167,6 +167,27 @@ const Utils = (() => {
     return lines.join('\n');
   }
 
+  const AVATAR_PALETTE = [
+    { bg: 'rgba(124, 58, 237, 0.12)', text: '#7C3AED', border: 'rgba(124, 58, 237, 0.25)' },
+    { bg: 'rgba(5, 150, 105, 0.12)',  text: '#059669', border: 'rgba(5, 150, 105, 0.25)' },
+    { bg: 'rgba(217, 119, 6, 0.12)',  text: '#D97706', border: 'rgba(217, 119, 6, 0.25)' },
+    { bg: 'rgba(2, 132, 199, 0.12)',  text: '#0284C7', border: 'rgba(2, 132, 199, 0.25)' },
+    { bg: 'rgba(225, 29, 72, 0.12)',  text: '#E11D48', border: 'rgba(225, 29, 72, 0.25)' },
+    { bg: 'rgba(139, 92, 246, 0.12)', text: '#8B5CF6', border: 'rgba(139, 92, 246, 0.25)' }
+  ];
+
+  function getInitials(name) {
+    if (!name) return 'ST';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  }
+
+  function getAvatarStyle(rollNumber) {
+    const c = AVATAR_PALETTE[(rollNumber || 1) % AVATAR_PALETTE.length];
+    return `background:${c.bg}; color:${c.text}; border:1px solid ${c.border};`;
+  }
+
   const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -175,6 +196,7 @@ const Utils = (() => {
     classesCanMiss, classesNeededToRecover,
     formatDate, formatDateShort, timeAgo, todayISO, toISODate,
     escapeHTML, debounce, downloadFile, toCSV,
+    getInitials, getAvatarStyle,
     DAY_NAMES, DAY_SHORT
   };
 })();

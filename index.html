@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Attendify — SY BSc IT Attendance Portal</title>
 <meta name="description" content="Admin attendance management system for 60 students of SY BSc IT batch.">
-<meta name="theme-color" content="#4F46E5">
+<meta name="theme-color" content="#7C3AED">
 
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/components.css">
@@ -34,9 +34,11 @@
 <script>
   (function () {
     try {
+      var urlParams = new URLSearchParams(window.location.search);
+      var themeParam = urlParams.get('theme');
       var raw = localStorage.getItem('attendify:v2');
-      var theme = 'light';
-      if (raw) {
+      var theme = themeParam || 'light';
+      if (!themeParam && raw) {
         var parsed = JSON.parse(raw);
         if (parsed && parsed.settings && parsed.settings.theme) theme = parsed.settings.theme;
       }

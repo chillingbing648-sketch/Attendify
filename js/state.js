@@ -28,9 +28,10 @@ const State = (() => {
 
   /* ---- Students ---- */
   function addStudent(student) {
+    const roll = student.rollNumber !== undefined ? parseInt(student.rollNumber, 10) : (data.students.length + 1);
     const rec = {
-      id: Utils.uid('stu'),
-      rollNumber: student.rollNumber || (data.students.length + 1),
+      id: student.id || Utils.uid('stu'),
+      rollNumber: isNaN(roll) ? (data.students.length + 1) : roll,
       name: (student.name || '').trim(),
       active: student.active !== false
     };
@@ -44,7 +45,15 @@ const State = (() => {
   function updateStudent(id, patch) {
     const s = data.students.find(x => x.id === id);
     if (!s) return null;
-    Object.assign(s, patch);
+    const cleanPatch = { ...patch };
+    if (cleanPatch.rollNumber !== undefined) {
+      const parsed = parseInt(cleanPatch.rollNumber, 10);
+      if (!isNaN(parsed)) cleanPatch.rollNumber = parsed;
+    }
+    if (cleanPatch.name !== undefined) {
+      cleanPatch.name = cleanPatch.name.trim();
+    }
+    Object.assign(s, cleanPatch);
     emit('students');
     return s;
   }

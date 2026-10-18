@@ -60,11 +60,12 @@ const App = (() => {
   function buildShell() {
     const root = document.getElementById('app-root');
     const settings = State.get().settings;
+    const currentTheme = settings.theme || 'light';
 
     root.innerHTML = `
       <div class="sidebar-scrim" id="sidebar-scrim"></div>
       <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
+        <div class="sidebar-brand" id="sidebar-brand-btn" role="button" tabindex="0" title="Go to Dashboard">
           <div class="brand-mark">A</div>
           <div class="brand-info">
             <div class="brand-name">Attendify</div>
@@ -86,8 +87,8 @@ const App = (() => {
 
         <div class="sidebar-footer">
           <button class="nav-item" id="theme-toggle-btn">
-            ${UI.icon('sun')}
-            <span>Toggle Theme</span>
+            ${UI.icon(currentTheme === 'dark' ? 'sun' : 'moon')}
+            <span>${currentTheme === 'dark' ? 'Light Theme' : 'Dark Theme'}</span>
           </button>
         </div>
       </aside>
@@ -100,7 +101,7 @@ const App = (() => {
               ${UI.icon('menu')}
             </button>
             <div class="topbar-breadcrumb">
-              <span>Attendify</span>
+              <span class="topbar-breadcrumb-link" id="breadcrumb-brand" role="button" tabindex="0" title="Go to Dashboard">Attendify</span>
               <span class="topbar-breadcrumb-sep">/</span>
               <span id="topbar-view-title">${VIEW_TITLES[currentView] || 'Dashboard'}</span>
             </div>
@@ -124,7 +125,7 @@ const App = (() => {
             <span class="topbar-date">${Utils.formatDate(new Date())}</span>
 
             <button class="icon-btn" id="topbar-theme-btn" aria-label="Toggle theme" title="Toggle Light/Dark Theme">
-              ${UI.icon('sun')}
+              ${UI.icon(currentTheme === 'dark' ? 'sun' : 'moon')}
             </button>
 
             <!-- Admin Profile Indicator -->
@@ -158,6 +159,18 @@ const App = (() => {
       btn.addEventListener('click', () => navigateTo(btn.dataset.view));
     });
 
+    const brandBtn = document.getElementById('sidebar-brand-btn');
+    if (brandBtn) {
+      brandBtn.addEventListener('click', () => navigateTo('dashboard'));
+      brandBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigateTo('dashboard'); });
+    }
+
+    const breadcrumbBrand = document.getElementById('breadcrumb-brand');
+    if (breadcrumbBrand) {
+      breadcrumbBrand.addEventListener('click', () => navigateTo('dashboard'));
+      breadcrumbBrand.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigateTo('dashboard'); });
+    }
+
     document.getElementById('theme-toggle-btn').addEventListener('click', cycleTheme);
     document.getElementById('topbar-theme-btn').addEventListener('click', cycleTheme);
 
@@ -169,11 +182,26 @@ const App = (() => {
       document.getElementById('sidebar-scrim').classList.add('open');
     });
     document.getElementById('sidebar-scrim').addEventListener('click', closeMobileSidebar);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMobileSidebar();
+    });
   }
 
   function closeMobileSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebar-scrim').classList.remove('open');
+    const sidebar = document.getElementById('sidebar');
+    const scrim = document.getElementById('sidebar-scrim');
+    if (sidebar) sidebar.classList.remove('open');
+    if (scrim) scrim.classList.remove('open');
+  }
+
+  function syncThemeIcons(theme) {
+    const isDark = theme === 'dark';
+    const topbarBtn = document.getElementById('topbar-theme-btn');
+    const footerBtn = document.getElementById('theme-toggle-btn');
+    const iconName = isDark ? 'sun' : 'moon';
+    if (topbarBtn) topbarBtn.innerHTML = UI.icon(iconName);
+    if (footerBtn) footerBtn.innerHTML = `${UI.icon(iconName)}<span>${isDark ? 'Light Theme' : 'Dark Theme'}</span>`;
   }
 
   function cycleTheme() {
@@ -181,7 +209,8 @@ const App = (() => {
     const next = current === 'light' ? 'dark' : 'light';
     State.updateSettings({ theme: next });
     UI.applyTheme(next);
-    UI.toast(`Theme: ${next.toUpperCase()}`, 'info', 1000);
+    syncThemeIcons(next);
+    UI.toast(`Switched to ${next.toUpperCase()} theme`, 'info', 1000);
   }
 
   function navigateTo(viewId) {
@@ -389,7 +418,8 @@ const App = (() => {
               return `
                 <div class="today-session-row" data-student-id="${s.id}" style="padding:6px 10px; cursor:pointer; border-radius:var(--r-sm); border:1px solid var(--border);">
                   <div style="display:flex; align-items:center; gap:8px;">
-                    <strong style="width:24px; font-size:12px; color:var(--ink); font-variant-numeric:tabular-nums;">${s.rollNumber}</strong>
+                    <span class="roll-cell" style="min-width:24px; padding:1px 5px; font-size:11px;">${s.rollNumber}</span>
+                    <div class="student-avatar" style="${Utils.getAvatarStyle(s.rollNumber)}; width:24px; height:24px; font-size:9.5px;" aria-hidden="true">${Utils.getInitials(s.name)}</div>
                     <span style="font-weight:600; font-size:12.5px; color:var(--ink);">${Utils.escapeHTML(s.name)}</span>
                   </div>
                   <div style="display:flex; align-items:center; gap:6px;">
@@ -527,7 +557,10 @@ const App = (() => {
 
   function init() {
     const { recovered } = State.init();
-    UI.applyTheme(State.get().settings.theme || 'light');
+    const urlParams = new URLSearchParams(window.location.search);
+    const themeParam = urlParams.get('theme');
+    const activeTheme = themeParam || State.get().settings.theme || 'light';
+    UI.applyTheme(activeTheme);
 
     buildShell();
 
@@ -535,7 +568,16 @@ const App = (() => {
       renderView(currentView);
     });
 
-    navigateTo('dashboard');
+    const hash = window.location.hash.replace('#', '');
+    const initialView = VIEWS.includes(hash) ? hash : 'dashboard';
+    navigateTo(initialView);
+
+    window.addEventListener('hashchange', () => {
+      const h = window.location.hash.replace('#', '');
+      if (VIEWS.includes(h) && h !== currentView) {
+        navigateTo(h);
+      }
+    });
 
     if (recovered) {
       UI.toast('Saved data safely recovered from backup', 'info');

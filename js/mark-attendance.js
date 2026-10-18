@@ -4,7 +4,9 @@
    • Choice between Lecture Attendance and Practical Attendance
    • Practical: Subject, Experiment Title, Date, Time, 60 Students
    • Lecture: Subject, Date, Time, 60 Students
-   • Quick Mark: Mark Absent Students OR Mark Present Students
+   • Quick Mark: Mark Absent Students OR Mark Present Students by Roll No
+   • Timetable Slot Quick Prefill Chips
+   • Bulk actions: All Present, All Absent, Invert Marks, Mark Remaining Present
    • Copy Previous Session with confirmation
    • Exceptions filter, Unmarked safety, Undo, and Keyboard shortcuts
    ============================================================ */
@@ -52,10 +54,22 @@ const MarkAttendanceView = (() => {
       selectedSessionType = prefillType || 'lecture';
       experimentTitle = '';
 
-      // Default all 60 students to Present
+      // Default all 60 students to Present for speed
       students.forEach(s => {
         studentStatusMap[s.id] = 'present';
       });
+    }
+  }
+
+  function getTimetableSlotsForSelectedDate() {
+    try {
+      const d = new Date(selectedDate);
+      if (isNaN(d.getTime())) return [];
+      const jsDay = d.getDay();
+      const ttDay = jsDay === 0 ? 6 : jsDay - 1; // Mon=0, ..., Sat=5, Sun=6
+      return State.getTimetableForDay(ttDay);
+    } catch {
+      return [];
     }
   }
 
@@ -90,23 +104,31 @@ const MarkAttendanceView = (() => {
 
     const counts = calculateCounts();
     const isPractical = selectedSessionType === 'practical';
+    const daySlots = getTimetableSlotsForSelectedDate();
+    const existingDuplicate = !editingSessionId ? State.findDuplicateSession(selectedSubjectId, selectedDate, selectedStartTime) : null;
 
     container.innerHTML = `
       <!-- 1. Mark Attendance Header -->
-      <div class="view-header" style="margin-bottom: 12px;">
+      <div class="view-header" style="margin-bottom: 14px;">
         <div>
           <h1>${editingSessionId ? 'Edit Attendance Session' : 'Mark Attendance'}</h1>
           <p class="view-subtitle">SY BSc IT · Single Batch · ${students.length} Students</p>
         </div>
         <div class="view-header-actions">
           <button class="btn btn-outline btn-sm" id="btn-undo-mark" ${historyStack.length === 0 ? 'disabled' : ''} title="Undo last change (Ctrl+Z)">
-            Undo Last Change
+            Undo (Ctrl+Z)
           </button>
-          <button class="btn btn-outline btn-sm" id="btn-copy-previous" title="Copy attendance from the last session for this course">
-            Copy Previous Attendance
+          <button class="btn btn-outline btn-sm" id="btn-copy-previous" title="Copy attendance from the last recorded session for this subject">
+            Copy Previous
           </button>
           <button class="btn btn-primary btn-sm" id="btn-quick-all-present" title="Mark all students as Present">
             ${UI.icon('check')} All Present
+          </button>
+          <button class="btn btn-outline btn-sm" id="btn-mark-remaining-present" title="Mark currently unmarked students as Present">
+            Mark Remaining Present
+          </button>
+          <button class="btn btn-outline btn-sm" id="btn-invert-marks" title="Swap Present and Absent">
+            Invert
           </button>
           <button class="btn btn-outline btn-sm" id="btn-quick-all-absent">All Absent</button>
           <button class="btn btn-outline btn-sm" id="btn-quick-reset">Reset</button>
@@ -116,11 +138,11 @@ const MarkAttendanceView = (() => {
       <!-- 2. Subject · Type · Date · Time Session Bar -->
       <div class="register-bar" style="margin-bottom: 12px;">
         <div class="register-bar-controls" style="flex:1;">
-          <div class="register-bar-field" style="min-width: 200px;">
+          <div class="register-bar-field" style="min-width: 220px;">
             <label for="mark-subject-select">Course / Subject</label>
             <select id="mark-subject-select" class="select">
               ${subjects.map(sub => `
-                <option value="${sub.id}" ${sub.id === selectedSubjectId ? 'selected' : ''}>${Utils.escapeHTML(sub.name)}</option>
+                <option value="${sub.id}" ${sub.id === selectedSubjectId ? 'selected' : ''}>${Utils.escapeHTML(sub.name)} (${sub.teacher || 'Faculty'})</option>
               `).join('')}
             </select>
           </div>
@@ -139,9 +161,9 @@ const MarkAttendanceView = (() => {
           </div>
 
           ${isPractical ? `
-            <div class="register-bar-field" style="min-width: 220px; flex:1;">
-              <label for="mark-exp-title">Practical / Experiment Title</label>
-              <input type="text" id="mark-exp-title" class="input" placeholder="e.g. Practical 04: File Handling" value="${Utils.escapeHTML(experimentTitle)}">
+            <div class="register-bar-field" style="min-width: 240px; flex:1;">
+              <label for="mark-exp-title">Practical / Experiment Title *</label>
+              <input type="text" id="mark-exp-title" class="input" placeholder="e.g. Practical 04: File Handling & Streams" value="${Utils.escapeHTML(experimentTitle)}">
             </div>
           ` : ''}
 
@@ -157,31 +179,62 @@ const MarkAttendanceView = (() => {
         </div>
       </div>
 
+      <!-- Timetable Slot Quick Prefills (if available for selected date) -->
+      ${daySlots.length > 0 ? `
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; font-size:12px; color:var(--ink-secondary);">
+          <span style="font-weight:600; text-transform:uppercase; font-size:10.5px; letter-spacing:0.04em; color:var(--ink-tertiary);">Timetable Slots:</span>
+          ${daySlots.map(slot => {
+            const sub = State.getSubject(slot.subjectId);
+            const isMatch = slot.subjectId === selectedSubjectId && slot.start === selectedStartTime && (slot.type === 'practical' ? isPractical : !isPractical);
+            return `
+              <button class="btn btn-sm ${isMatch ? 'btn-primary' : 'btn-outline'} timetable-slot-chip" 
+                data-sub="${slot.subjectId}" data-time="${slot.start}" data-type="${slot.type || 'theory'}"
+                style="height:24px; padding:0 8px; font-size:11px;">
+                ${slot.start} · ${sub ? sub.name.slice(0, 18) : 'Class'} (${slot.type === 'practical' ? 'Lab' : 'Lec'})
+              </button>
+            `;
+          }).join('')}
+        </div>
+      ` : ''}
+
+      <!-- Duplicate Session Alert Notice -->
+      ${existingDuplicate ? `
+        <div class="card" style="padding:8px 14px; margin-bottom:12px; background:var(--warn-subtle); border-color:var(--warn-border); display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--warn-ink); font-weight:600;">
+            ${UI.icon('alert')}
+            <span>An attendance session already exists for this subject, date and time. Saving will overwrite its records.</span>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="App.navigateToMarkSession('${existingDuplicate.id}')">
+            Load Saved Session
+          </button>
+        </div>
+      ` : ''}
+
       <!-- 3. Quick Mark Bar -->
       <div class="card" style="background:var(--surface); border:1px solid ${isPractical ? 'var(--practical-border)' : 'var(--accent-border)'}; margin-bottom:12px; padding:10px 14px;">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:320px; flex-wrap:wrap;">
-            <span style="font-size:11px; font-weight:700; color:${isPractical ? 'var(--practical)' : 'var(--accent)'}; text-transform:uppercase; letter-spacing:0.04em;">
+            <span style="font-size:11px; font-weight:750; color:${isPractical ? 'var(--practical)' : 'var(--accent)'}; text-transform:uppercase; letter-spacing:0.05em;">
               Quick Mark:
             </span>
-            <select id="quick-mark-mode" class="select" style="height:28px; font-size:11.5px; padding:2px 8px; width:auto;">
+            <select id="quick-mark-mode" class="select" style="height:30px; font-size:12px; padding:2px 8px; width:auto;">
               <option value="absent" ${quickMarkMode === 'absent' ? 'selected' : ''}>Absent Roll Numbers</option>
               <option value="present" ${quickMarkMode === 'present' ? 'selected' : ''}>Present Roll Numbers</option>
             </select>
-            <input type="text" id="quick-roll-input" class="input" style="height:28px; font-size:var(--fs-xs); flex:1; min-width:180px; max-width:340px;" placeholder="Roll Nos: e.g. 4, 12, 18, 32, 47">
+            <input type="text" id="quick-roll-input" class="input" style="height:30px; font-size:var(--fs-xs); flex:1; min-width:180px; max-width:340px;" placeholder="Roll Nos: e.g. 4, 12, 18, 32, 47">
             <button class="btn btn-primary btn-sm" id="btn-apply-quick-mark" style="${isPractical ? 'background:var(--practical); border-color:var(--practical);' : ''}">
               Apply
             </button>
           </div>
           <span style="font-size:11px; color:var(--ink-secondary);">
-            Sets entered roll numbers to ${quickMarkMode === 'absent' ? 'Absent' : 'Present'} and remaining students to ${quickMarkMode === 'absent' ? 'Present' : 'Absent'}.
+            Sets entered roll numbers to <strong>${quickMarkMode === 'absent' ? 'Absent' : 'Present'}</strong> and remaining students to <strong>${quickMarkMode === 'absent' ? 'Present' : 'Absent'}</strong>.
           </span>
         </div>
       </div>
 
       <!-- 4. Search & Filter Bar + 5. Live Summary (Sticky Header) -->
       <div class="register-container">
-        <div class="register-counts-sticky">
+        <div class="register-counts-sticky" role="region" aria-label="Live Headcount Reconciliation">
           <!-- Reconciled Live Summary (60 Total · Present · Absent · Late · Unmarked) -->
           <div class="count-pills">
             <span class="pill pill-total">Total: ${students.length}</span>
@@ -191,22 +244,22 @@ const MarkAttendanceView = (() => {
             <span class="pill pill-unmarked ${counts.unmarked > 0 ? 'has-unmarked' : ''}" id="count-unmarked">Unmarked: ${counts.unmarked}</span>
           </div>
 
-          <!-- Quick Filters & Search -->
+          <!-- Quick Filters & Search (Apple Segmented Control) -->
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <div style="display:flex; gap:3px;">
-              <button class="btn btn-sm ${activeFilter === 'all' ? 'btn-secondary' : 'btn-ghost'}" data-filter="all">All (${students.length})</button>
-              <button class="btn btn-sm ${activeFilter === 'exceptions' ? 'btn-secondary' : 'btn-ghost'}" data-filter="exceptions" title="Show only Absentees, Late and Unmarked students">
-                Only Exceptions (${counts.absent + counts.late + counts.unmarked})
+            <div class="segmented-control">
+              <button class="segmented-item ${activeFilter === 'all' ? 'active' : ''}" data-filter="all">All (${students.length})</button>
+              <button class="segmented-item ${activeFilter === 'exceptions' ? 'active' : ''}" data-filter="exceptions" title="Show only Absentees, Late and Unmarked students">
+                Exceptions (${counts.absent + counts.late + counts.unmarked})
               </button>
-              <button class="btn btn-sm ${activeFilter === 'present' ? 'btn-secondary' : 'btn-ghost'}" data-filter="present">Present (${counts.present})</button>
-              <button class="btn btn-sm ${activeFilter === 'absent' ? 'btn-secondary' : 'btn-ghost'}" data-filter="absent">Absent (${counts.absent})</button>
-              <button class="btn btn-sm ${activeFilter === 'late' ? 'btn-secondary' : 'btn-ghost'}" data-filter="late">Late (${counts.late})</button>
-              <button class="btn btn-sm ${activeFilter === 'unmarked' ? 'btn-secondary' : 'btn-ghost'}" data-filter="unmarked">Unmarked (${counts.unmarked})</button>
+              <button class="segmented-item ${activeFilter === 'present' ? 'active' : ''}" data-filter="present">Present (${counts.present})</button>
+              <button class="segmented-item ${activeFilter === 'absent' ? 'active' : ''}" data-filter="absent">Absent (${counts.absent})</button>
+              <button class="segmented-item ${activeFilter === 'late' ? 'active' : ''}" data-filter="late">Late (${counts.late})</button>
+              <button class="segmented-item ${activeFilter === 'unmarked' ? 'active' : ''}" data-filter="unmarked">Unmarked (${counts.unmarked})</button>
             </div>
 
             <div class="search-box" style="min-width: 170px;">
               ${UI.icon('search')}
-              <input type="text" id="mark-student-search" class="input" style="height: 28px; font-size: 11.5px;" placeholder="Search roll or name..." value="${Utils.escapeHTML(searchQuery)}">
+              <input type="text" id="mark-student-search" class="input" style="height: 30px; font-size: 11.5px;" placeholder="Search roll or name..." value="${Utils.escapeHTML(searchQuery)}">
             </div>
           </div>
         </div>
@@ -219,7 +272,7 @@ const MarkAttendanceView = (() => {
                 <th style="width: 45px; text-align: center;">#</th>
                 <th style="width: 80px;">Roll No.</th>
                 <th>Student</th>
-                <th style="width: 130px; text-align: center;">Status</th>
+                <th style="width: 140px; text-align: center;">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -231,10 +284,10 @@ const MarkAttendanceView = (() => {
         <!-- 7. Sticky Footer Summary & Save Action -->
         <div class="register-footer">
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <span style="font-size:var(--fs-sm); font-weight:650; color:var(--ink);" id="footer-reconciled-summary">
+            <span style="font-size:var(--fs-sm); font-weight:700; color:var(--ink);" id="footer-reconciled-summary">
               ${students.length} Total · ${counts.present} Present · ${counts.absent} Absent · ${counts.late} Late · ${counts.unmarked} Unmarked
             </span>
-            <span style="font-size:var(--fs-xs); color:var(--ink-secondary); font-weight:500;">
+            <span style="font-size:var(--fs-xs); color:var(--ink-secondary); font-weight:600;">
               (${Utils.safePercent(counts.present + counts.late, students.length)}% Turnout)
             </span>
           </div>
@@ -275,7 +328,7 @@ const MarkAttendanceView = (() => {
     if (filtered.length === 0) {
       return `
         <tr>
-          <td colspan="4" style="text-align:center; padding: 24px; color:var(--ink-secondary);">
+          <td colspan="4" style="text-align:center; padding: 28px; color:var(--ink-secondary);">
             No students match the active filter or search query.
           </td>
         </tr>
@@ -285,7 +338,7 @@ const MarkAttendanceView = (() => {
     return filtered.map((stu, idx) => {
       const status = studentStatusMap[stu.id] || 'present';
       return `
-        <tr data-student-id="${stu.id}" tabindex="0" class="register-row ${status === 'absent' ? 'row-absent' : status === 'late' ? 'row-late' : status === 'unmarked' ? 'row-unmarked' : ''}">
+        <tr data-student-id="${stu.id}" tabindex="0" class="register-row ${status === 'absent' ? 'row-absent' : status === 'late' ? 'row-late' : status === 'unmarked' ? 'row-unmarked' : ''}" aria-label="Roll ${stu.rollNumber} ${stu.name}, Status: ${status}">
           <td style="color:var(--ink-tertiary); text-align: center; font-variant-numeric: tabular-nums; font-size: 11px;">
             ${String(idx + 1).padStart(2, '0')}
           </td>
@@ -295,13 +348,16 @@ const MarkAttendanceView = (() => {
             </span>
           </td>
           <td>
-            <div style="font-weight: 550; color:var(--ink);">${Utils.escapeHTML(stu.name)}</div>
+            <div style="display:flex; align-items:center; gap:9px;">
+              <div class="student-avatar" style="${Utils.getAvatarStyle(stu.rollNumber)}" aria-hidden="true">${Utils.getInitials(stu.name)}</div>
+              <div style="font-weight: 600; color:var(--ink);">${Utils.escapeHTML(stu.name)}</div>
+            </div>
           </td>
           <td style="text-align: center;">
-            <div class="status-btn-group" data-student-id="${stu.id}">
-              <button type="button" class="status-btn ${status === 'present' ? 'active-present' : ''}" data-val="present" title="Present (P)">P</button>
-              <button type="button" class="status-btn ${status === 'absent' ? 'active-absent' : ''}" data-val="absent" title="Absent (A)">A</button>
-              <button type="button" class="status-btn ${status === 'late' ? 'active-late' : ''}" data-val="late" title="Late (L)">L</button>
+            <div class="status-btn-group" data-student-id="${stu.id}" role="group" aria-label="Attendance for ${Utils.escapeHTML(stu.name)}">
+              <button type="button" class="status-btn ${status === 'present' ? 'active-present' : ''}" data-val="present" aria-pressed="${status === 'present'}" aria-label="Present (P)" title="Present (P)">P</button>
+              <button type="button" class="status-btn ${status === 'absent' ? 'active-absent' : ''}" data-val="absent" aria-pressed="${status === 'absent'}" aria-label="Absent (A)" title="Absent (A)">A</button>
+              <button type="button" class="status-btn ${status === 'late' ? 'active-late' : ''}" data-val="late" aria-pressed="${status === 'late'}" aria-label="Late (L)" title="Late (L)">L</button>
             </div>
           </td>
         </tr>
@@ -368,23 +424,56 @@ const MarkAttendanceView = (() => {
     }
 
     const subSel = container.querySelector('#mark-subject-select');
-    if (subSel) subSel.addEventListener('change', (e) => { selectedSubjectId = e.target.value; });
+    if (subSel) {
+      subSel.addEventListener('change', async (e) => {
+        const newSubId = e.target.value;
+        if (historyStack.length > 0) {
+          const ok = await UI.confirmDialog({
+            title: 'Change Subject?',
+            message: 'You have made attendance modifications in this session. Changing subject will continue with current marks. Proceed?',
+            confirmLabel: 'Change Subject',
+            danger: false
+          });
+          if (!ok) {
+            subSel.value = selectedSubjectId;
+            return;
+          }
+        }
+        selectedSubjectId = newSubId;
+        render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
+      });
+    }
 
     const expInput = container.querySelector('#mark-exp-title');
     if (expInput) expInput.addEventListener('input', (e) => { experimentTitle = e.target.value; });
 
     const dateInp = container.querySelector('#mark-date-input');
-    if (dateInp) dateInp.addEventListener('change', (e) => { selectedDate = e.target.value; });
+    if (dateInp) {
+      dateInp.addEventListener('change', (e) => {
+        selectedDate = e.target.value;
+        render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
+      });
+    }
 
     const timeInp = container.querySelector('#mark-time-input');
     if (timeInp) timeInp.addEventListener('change', (e) => { selectedStartTime = e.target.value; });
+
+    // Timetable slot chips
+    container.querySelectorAll('.timetable-slot-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        selectedSubjectId = chip.dataset.sub;
+        selectedStartTime = chip.dataset.time;
+        selectedSessionType = chip.dataset.type === 'practical' ? 'practical' : 'lecture';
+        render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
+      });
+    });
 
     const searchInp = container.querySelector('#mark-student-search');
     if (searchInp) {
       searchInp.addEventListener('input', Utils.debounce((e) => {
         searchQuery = e.target.value;
         refreshTable(container);
-      }, 120));
+      }, 100));
     }
 
     // Quick Mark Mode and Input
@@ -448,6 +537,36 @@ const MarkAttendanceView = (() => {
       });
     }
 
+    const markRemainingP = container.querySelector('#btn-mark-remaining-present');
+    if (markRemainingP) {
+      markRemainingP.addEventListener('click', () => {
+        historyStack.push({ fullSnapshot: { ...studentStatusMap } });
+        let count = 0;
+        State.getAllStudents().forEach(s => {
+          if (!studentStatusMap[s.id] || studentStatusMap[s.id] === 'unmarked') {
+            studentStatusMap[s.id] = 'present';
+            count++;
+          }
+        });
+        render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
+        UI.toast(`Marked ${count} remaining students as Present`, 'info', 1500);
+      });
+    }
+
+    const invertBtn = container.querySelector('#btn-invert-marks');
+    if (invertBtn) {
+      invertBtn.addEventListener('click', () => {
+        historyStack.push({ fullSnapshot: { ...studentStatusMap } });
+        State.getAllStudents().forEach(s => {
+          const cur = studentStatusMap[s.id];
+          if (cur === 'present') studentStatusMap[s.id] = 'absent';
+          else if (cur === 'absent') studentStatusMap[s.id] = 'present';
+        });
+        render('view-mark-attendance', selectedSubjectId, editingSessionId, selectedStartTime, selectedSessionType);
+        UI.toast('Inverted Present / Absent marks', 'info', 1500);
+      });
+    }
+
     const resetBtn = container.querySelector('#btn-quick-reset');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
@@ -475,9 +594,11 @@ const MarkAttendanceView = (() => {
 
       group.querySelectorAll('.status-btn').forEach(b => {
         b.className = 'status-btn';
+        b.setAttribute('aria-pressed', 'false');
       });
       if (newStatus !== 'unmarked') {
         btn.classList.add(`active-${newStatus}`);
+        btn.setAttribute('aria-pressed', 'true');
       }
 
       const row = btn.closest('.register-row');
@@ -522,24 +643,12 @@ const MarkAttendanceView = (() => {
     const students = State.getAllStudents();
     historyStack.push({ fullSnapshot: { ...studentStatusMap } });
 
-    let matchCount = 0;
     students.forEach(s => {
       const isTarget = tokenSet.has(s.rollNumber);
       if (mode === 'absent') {
-        if (isTarget) {
-          studentStatusMap[s.id] = 'absent';
-          matchCount++;
-        } else {
-          studentStatusMap[s.id] = 'present';
-        }
+        studentStatusMap[s.id] = isTarget ? 'absent' : 'present';
       } else {
-        // Mode is present
-        if (isTarget) {
-          studentStatusMap[s.id] = 'present';
-          matchCount++;
-        } else {
-          studentStatusMap[s.id] = 'absent';
-        }
+        studentStatusMap[s.id] = isTarget ? 'present' : 'absent';
       }
     });
 
@@ -554,7 +663,6 @@ const MarkAttendanceView = (() => {
       return;
     }
 
-    // Find the latest session for this subject and type
     const sessions = State.getSessionsForSubject(selectedSubjectId)
       .filter(s => s.type === selectedSessionType && s.id !== editingSessionId);
 
@@ -563,7 +671,7 @@ const MarkAttendanceView = (() => {
       return;
     }
 
-    const prevSession = sessions[0]; // latest by date
+    const prevSession = sessions[0];
     const prevStats = Attendance.statsForSession(prevSession.id);
     const sub = State.getSubject(selectedSubjectId);
 
@@ -628,10 +736,16 @@ const MarkAttendanceView = (() => {
 
           const group = row.querySelector('.status-btn-group');
           if (group) {
-            group.querySelectorAll('.status-btn').forEach(b => { b.className = 'status-btn'; });
+            group.querySelectorAll('.status-btn').forEach(b => {
+              b.className = 'status-btn';
+              b.setAttribute('aria-pressed', 'false');
+            });
             if (status !== 'unmarked') {
               const activeBtn = group.querySelector(`[data-val="${status}"]`);
-              if (activeBtn) activeBtn.classList.add(`active-${status}`);
+              if (activeBtn) {
+                activeBtn.classList.add(`active-${status}`);
+                activeBtn.setAttribute('aria-pressed', 'true');
+              }
             }
           }
           row.classList.toggle('row-absent', status === 'absent');
@@ -659,6 +773,13 @@ const MarkAttendanceView = (() => {
   function handleSave() {
     if (!selectedSubjectId) {
       UI.toast('Please select a course', 'error');
+      return;
+    }
+
+    if (selectedSessionType === 'practical' && !experimentTitle.trim()) {
+      UI.toast('Please enter the practical experiment title', 'warn');
+      const expInput = document.getElementById('mark-exp-title');
+      if (expInput) expInput.focus();
       return;
     }
 
