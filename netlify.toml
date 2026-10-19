@@ -1,0 +1,49 @@
+# Attendify — Netlify Deployment Configuration
+
+[build]
+  publish = "."
+
+# Client-side rewrites for clean routing
+[[redirects]]
+  from = "/student"
+  to = "/student.html"
+  status = 200
+
+[[redirects]]
+  from = "/student/"
+  to = "/student.html"
+  status = 200
+
+[[redirects]]
+  from = "/checkin"
+  to = "/checkin.html"
+  status = 200
+
+[[redirects]]
+  from = "/checkin/"
+  to = "/checkin.html"
+  status = 200
+
+# Global Security & Privacy Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
