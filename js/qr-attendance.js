@@ -35,15 +35,54 @@ const QRAttendanceView = (() => {
   // Check backend server availability on initialization
   async function checkServerHealth() {
     try {
-      const res = await fetch('/api/qr/health', { cache: 'no-store' });
+      const res = await (typeof AttendifyConfig !== 'undefined'
+        ? AttendifyConfig.apiFetch('/api/qr/health', { cache: 'no-store', timeoutMs: 4000 })
+        : fetch('/api/qr/health', { cache: 'no-store' }));
       if (res.ok) {
         const data = await res.json();
-        serverAvailable = data && data.status === 'ok';
+        serverAvailable = data && (data.status === 'ok' || data.ok === true);
       } else {
         serverAvailable = false;
       }
     } catch {
       serverAvailable = false;
+    }
+  }
+
+  function buildCheckinUrl(sessionId, token) {
+    if (typeof window === 'undefined' || !window.location) {
+      return `/checkin.html?s=${encodeURIComponent(sessionId)}&t=${encodeURIComponent(token)}`;
+    }
+    const checkinPath = new URL('checkin.html', window.location.href);
+    checkinPath.searchParams.set('s', sessionId);
+    checkinPath.searchParams.set('t', token);
+    const configuredApi = typeof AttendifyConfig !== 'undefined' ? AttendifyConfig.getApiBaseUrl() : '';
+    if (configuredApi) {
+      checkinPath.searchParams.set('api', configuredApi);
+    }
+    return checkinPath.href;
+  }
+
+  function configureBackendPrompt() {
+    if (typeof AttendifyConfig === 'undefined') return;
+    const current = AttendifyConfig.getApiBaseUrl();
+    const entered = prompt(
+      'Configure Attendify Deployed Backend URL\n\n' +
+      'If your backend is deployed on Render/Railway/Fly.io (e.g. https://attendify-api.onrender.com), enter it below:\n' +
+      '(Leave empty for local same-origin)',
+      current
+    );
+    if (entered !== null) {
+      AttendifyConfig.setApiBaseUrl(entered.trim());
+      UI.toast('Backend URL updated. Testing connection...', 'info', 2000);
+      checkServerHealth().then(() => {
+        render();
+        if (serverAvailable) {
+          UI.toast('✓ Successfully connected to Attendify backend!', 'success', 3000);
+        } else {
+          UI.toast('⚠️ Could not reach backend at ' + (AttendifyConfig.getApiBaseUrl() || 'same-origin') + '. Verify URL and server status.', 'error', 4500);
+        }
+      });
     }
   }
 
@@ -113,11 +152,16 @@ const QRAttendanceView = (() => {
 
     if (serverAvailable) {
       try {
-        const res = await fetch('/api/qr/session/start', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        const res = await (typeof AttendifyConfig !== 'undefined'
+          ? AttendifyConfig.apiFetch('/api/qr/session/start', {
+              method: 'POST',
+              body: JSON.stringify(payload)
+            })
+          : fetch('/api/qr/session/start', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            }));
         const data = await res.json();
         if (data.success && data.session) {
           activeSession = data.session;
@@ -134,7 +178,7 @@ const QRAttendanceView = (() => {
 
     // Strict Rule: Never simulate attendance when server is offline
     serverAvailable = false;
-    UI.toast('Attendance verification is temporarily unavailable. Please start the backend server (node server.js) and try again.', 'error', 4500);
+    UI.toast('Attendance verification is temporarily unavailable. Please verify the backend is running and reachable.', 'error', 4500);
     render();
   }
 
@@ -143,11 +187,16 @@ const QRAttendanceView = (() => {
 
     if (serverAvailable) {
       try {
-        const res = await fetch('/api/qr/session/rotate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: activeSession.id })
-        });
+        const res = await (typeof AttendifyConfig !== 'undefined'
+          ? AttendifyConfig.apiFetch('/api/qr/session/rotate', {
+              method: 'POST',
+              body: JSON.stringify({ sessionId: activeSession.id })
+            })
+          : fetch('/api/qr/session/rotate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ sessionId: activeSession.id })
+            }));
         const data = await res.json();
         if (data.success) {
           activeSession.token = data.token;
@@ -198,7 +247,10 @@ const QRAttendanceView = (() => {
       pollInterval = setInterval(async () => {
         if (!activeSession || activeSession.status !== 'active' || activeSession.id.startsWith('qr_local_')) return;
         try {
-          const res = await fetch(`/api/qr/session/status?sessionId=${encodeURIComponent(activeSession.id)}`);
+          const statusUrl = `/api/qr/session/status?sessionId=${encodeURIComponent(activeSession.id)}`;
+          const res = await (typeof AttendifyConfig !== 'undefined'
+            ? AttendifyConfig.apiFetch(statusUrl, { timeoutMs: 3000 })
+            : fetch(statusUrl));
           if (res.ok) {
             const data = await res.json();
             if (data.success && data.session) {
@@ -257,7 +309,7 @@ const QRAttendanceView = (() => {
     const tokenHashEl = document.getElementById('qr-token-hash');
     if (!qrContainer) return;
 
-    const checkinUrl = `${window.location.origin}/checkin.html?s=${encodeURIComponent(activeSession.id)}&t=${encodeURIComponent(activeSession.token)}`;
+    const checkinUrl = buildCheckinUrl(activeSession.id, activeSession.token);
     const svg = QRCode.generateSVG(checkinUrl, {
       margin: 2,
       darkColor: '#20243A',
@@ -329,8 +381,8 @@ const QRAttendanceView = (() => {
                 🔒 SERVER CONNECTED
               </span>
             ` : `
-              <span class="badge badge-danger" style="font-size:10.5px; padding:2px 7px;" title="Backend service unavailable. Start node server.js to enable QR verification.">
-                ⚠️ SERVER UNAVAILABLE
+              <span class="badge badge-danger" id="qr-server-status-pill" style="font-size:10.5px; padding:2px 7px; cursor:pointer;" title="Backend service unavailable. Click to configure deployed backend URL.">
+                ⚠️ SERVER UNAVAILABLE (Configure)
               </span>
             `}
           </div>
@@ -349,7 +401,7 @@ const QRAttendanceView = (() => {
               ${UI.icon('checkCircle')} End & Review Session
             </button>
           ` : `
-            <button class="btn btn-primary btn-sm" id="btn-start-qr-session" ${!serverAvailable ? 'disabled style="opacity:0.6; cursor:not-allowed;" title="Attendance verification is temporarily unavailable. Start node server.js."' : ''}>
+            <button class="btn btn-primary btn-sm" id="btn-start-qr-session" ${!serverAvailable ? 'disabled style="opacity:0.6; cursor:not-allowed;" title="Attendance verification is temporarily unavailable. Verify server connection or configure backend URL."' : ''}>
               ${UI.icon('qrcode')} Start QR Session
             </button>
           `}
@@ -686,7 +738,7 @@ const QRAttendanceView = (() => {
     if (copyBtn) {
       copyBtn.addEventListener('click', () => {
         if (!activeSession) return;
-        const checkinUrl = `${window.location.origin}/checkin.html?s=${encodeURIComponent(activeSession.id)}&t=${encodeURIComponent(activeSession.token)}`;
+        const checkinUrl = buildCheckinUrl(activeSession.id, activeSession.token);
         if (navigator.clipboard) {
           navigator.clipboard.writeText(checkinUrl);
           UI.toast('Copied student check-in link to clipboard', 'success', 1500);
@@ -694,6 +746,12 @@ const QRAttendanceView = (() => {
           prompt('Copy this student check-in link:', checkinUrl);
         }
       });
+    }
+
+    // Server Offline Badge Click to Configure Backend URL
+    const serverPill = container.querySelector('#qr-server-status-pill');
+    if (serverPill) {
+      serverPill.addEventListener('click', configureBackendPrompt);
     }
 
     // Test Scan / Simulated Student Scan Dialog
@@ -725,15 +783,25 @@ const QRAttendanceView = (() => {
     record.timestamp = nextStatus !== 'absent' && nextStatus !== 'pending' ? new Date().toISOString() : null;
 
     if (serverAvailable && activeSession && !activeSession.id.startsWith('qr_local_')) {
-      fetch('/api/qr/session/correct', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: activeSession.id,
-          studentId,
-          status: nextStatus
-        })
-      }).catch(() => {});
+      const fetchPromise = typeof AttendifyConfig !== 'undefined'
+        ? AttendifyConfig.apiFetch('/api/qr/session/correct', {
+            method: 'POST',
+            body: JSON.stringify({
+              sessionId: activeSession.id,
+              studentId,
+              status: nextStatus
+            })
+          })
+        : fetch('/api/qr/session/correct', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: activeSession.id,
+              studentId,
+              status: nextStatus
+            })
+          });
+      fetchPromise.catch(() => {});
     }
 
     updateActivityRoster();
@@ -785,17 +853,28 @@ const QRAttendanceView = (() => {
 
             if (serverAvailable) {
               try {
-                const res = await fetch('/api/qr/session/checkin', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    sessionId: activeSession.id,
-                    token: activeSession.token,
-                    studentId: sid,
-                    rollNumber: roll,
-                    studentName: name
-                  })
-                });
+                const res = await (typeof AttendifyConfig !== 'undefined'
+                  ? AttendifyConfig.apiFetch('/api/qr/session/checkin', {
+                      method: 'POST',
+                      body: JSON.stringify({
+                        sessionId: activeSession.id,
+                        token: activeSession.token,
+                        studentId: sid,
+                        rollNumber: roll,
+                        studentName: name
+                      })
+                    })
+                  : fetch('/api/qr/session/checkin', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        sessionId: activeSession.id,
+                        token: activeSession.token,
+                        studentId: sid,
+                        rollNumber: roll,
+                        studentName: name
+                      })
+                    }));
                 const data = await res.json();
                 if (data.success) {
                   const rec = studentCheckinMap.get(sid);
@@ -879,11 +958,18 @@ const QRAttendanceView = (() => {
     // 1. Invalidate tokens on server
     if (serverAvailable && !activeSession.id.startsWith('qr_local_')) {
       try {
-        await fetch('/api/qr/session/end', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: activeSession.id })
-        });
+        if (typeof AttendifyConfig !== 'undefined') {
+          await AttendifyConfig.apiFetch('/api/qr/session/end', {
+            method: 'POST',
+            body: JSON.stringify({ sessionId: activeSession.id })
+          });
+        } else {
+          await fetch('/api/qr/session/end', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: activeSession.id })
+          });
+        }
       } catch {}
     }
 

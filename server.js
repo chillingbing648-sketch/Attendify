@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = parseInt(process.env.PORT, 10) || 3000;
-const HOST = process.env.HOST || '127.0.0.1';
+const HOST = process.env.HOST || '0.0.0.0';
 const ROOT = __dirname;
 
 const MIME_TYPES = {
@@ -21,45 +21,35 @@ const MIME_TYPES = {
 const database = require('./database.js');
 const qrBackend = require('./qr-backend.js');
 const studentBackend = require('./student-backend.js');
-
-// Configurable CORS Allowlist
-const rawAllowed = process.env.ALLOWED_ORIGINS || '';
-const ALLOWED_ORIGINS = rawAllowed
-  ? rawAllowed.split(',').map(s => s.trim().toLowerCase())
-  : [
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      'http://localhost:5173',
-      'https://chillingbing648-sketch.github.io'
-    ];
-
-function getCorsOrigin(req) {
-  const origin = req.headers.origin || '';
-  if (!origin) return '';
-  const lower = origin.toLowerCase();
-  if (
-    ALLOWED_ORIGINS.includes(lower) ||
-    lower.startsWith('http://localhost:') ||
-    lower.startsWith('http://127.0.0.1:')
-  ) {
-    return origin;
-  }
-  return '';
-}
+const { getCorsOrigin, getCorsHeaders } = require('./cors.js');
 
 const server = http.createServer((req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = decodeURIComponent(parsedUrl.pathname);
 
-  // Global Health Check
+  // Handle preflight OPTIONS requests with strict CORS headers
+  if (req.method === 'OPTIONS') {
+    const corsHeaders = getCorsHeaders(req);
+    res.writeHead(204, {
+      ...corsHeaders,
+      'Content-Length': '0'
+    });
+    res.end();
+    return;
+  }
+
+  // Global Backend & Database Health Check
   if (pathname === '/api/health' && req.method === 'GET') {
+    const corsHeaders = getCorsHeaders(req);
     try {
       const active = database.getActiveSessions();
       res.writeHead(200, {
         'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'no-store'
+        'Cache-Control': 'no-store',
+        ...corsHeaders
       });
       res.end(JSON.stringify({
+        ok: true,
         status: 'healthy',
         database: 'connected (node:sqlite ACID)',
         serverTime: new Date().toISOString(),
@@ -68,11 +58,13 @@ const server = http.createServer((req, res) => {
     } catch (err) {
       res.writeHead(503, {
         'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'no-store'
+        'Cache-Control': 'no-store',
+        ...corsHeaders
       });
       res.end(JSON.stringify({
+        ok: false,
         status: 'unhealthy',
-        error: 'Database connection failure',
+        error: 'Database connection failure: ' + (err.message || 'unknown error'),
         serverTime: new Date().toISOString()
       }));
     }
@@ -151,23 +143,38 @@ const server = http.createServer((req, res) => {
         return;
       }
 
-      const corsOrigin = getCorsOrigin(req);
+      const corsHeaders = getCorsHeaders(req);
       const headers = {
         'Content-Type': contentType,
         'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=86400',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
-        'Referrer-Policy': 'strict-origin-when-cross-origin'
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        ...corsHeaders
       };
-      if (corsOrigin) {
-        headers['Access-Control-Allow-Origin'] = corsOrigin;
-      }
 
       res.writeHead(200, headers);
       res.end(data);
     });
   });
 });
+
+function handleShutdown(signal) {
+  console.log(`\nReceived ${signal}. Gracefully shutting down Attendify server...`);
+  server.close(() => {
+    try {
+      database.closeDatabaseConnection();
+    } catch {}
+    console.log('Database connection closed. Attendify server stopped.');
+    process.exit(0);
+  });
+  setTimeout(() => {
+    process.exit(0);
+  }, 5000).unref();
+}
+
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+process.on('SIGINT', () => handleShutdown('SIGINT'));
 
 if (require.main === module) {
   server.listen(PORT, HOST, () => {

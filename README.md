@@ -6,7 +6,7 @@
   ### Professional Academic Attendance Management & Faculty Workflow Platform
 
   [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero%20(Vanilla%20ES6%2B)-51458A?style=for-the-badge)](#-technology-stack)
-  [![Test Suite](https://img.shields.io/badge/Tests-54%20Passing%20(100%25)-178568?style=for-the-badge)](#-test-suite--quality-assurance)
+  [![Test Suite](https://img.shields.io/badge/Tests-60%20Passing%20(100%25)-178568?style=for-the-badge)](#-test-suite--quality-assurance)
   [![Security](https://img.shields.io/badge/Security-Server--Gated%20Bearer%20Tokens-51458A?style=for-the-badge)](#4--dedicated-student-only-portal--strict-visibility-rule-new)
   [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20Contrast-2CD5A4?style=for-the-badge)](#-typography--design-tokens)
   [![Architecture](https://img.shields.io/badge/State-Reactive%20%2B%20Backup%20Rotation-4F5D95?style=for-the-badge)](#-state-engine--data-reliability)
@@ -286,39 +286,81 @@ node server.js
 # QR Check-In:   http://localhost:3000/checkin.html
 ```
 
-### Deployment Architectures
-* **Node.js Backend Hosting (Render, Railway, Fly.io, DigitalOcean, VPS)**:
-  - Run `node server.js` with `NODE_ENV=production`.
-  - Set `PORT` and `ALLOWED_ORIGINS` to allow cross-origin requests from your frontend host.
-* **Static Frontend Hosting (GitHub Pages, Netlify)**:
-  - Frontend is 100% static and deployed to GitHub Pages and Netlify.
-  - Client points to authoritative server endpoints for cryptographic validation and database persistence.
-  - Netlify configuration (`netlify.toml`) provides client-side rewrites (`/student` → `/student.html`, `/checkin` → `/checkin.html`) and strict security headers (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`).
+### Deployment Architectures & Frontend–Backend Integration
+
+Attendify uses a decoupled production architecture:
+1. **Frontend (GitHub Pages / Netlify)**: Static SPA hosted at `https://chillingbing648-sketch.github.io/Attendify/` or custom domain.
+2. **Backend (Render / Railway / Fly.io / VPS)**: Persistent Node.js 22+ ACID database and cryptographic QR token server.
+
+#### Deploying the Backend to Render (Recommended)
+1. Fork or push the Attendify repository to your GitHub account (`chillingbing648-sketch/Attendify`).
+2. Log into [Render.com](https://render.com) and click **New +** → **Web Service** (or use Blueprints with `render.yaml`).
+3. Connect your Attendify repository.
+4. Configure service settings:
+   - **Environment**: `Node`
+   - **Node Version**: `22` (or set via `engines` in `package.json`)
+   - **Build Command**: `node -v` (no build step required; zero npm dependencies)
+   - **Start Command**: `node server.js`
+   - **Plan**: `Free` or `Starter` (attach persistent disk for SQLite if upgrading to paid, or use managed PostgreSQL)
+5. Add Environment Variables:
+   - `NODE_ENV`: `production`
+   - `PORT`: `10000` (Render default)
+   - `HOST`: `0.0.0.0`
+   - `ALLOWED_ORIGINS`: `https://chillingbing648-sketch.github.io,https://harshportfolio404.netlify.app`
+   - `FACULTY_SESSION_SECRET`: `[generate a secure 32+ character random secret]`
+6. Click **Deploy Web Service**. Once deployed, Render will provide a public URL like:
+   `https://attendify-api.onrender.com`
+
+#### Connecting GitHub Pages Frontend to the Backend
+Once your backend is deployed:
+* **Option A (In-App Settings UI)**:
+  1. Open your GitHub Pages site: `https://chillingbing648-sketch.github.io/Attendify/`
+  2. Navigate to **Settings** → **Backend API & Server Connection**.
+  3. Enter your deployed URL (e.g. `https://attendify-api.onrender.com`) and click **Test Connection**, then **Save Backend URL**.
+* **Option B (1-Click URL Query Parameter)**:
+  - Append `?api=https://your-backend.onrender.com` to your site URL:
+    `https://chillingbing648-sketch.github.io/Attendify/?api=https://attendify-api.onrender.com`
+  - Attendify automatically detects, validates, and persists this endpoint in `localStorage`.
+* **Option C (Build-Time / HTML Injection)**:
+  - Set `window.ATTENDIFY_API_BASE_URL = 'https://attendify-api.onrender.com';` in `index.html`.
+
+#### Deploying via Docker / Railway / Fly.io / VPS
+Attendify includes root container specifications:
+* **Docker**: Build and run using the included production `Dockerfile`:
+  ```bash
+  docker build -t attendify-api .
+  docker run -d -p 3000:3000 -e PORT=3000 -e HOST=0.0.0.0 -e ALLOWED_ORIGINS=https://chillingbing648-sketch.github.io attendify-api
+  ```
+* **Railway / Heroku**: Uses included `Procfile` (`web: node server.js`).
+* **Health Checks**: Authoritative health check is live at `GET /api/health` and `GET /api/qr/health`.
 
 ---
 
 ## 🧪 Test Suite & Quality Assurance
 
-Attendify includes an automated unit and integration test suite utilizing Node.js native test runner:
+Attendify includes an automated unit, security, persistence, and cross-origin test suite utilizing Node.js native test runner:
 
 ```bash
-# Run all 54 unit, security, and persistence tests
+# Run all 60 automated unit, integration, and security tests
 node --test tests/*.test.js
 ```
 
-### Verified Test Assertions (54 Suites / 100% Passing):
-* **Security Spec 1** — `QR Active Token Acceptance`: Valid QR token is accepted during active session.
-* **Security Spec 2** — `QR Expiry & Malformed Rejection`: Expired and malformed tokens are strictly rejected.
-* **Security Spec 3** — `Token Reuse Blocking`: A previously used token cannot create a second attendance record.
-* **Security Spec 4** — `Zero-Trust Identity Guard`: Student identity is strictly derived from server session; forged client parameters are rejected.
-* **Security Spec 5** — `Faculty Role-Based Auth`: Unauthorized users cannot create, rotate, or close faculty sessions.
-* **Security Spec 6** — `Enrollment Roster Validation`: Students outside the authorized 60-student roster ($1 \le \text{Roll} \le 60$) are rejected.
-* **Security Spec 7** — `Concurrency / Race Condition Safety`: 10 simultaneous concurrent requests result in strictly 1 check-in and 9 rejected duplicates.
-* **Security Spec 8** — `Token Invalidation on Session End`: Closing a session revokes all active and grace tokens immediately.
-* **Security Spec 9** — `Fail-Safe Invariant`: Backend or database outages fail safely with clear error messaging, never false success.
-* **Security Spec 10** — `Real Disk Persistence`: Attendance records survive backend restarts and database reboots on disk (`attendify.db`).
-* **Security Spec 11** — `Sliding Rate Limiter`: Rate limiter throttles rapid repeated calls, preventing brute force attempts.
-* **Security Spec 12** — `End-to-End Workflow`: Faculty creates session, student logs in, confirms attendance, summary unlocks, faculty finalizes into ledger.
+### Verified Test Assertions (60 Suites / 100% Passing):
+* **CORS & Cross-Origin Specs (6 Suites — NEW)**:
+  - Strict allowlist enforcement for `https://chillingbing648-sketch.github.io` and local dev hosts.
+  - Immediate blocking and non-reflection of untrusted / phishing origins.
+  - Preflight `OPTIONS` returning HTTP 204 with strict `Access-Control-Allow-Methods/Headers/Max-Age`.
+  - Base URL sanitization, prefixing, and storage routing in `AttendifyConfig`.
+  - Global `GET /api/health` and `GET /api/qr/health` verification with connected SQLite database reporting.
+  - End-to-end cross-origin student authentication, token exchange, and duplicate-prevention over HTTP.
+* **Security & Persistence Specs (12 Suites)**:
+  - Active QR token acceptance and 5s grace window enforcement.
+  - Expired, malformed, reused, and replayed token rejection.
+  - Zero-trust identity derivation from server bearer sessions (forged client identity rejected).
+  - Faculty authentication, session invalidation on closure, and atomic transactions.
+  - Strict cohort enforcement ($1 \le \text{Roll} \le 60$).
+  - High-concurrency race condition safety (10 concurrent requests yield strictly 1 check-in).
+  - Real SQLite disk persistence surviving backend restarts and reboots.
 * **Student Portal Specs (10 Suites)**: Login, PIN auth, Bearer guards, active class filtering, critical visibility locks before and after submission, and privacy isolation.
 * **Core QR Specs (9 Suites)**: Vector SVG generation, token rotation, 5s grace window, replay protection, manual correction overrides.
 * **Core Application Specs (23 Suites)**: Reactive state dispatcher, backup rotation, cascade deletion, boundary calculations, and schema validations.
@@ -328,3 +370,4 @@ node --test tests/*.test.js
 <div align="center">
   <sub>Crafted with precision for academic excellence. Attendify © 2026.</sub>
 </div>
+

@@ -1,0 +1,25 @@
+{
+  "name": "attendify",
+  "version": "2.0.0",
+  "description": "Attendify — Trusted Server-Side Rotating QR Attendance System with Persistent ACID Storage",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/*.test.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "attendance",
+    "qr-code",
+    "attendance-system",
+    "education",
+    "sqlite",
+    "node22"
+  ],
+  "author": "Harsh Dubey",
+  "license": "MIT"
+}

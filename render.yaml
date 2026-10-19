@@ -1,0 +1,23 @@
+# Attendify — Render Deployment Blueprint
+# Deploy Attendify persistent backend with 1-click on Render
+services:
+  - type: web
+    name: attendify-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: "node -v"
+    startCommand: "node server.js"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
+      - key: ALLOWED_ORIGINS
+        value: https://chillingbing648-sketch.github.io,https://harshportfolio404.netlify.app
+      - key: DATABASE_PATH
+        value: ./attendify.db
+      - key: FACULTY_SESSION_SECRET
+        generateValue: true

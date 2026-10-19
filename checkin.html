@@ -290,6 +290,7 @@
   </div>
 </div>
 
+<script src="js/api-config.js"></script>
 <script>
   // SY BSc IT 60 Enrolled Students list matching database & Storage.seedStudents()
   const ENROLLED_STUDENTS = [
@@ -353,9 +354,13 @@
   async function checkExistingAuth() {
     if (!bearerToken) return;
     try {
-      const res = await fetch('/api/student/available-classes', {
-        headers: { 'Authorization': `Bearer ${bearerToken}` }
-      });
+      const res = await (typeof AttendifyConfig !== 'undefined'
+        ? AttendifyConfig.apiFetch('/api/student/available-classes', {
+            headers: { 'Authorization': `Bearer ${bearerToken}` }
+          })
+        : fetch('/api/student/available-classes', {
+            headers: { 'Authorization': `Bearer ${bearerToken}` }
+          }));
       if (res.ok) {
         // Authenticated! Find student from stored profile or roll
         const savedRollNum = parseInt(localStorage.getItem('attendify:student_roll'), 10);
@@ -397,14 +402,22 @@
     banner.style.display = 'none';
 
     try {
-      const res = await fetch('/api/student/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${bearerToken}`
-        },
-        body: JSON.stringify({ sessionId, token })
-      });
+      const res = await (typeof AttendifyConfig !== 'undefined'
+        ? AttendifyConfig.apiFetch('/api/student/submit', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${bearerToken}`
+            },
+            body: JSON.stringify({ sessionId, token })
+          })
+        : fetch('/api/student/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${bearerToken}`
+            },
+            body: JSON.stringify({ sessionId, token })
+          }));
       const data = await res.json();
       if (data.success) {
         banner.className = 'status-banner success';
@@ -437,11 +450,16 @@
 
     try {
       // 1. Authenticate with server to obtain cryptographic bearer token
-      const loginRes = await fetch('/api/student/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rollNumber: roll, pin })
-      });
+      const loginRes = await (typeof AttendifyConfig !== 'undefined'
+        ? AttendifyConfig.apiFetch('/api/student/login', {
+            method: 'POST',
+            body: JSON.stringify({ rollNumber: roll, pin })
+          })
+        : fetch('/api/student/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rollNumber: roll, pin })
+          }));
       const loginData = await loginRes.json();
       if (!loginData.success || !loginData.token) {
         banner.className = 'status-banner error';
@@ -460,14 +478,22 @@
 
       // 2. Submit attendance using authenticated server session
       submitBtn.innerHTML = '<span>Validating QR token...</span>';
-      const submitRes = await fetch('/api/student/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${bearerToken}`
-        },
-        body: JSON.stringify({ sessionId, token })
-      });
+      const submitRes = await (typeof AttendifyConfig !== 'undefined'
+        ? AttendifyConfig.apiFetch('/api/student/submit', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${bearerToken}`
+            },
+            body: JSON.stringify({ sessionId, token })
+          })
+        : fetch('/api/student/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${bearerToken}`
+            },
+            body: JSON.stringify({ sessionId, token })
+          }));
 
       const submitData = await submitRes.json();
       if (submitData.success) {

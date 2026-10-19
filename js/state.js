@@ -17,18 +17,29 @@ const State = (() => {
 
   function persist() {
     Storage.save(data);
-    if (typeof fetch !== 'undefined' && typeof window !== 'undefined' && window.location) {
+    if (typeof window !== 'undefined' && window.location) {
       try {
-        fetch('/api/state/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessions: data.sessions || [],
-            records: data.records || [],
-            subjects: data.subjects || [],
-            students: data.students || []
-          })
-        }).catch(() => {});
+        const syncFetch = typeof AttendifyConfig !== 'undefined'
+          ? AttendifyConfig.apiFetch('/api/state/sync', {
+              method: 'POST',
+              body: JSON.stringify({
+                sessions: data.sessions || [],
+                records: data.records || [],
+                subjects: data.subjects || [],
+                students: data.students || []
+              })
+            })
+          : (typeof fetch !== 'undefined' ? fetch('/api/state/sync', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                sessions: data.sessions || [],
+                records: data.records || [],
+                subjects: data.subjects || [],
+                students: data.students || []
+              })
+            }) : Promise.resolve());
+        syncFetch.catch(() => {});
       } catch {}
     }
   }

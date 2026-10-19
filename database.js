@@ -84,6 +84,7 @@ function getDb(customPath = null) {
   
   // Enforce foreign keys and WAL mode for high concurrency
   db.exec('PRAGMA foreign_keys = ON;');
+  db.exec('PRAGMA busy_timeout = 10000;');
   if (targetPath !== ':memory:') {
     try {
       db.exec('PRAGMA journal_mode = WAL;');

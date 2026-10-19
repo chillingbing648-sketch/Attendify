@@ -743,6 +743,7 @@
 
 </main>
 
+<script src="js/api-config.js"></script>
 <script>
   // Theme management
   const savedTheme = localStorage.getItem('attendify:theme') || 'light';
@@ -797,11 +798,16 @@
     const pin = loginPin.value.trim();
 
     try {
-      const res = await fetch('/api/student/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rollNumber: roll, pin })
-      });
+      const res = await (typeof AttendifyConfig !== 'undefined'
+        ? AttendifyConfig.apiFetch('/api/student/login', {
+            method: 'POST',
+            body: JSON.stringify({ rollNumber: roll, pin })
+          })
+        : fetch('/api/student/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rollNumber: roll, pin })
+          }));
       const data = await res.json();
       if (data.success && data.token) {
         authToken = data.token;
@@ -813,7 +819,9 @@
         loginError.style.display = 'block';
       }
     } catch (err) {
-      loginError.textContent = 'Network error connecting to campus server. Please try again.';
+      loginError.textContent = err.isTimeout
+        ? 'Connection timed out. Please check server status.'
+        : 'Network error connecting to campus server. Please try again.';
       loginError.style.display = 'block';
     }
   });
@@ -822,10 +830,17 @@
   btnLogout.addEventListener('click', async () => {
     if (authToken) {
       try {
-        await fetch('/api/student/logout', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
+        if (typeof AttendifyConfig !== 'undefined') {
+          await AttendifyConfig.apiFetch('/api/student/logout', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+        } else {
+          await fetch('/api/student/logout', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+        }
       } catch {}
     }
     authToken = '';
@@ -870,9 +885,13 @@
 
     // 1. Fetch available classes
     try {
-      const classRes = await fetch('/api/student/available-classes', {
-        headers: { 'Authorization': `Bearer ${authToken}` }
-      });
+      const classRes = await (typeof AttendifyConfig !== 'undefined'
+        ? AttendifyConfig.apiFetch('/api/student/available-classes', {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          })
+        : fetch('/api/student/available-classes', {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          }));
       if (classRes.status === 401) {
         showLogin();
         return;
@@ -885,9 +904,13 @@
 
     // 2. Fetch Attendance Summary (Enforces visibility rule on backend)
     try {
-      const sumRes = await fetch('/api/student/attendance-summary', {
-        headers: { 'Authorization': `Bearer ${authToken}` }
-      });
+      const sumRes = await (typeof AttendifyConfig !== 'undefined'
+        ? AttendifyConfig.apiFetch('/api/student/attendance-summary', {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          })
+        : fetch('/api/student/attendance-summary', {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          }));
       if (sumRes.status === 401) {
         showLogin();
         return;
@@ -980,14 +1003,22 @@
         showBanner('', 'none');
 
         try {
-          const res = await fetch('/api/student/submit', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify({ sessionId, token })
-          });
+          const res = await (typeof AttendifyConfig !== 'undefined'
+            ? AttendifyConfig.apiFetch('/api/student/submit', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ sessionId, token })
+              })
+            : fetch('/api/student/submit', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ sessionId, token })
+              }));
 
           const data = await res.json();
           if (data.success) {
@@ -1096,9 +1127,14 @@
   // Initial Boot
   if (authToken) {
     // Verify token validity
-    fetch('/api/student/me', {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    }).then(res => {
+    const mePromise = typeof AttendifyConfig !== 'undefined'
+      ? AttendifyConfig.apiFetch('/api/student/me', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        })
+      : fetch('/api/student/me', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+    mePromise.then(res => {
       if (res.ok) return res.json();
       throw new Error('Invalid token');
     }).then(data => {

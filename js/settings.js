@@ -59,6 +59,30 @@ const SettingsView = (() => {
         </div>
       </div>
 
+      <!-- Cloud Backend API Server (Integration) -->
+      <div class="section">
+        <div class="section-title-row"><div class="section-title">Backend API & Server Connection</div></div>
+        <div class="card" style="display:flex; flex-direction:column; gap:14px;">
+          <p style="font-size:var(--fs-xs); color:var(--ink-secondary); line-height:1.5;">
+            Configure the persistent Node.js backend server endpoint. When hosting on GitHub Pages, point this to your deployed backend (e.g. Render, Railway, Fly.io, or VPS). Leave empty when running locally on localhost.
+          </p>
+          <div class="field">
+            <label>Backend API Base URL</label>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="url" id="setting-api-url" class="input" style="flex:1;" placeholder="https://attendify-api.onrender.com (or leave empty for localhost)" value="${typeof AttendifyConfig !== 'undefined' ? Utils.escapeHTML(AttendifyConfig.getApiBaseUrl()) : ''}">
+              <button class="btn btn-outline" id="btn-test-api-conn" type="button">
+                Test Connection
+              </button>
+            </div>
+            <div id="api-conn-status" style="font-size:12px; margin-top:6px; font-weight:600; display:none;"></div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn btn-primary" id="btn-save-api-url">Save Backend URL</button>
+            <button class="btn btn-outline" id="btn-reset-api-url">Reset to Default</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Backup & Restore (Prompt 16) -->
       <div class="section">
         <div class="section-title-row"><div class="section-title">Data Backup & Restore</div></div>
@@ -192,6 +216,64 @@ const SettingsView = (() => {
 
         State.updateSettings({ className, batchName, thresholdSafe, thresholdWarn });
         UI.toast('Class configuration saved', 'success');
+      });
+    }
+
+    // Backend API Server Connection Listeners
+    const saveApiBtn = container.querySelector('#btn-save-api-url');
+    const testApiBtn = container.querySelector('#btn-test-api-conn');
+    const resetApiBtn = container.querySelector('#btn-reset-api-url');
+    const apiInput = container.querySelector('#setting-api-url');
+    const statusDiv = container.querySelector('#api-conn-status');
+
+    if (saveApiBtn && apiInput) {
+      saveApiBtn.addEventListener('click', () => {
+        if (typeof AttendifyConfig !== 'undefined') {
+          AttendifyConfig.setApiBaseUrl(apiInput.value.trim());
+          UI.toast('Backend API URL saved successfully', 'success', 2000);
+        }
+      });
+    }
+
+    if (resetApiBtn && apiInput) {
+      resetApiBtn.addEventListener('click', () => {
+        if (typeof AttendifyConfig !== 'undefined') {
+          AttendifyConfig.clearApiBaseUrl();
+          apiInput.value = '';
+          UI.toast('Reset to default same-origin', 'info', 1500);
+          if (statusDiv) statusDiv.style.display = 'none';
+        }
+      });
+    }
+
+    if (testApiBtn && apiInput && statusDiv) {
+      testApiBtn.addEventListener('click', async () => {
+        testApiBtn.disabled = true;
+        testApiBtn.textContent = 'Testing...';
+        statusDiv.style.display = 'block';
+        statusDiv.style.color = 'var(--ink-secondary)';
+        statusDiv.textContent = 'Connecting to backend...';
+
+        const target = apiInput.value.trim();
+        if (typeof AttendifyConfig !== 'undefined') {
+          AttendifyConfig.setApiBaseUrl(target);
+          const result = await AttendifyConfig.checkHealth();
+          testApiBtn.disabled = false;
+          testApiBtn.textContent = 'Test Connection';
+
+          if (result.ok) {
+            statusDiv.style.color = 'var(--safe)';
+            statusDiv.innerHTML = `✓ Connected! Backend: ${result.data?.database || 'ACID SQLite'} · Active Sessions: ${result.data?.activeSessions ?? 0}`;
+            UI.toast('Backend connection verified successfully!', 'success', 2500);
+          } else {
+            statusDiv.style.color = 'var(--critical)';
+            statusDiv.innerHTML = `✗ Connection failed: ${result.message || 'Unable to reach backend. Check URL and CORS.'}`;
+            UI.toast('Unable to connect to backend.', 'error', 3000);
+          }
+        } else {
+          testApiBtn.disabled = false;
+          testApiBtn.textContent = 'Test Connection';
+        }
       });
     }
 

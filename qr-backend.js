@@ -16,6 +16,7 @@
 
 const crypto = require('crypto');
 const database = require('./database.js');
+const { getCorsHeaders } = require('./cors.js');
 
 // Rate limiting map: ip -> { count, windowStart }
 const rateLimits = new Map();
@@ -182,21 +183,20 @@ function handleApiRequest(req, res, parsedUrl) {
   const pathname = parsedUrl.pathname;
 
   function json(status, data) {
+    const corsHeaders = getCorsHeaders(req);
     res.writeHead(status, {
       'Content-Type': 'application/json; charset=utf-8',
-      'Access-Control-Allow-Origin': req.headers.origin || '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Cache-Control': 'no-store'
+      'Cache-Control': 'no-store',
+      ...corsHeaders
     });
     res.end(JSON.stringify(data));
   }
 
   if (req.method === 'OPTIONS') {
+    const corsHeaders = getCorsHeaders(req);
     res.writeHead(204, {
-      'Access-Control-Allow-Origin': req.headers.origin || '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      ...corsHeaders,
+      'Content-Length': '0'
     });
     res.end();
     return;
@@ -207,6 +207,7 @@ function handleApiRequest(req, res, parsedUrl) {
     try {
       const active = database.getActiveSessions();
       json(200, {
+        ok: true,
         status: 'ok',
         backend: 'attendify-trusted-node-backend',
         storage: 'persistent-sqlite-relational',
@@ -214,7 +215,7 @@ function handleApiRequest(req, res, parsedUrl) {
         activeSessions: active.length
       });
     } catch (e) {
-      json(503, { status: 'error', message: 'Database unavailable: ' + e.message });
+      json(503, { ok: false, status: 'error', message: 'Database unavailable: ' + e.message });
     }
     return;
   }
