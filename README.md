@@ -6,7 +6,7 @@
   ### Professional Academic Attendance Management & Faculty Workflow Platform
 
   [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero%20(Vanilla%20ES6%2B)-51458A?style=for-the-badge)](#-technology-stack)
-  [![Test Suite](https://img.shields.io/badge/Tests-42%20Passing%20(100%25)-178568?style=for-the-badge)](#-test-suite--quality-assurance)
+  [![Test Suite](https://img.shields.io/badge/Tests-54%20Passing%20(100%25)-178568?style=for-the-badge)](#-test-suite--quality-assurance)
   [![Security](https://img.shields.io/badge/Security-Server--Gated%20Bearer%20Tokens-51458A?style=for-the-badge)](#4--dedicated-student-only-portal--strict-visibility-rule-new)
   [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20Contrast-2CD5A4?style=for-the-badge)](#-typography--design-tokens)
   [![Architecture](https://img.shields.io/badge/State-Reactive%20%2B%20Backup%20Rotation-4F5D95?style=for-the-badge)](#-state-engine--data-reliability)
@@ -257,13 +257,43 @@ npm start
 node server.js
 
 # 3. Open your browser
-# Navigate to http://localhost:3000
+### Database Architecture & ACID Persistence (`schema.sql`, `database.js`)
+Attendify features an enterprise-grade, relational SQL database engine powered by Node.js native `node:sqlite` DatabaseSync with zero external dependencies:
+* **Persistent Disk Storage (`attendify.db`)**: Attendance sessions, verified student check-ins, security audit logs, faculty accounts, and enrolled students persist permanently across server restarts.
+* **ACID Transactions**: Attendance validation, token rotation, and check-in confirmation execute in `BEGIN IMMEDIATE` / `COMMIT` blocks, guaranteeing consistency even under rapid concurrent scans.
+* **Database-Level Uniqueness Constraints**: Dual unique constraints (`UNIQUE(session_id, student_id)` and `UNIQUE(session_id, roll_number)`) strictly prevent duplicate records at the database level.
+* **Cryptographic Salted PBKDF2 Hashing**: Student PINs and faculty passwords are authenticated via salted PBKDF2 with SHA-256 and constant-time comparison (`crypto.timingSafeEqual`).
+* **PostgreSQL / Managed Cloud Compatibility**: The clean relational schema in `schema.sql` can be deployed directly to cloud relational databases (PostgreSQL / AWS RDS / Neon / Supabase).
+
+---
+
+## 💻 Local Setup & Deployment
+
+```bash
+# 1. Clone repository
+git clone https://github.com/chillingbing648-sketch/Attendify.git
+cd Attendify
+
+# 2. Configure Environment (Optional, sensible defaults apply)
+cp .env.example .env
+
+# 3. Start Production Server (Node 22+)
+node server.js
+
+# 4. Open Application
+# Faculty Portal: http://localhost:3000/
+# Student Portal: http://localhost:3000/student.html
+# QR Check-In:   http://localhost:3000/checkin.html
 ```
 
-### Static Hosting Deployment
-Because Attendify is a zero-dependency SPA, it can be deployed to any static host with zero build step:
-* **Vercel / Netlify / Cloudflare Pages**: Point to repository root directory (Entry: `index.html`).
-* **GitHub Pages**: Enable GitHub Pages from repository settings pointing to `main` branch.
+### Deployment Architectures
+* **Node.js Backend Hosting (Render, Railway, Fly.io, DigitalOcean, VPS)**:
+  - Run `node server.js` with `NODE_ENV=production`.
+  - Set `PORT` and `ALLOWED_ORIGINS` to allow cross-origin requests from your frontend host.
+* **Static Frontend Hosting (GitHub Pages, Netlify)**:
+  - Frontend is 100% static and deployed to GitHub Pages and Netlify.
+  - Client points to authoritative server endpoints for cryptographic validation and database persistence.
+  - Netlify configuration (`netlify.toml`) provides client-side rewrites (`/student` → `/student.html`, `/checkin` → `/checkin.html`) and strict security headers (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`).
 
 ---
 
@@ -272,40 +302,26 @@ Because Attendify is a zero-dependency SPA, it can be deployed to any static hos
 Attendify includes an automated unit and integration test suite utilizing Node.js native test runner:
 
 ```bash
-# Run all unit and integration tests
-npm test
-# or:
+# Run all 54 unit, security, and persistence tests
 node --test tests/*.test.js
 ```
 
-### Verified Test Assertions (42 Suites / 100% Passing):
-* `Student Portal Login` — authenticates enrolled roll numbers ($1 \le \text{Roll} \le 60$) with PIN and generates cryptographically secure 28-byte bearer tokens.
-* `Student Portal Auth Guard` — rejects invalid PINs, out-of-bounds roll numbers, and forged authorization headers.
-* `Student Active Classes` — displays only active classes authorized by faculty, withholding other students' attendance details.
-* `Student Critical Visibility Rule (Before Submit)` — **strictly withholds attendance totals, percentages, and records** on the server before confirmed submission.
-* `Student Submission Verification` — validates active session status, QR rotation token freshness, and student enrollment on the server.
-* `Student Duplicate Prevention` — strictly blocks duplicate attendance submissions for the same student and session.
-* `Student Critical Visibility Rule (After Submit)` — **reveals personal attendance percentage, breakdown, and ledger** only upon server-confirmed submission.
-* `Student Privacy Isolation` — guarantees students can access only their own records, strictly isolating identities via bearer token.
-* `QRCode Generator` — produces valid vector SVG markup without external dependencies.
-* `QR Session Start` — generates active session with cryptographically secure 24-byte token.
-* `QR Token Rotation` — smoothly rotates tokens and sets strict expiration timestamps.
-* `QR Student Check-in` — verifies enrolled student, records server timestamp, and updates headcount.
-* `QR Duplicate Prevention` — strictly blocks duplicate student check-ins within the same active session.
-* `QR Replay & Expiry Prevention` — rejects expired tokens outside the grace window and old replayed tokens.
-* `QR Enrollment Boundary` — validates student roll numbers ($1 \le \text{Roll} \le 60$) and rejects unauthorized submissions.
-* `QR Session Invalidation` — cleanly ends session and revokes all active QR tokens.
-* `QR State Reconciliation` — commits finalized session into `State.createSession` & `State.saveRecords`.
-* `Utils.safePercent` — boundary values and zero denominators.
-* `Integration` — State initialization seeds 60 students and curriculum courses.
-* `Integration` — Lecture and Practical sessions share single attendance engine.
-* `Integration` — Archival moves sessions safely without data loss.
-* `Integration` — Smart admin insights detect defaulters and consecutive absences.
-* `Reactivity Dispatcher` — re-renders active view when dependent change fires.
-* `Storage.save` — rotates current data to backup key before overwriting.
-* `Storage.load` — recovers from corrupted primary JSON via backup key.
-* `State.deleteSubject` — cascades correctly to attendance, timetable, and notifications.
-* `Validation` — validates student roll numbers $[1, 60]$, status enums, date formats, and timetable validity.
+### Verified Test Assertions (54 Suites / 100% Passing):
+* **Security Spec 1** — `QR Active Token Acceptance`: Valid QR token is accepted during active session.
+* **Security Spec 2** — `QR Expiry & Malformed Rejection`: Expired and malformed tokens are strictly rejected.
+* **Security Spec 3** — `Token Reuse Blocking`: A previously used token cannot create a second attendance record.
+* **Security Spec 4** — `Zero-Trust Identity Guard`: Student identity is strictly derived from server session; forged client parameters are rejected.
+* **Security Spec 5** — `Faculty Role-Based Auth`: Unauthorized users cannot create, rotate, or close faculty sessions.
+* **Security Spec 6** — `Enrollment Roster Validation`: Students outside the authorized 60-student roster ($1 \le \text{Roll} \le 60$) are rejected.
+* **Security Spec 7** — `Concurrency / Race Condition Safety`: 10 simultaneous concurrent requests result in strictly 1 check-in and 9 rejected duplicates.
+* **Security Spec 8** — `Token Invalidation on Session End`: Closing a session revokes all active and grace tokens immediately.
+* **Security Spec 9** — `Fail-Safe Invariant`: Backend or database outages fail safely with clear error messaging, never false success.
+* **Security Spec 10** — `Real Disk Persistence`: Attendance records survive backend restarts and database reboots on disk (`attendify.db`).
+* **Security Spec 11** — `Sliding Rate Limiter`: Rate limiter throttles rapid repeated calls, preventing brute force attempts.
+* **Security Spec 12** — `End-to-End Workflow`: Faculty creates session, student logs in, confirms attendance, summary unlocks, faculty finalizes into ledger.
+* **Student Portal Specs (10 Suites)**: Login, PIN auth, Bearer guards, active class filtering, critical visibility locks before and after submission, and privacy isolation.
+* **Core QR Specs (9 Suites)**: Vector SVG generation, token rotation, 5s grace window, replay protection, manual correction overrides.
+* **Core Application Specs (23 Suites)**: Reactive state dispatcher, backup rotation, cascade deletion, boundary calculations, and schema validations.
 
 ---
 

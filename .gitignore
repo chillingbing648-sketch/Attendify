@@ -58,6 +58,10 @@ npm-debug.log*
 coverage/
 .nyc_output/
 
-# --- Project Specific ---
-# If you keep the original filename for backup, but don't want it in the repo
+# --- Project Specific & Database Files ---
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+attendify.db
 ATTENDIFY\ (2).html

@@ -2,7 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT, 10) || 3000;
+const HOST = process.env.HOST || '127.0.0.1';
 const ROOT = __dirname;
 
 const MIME_TYPES = {
@@ -17,13 +18,66 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+const database = require('./database.js');
 const qrBackend = require('./qr-backend.js');
 const studentBackend = require('./student-backend.js');
 
+// Configurable CORS Allowlist
+const rawAllowed = process.env.ALLOWED_ORIGINS || '';
+const ALLOWED_ORIGINS = rawAllowed
+  ? rawAllowed.split(',').map(s => s.trim().toLowerCase())
+  : [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'http://localhost:5173',
+      'https://chillingbing648-sketch.github.io'
+    ];
+
+function getCorsOrigin(req) {
+  const origin = req.headers.origin || '';
+  if (!origin) return '';
+  const lower = origin.toLowerCase();
+  if (
+    ALLOWED_ORIGINS.includes(lower) ||
+    lower.startsWith('http://localhost:') ||
+    lower.startsWith('http://127.0.0.1:')
+  ) {
+    return origin;
+  }
+  return '';
+}
+
 const server = http.createServer((req, res) => {
-  // Normalize URL and remove query params
-  const parsedUrl = new URL(req.url, `http://localhost:${PORT}`);
+  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = decodeURIComponent(parsedUrl.pathname);
+
+  // Global Health Check
+  if (pathname === '/api/health' && req.method === 'GET') {
+    try {
+      const active = database.getActiveSessions();
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store'
+      });
+      res.end(JSON.stringify({
+        status: 'healthy',
+        database: 'connected (node:sqlite ACID)',
+        serverTime: new Date().toISOString(),
+        activeSessions: active.length
+      }));
+    } catch (err) {
+      res.writeHead(503, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store'
+      });
+      res.end(JSON.stringify({
+        status: 'unhealthy',
+        error: 'Database connection failure',
+        serverTime: new Date().toISOString()
+      }));
+    }
+    return;
+  }
 
   // Intercept QR Code Attendance Backend API routes
   if (pathname.startsWith('/api/qr/')) {
@@ -31,15 +85,26 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Intercept Student Portal API routes & State Sync
-  if (pathname.startsWith('/api/student/') || pathname === '/api/state/sync') {
+  // Intercept Student Portal API routes
+  if (pathname.startsWith('/api/student/')) {
     studentBackend.handleApiRequest(req, res, parsedUrl);
+    return;
+  }
+
+  // Intercept Faculty Auth API routes
+  if (pathname.startsWith('/api/faculty/')) {
+    qrBackend.handleApiRequest(req, res, parsedUrl);
     return;
   }
 
   // Route /student to student.html
   if (pathname === '/student' || pathname === '/student/') {
     pathname = '/student.html';
+  }
+
+  // Route /checkin to checkin.html
+  if (pathname === '/checkin' || pathname === '/checkin/') {
+    pathname = '/checkin.html';
   }
 
   if (pathname === '/' || pathname === '') {
@@ -57,7 +122,7 @@ const server = http.createServer((req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
-      // Fallback to index.html for SPA-style handling or 404
+      // Fallback to index.html for SPA navigation
       const fallbackPath = path.join(ROOT, 'index.html');
       fs.readFile(fallbackPath, (fallbackErr, data) => {
         if (fallbackErr) {
@@ -67,7 +132,9 @@ const server = http.createServer((req, res) => {
         }
         res.writeHead(200, {
           'Content-Type': 'text/html; charset=utf-8',
-          'Access-Control-Allow-Origin': '*'
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'DENY',
+          'Referrer-Policy': 'strict-origin-when-cross-origin'
         });
         res.end(data);
       });
@@ -84,16 +151,28 @@ const server = http.createServer((req, res) => {
         return;
       }
 
-      res.writeHead(200, {
+      const corsOrigin = getCorsOrigin(req);
+      const headers = {
         'Content-Type': contentType,
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'no-cache'
-      });
+        'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=86400',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'Referrer-Policy': 'strict-origin-when-cross-origin'
+      };
+      if (corsOrigin) {
+        headers['Access-Control-Allow-Origin'] = corsOrigin;
+      }
+
+      res.writeHead(200, headers);
       res.end(data);
     });
   });
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`Attendify live server running at http://localhost:${PORT}/ (and http://127.0.0.1:${PORT}/)`);
-});
+if (require.main === module) {
+  server.listen(PORT, HOST, () => {
+    console.log(`Attendify live production server running at http://${HOST}:${PORT}/`);
+  });
+}
+
+module.exports = server;

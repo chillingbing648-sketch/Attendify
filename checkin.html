@@ -100,10 +100,10 @@
   .session-info-row:last-child { margin-bottom: 0; }
 
   .form-group {
-    margin-bottom: 18px;
     display: flex;
     flex-direction: column;
     gap: 6px;
+    margin-bottom: 16px;
   }
 
   label {
@@ -113,7 +113,7 @@
   }
 
   select, input {
-    height: 42px;
+    height: 44px;
     padding: 0 12px;
     border-radius: var(--r-md);
     border: 1px solid var(--border-strong);
@@ -121,7 +121,6 @@
     color: var(--ink);
     font-family: inherit;
     font-size: 14px;
-    font-weight: 500;
     outline: none;
     transition: border-color 0.2s ease;
   }
@@ -132,47 +131,58 @@
 
   .btn {
     width: 100%;
-    height: 44px;
+    height: 46px;
     background: var(--accent);
     color: #FFFFFF;
     border: none;
     border-radius: var(--r-md);
-    font-family: inherit;
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    transition: background 0.2s ease, opacity 0.2s ease;
   }
 
-  .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
-  .btn:active { transform: scale(0.98); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
   .status-banner {
-    border-radius: var(--r-md);
-    padding: 14px;
     margin-top: 18px;
-    font-size: 13.5px;
-    line-height: 1.45;
+    padding: 12px 14px;
+    border-radius: var(--r-md);
+    font-size: 13px;
+    line-height: 1.4;
     display: none;
   }
 
   .status-banner.success {
     display: block;
     background: var(--safe-subtle);
-    border: 1px solid rgba(23,133,104,0.3);
     color: var(--safe);
+    border: 1px solid rgba(23, 133, 104, 0.25);
   }
 
   .status-banner.error {
     display: block;
     background: var(--critical-subtle);
-    border: 1px solid rgba(201,75,80,0.3);
     color: var(--critical);
+    border: 1px solid rgba(201, 75, 80, 0.25);
+  }
+
+  .status-banner.warn {
+    display: block;
+    background: rgba(194, 138, 37, 0.12);
+    color: var(--warn);
+    border: 1px solid rgba(194, 138, 37, 0.25);
   }
 
   .security-indicator {
@@ -180,34 +190,27 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--ink-tertiary);
-    margin-top: 16px;
-    font-weight: 500;
+    margin-top: 18px;
   }
 
   .security-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--safe);
   }
 
-  @media (max-width: 480px) {
-    body {
-      padding: max(16px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
-    }
-    .checkin-card {
-      padding: 22px 16px;
-    }
-    .btn {
-      height: 48px;
-      font-size: 15px;
-    }
-    select, input {
-      height: 46px;
-      font-size: 15px;
-    }
+  .authenticated-user-pill {
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 </style>
 </head>
@@ -240,23 +243,42 @@
     </div>
   </div>
 
+  <div id="authenticated-view" style="display:none;">
+    <div class="authenticated-user-pill">
+      <div>
+        <div style="font-size:11px; text-transform:uppercase; color:var(--ink-tertiary); font-weight:700;">Verified Student</div>
+        <strong id="auth-student-name" style="color:var(--ink); font-size:14px;">Student Name</strong>
+      </div>
+      <button type="button" id="btn-switch-account" style="background:none; border:none; color:var(--accent); font-size:12px; font-weight:600; cursor:pointer;">Switch</button>
+    </div>
+    <button type="button" class="btn" id="btn-submit-authenticated">
+      <span>Confirm Attendance Check-In</span>
+    </button>
+  </div>
+
   <form id="checkin-form">
     <div class="form-group">
-      <label for="student-select">Select Your Enrolled Identity</label>
+      <label for="student-select">Enrolled Student Identity</label>
       <select id="student-select" required>
-        <option value="">— Choose your Name & Roll No. —</option>
+        <option value="">— Choose your Roll No. & Name —</option>
       </select>
+    </div>
+
+    <div class="form-group">
+      <label for="student-pin">Student Access PIN</label>
+      <input type="password" id="student-pin" placeholder="Enter PIN (Default: 1000 + Roll No)" required autocomplete="current-password">
+      <span style="font-size:11px; color:var(--ink-tertiary);">Identity verification requires your secret student PIN.</span>
     </div>
 
     <div class="form-group" style="flex-direction:row; align-items:center; gap:8px;">
       <input type="checkbox" id="remember-me" style="width:16px; height:16px; cursor:pointer;" checked>
       <label for="remember-me" style="font-size:12px; font-weight:500; cursor:pointer; color:var(--ink-secondary);">
-        Remember my identity on this phone/browser
+        Remember me on this browser
       </label>
     </div>
 
     <button type="submit" class="btn" id="btn-submit">
-      <span>Confirm Attendance Check-In</span>
+      <span>Verify Identity &amp; Confirm Attendance</span>
     </button>
   </form>
 
@@ -264,46 +286,52 @@
 
   <div class="security-indicator">
     <span class="security-dot"></span>
-    <span>Server-side cryptographic token validation active</span>
+    <span>Zero-trust server validation &amp; database transactions</span>
   </div>
 </div>
 
 <script>
-  // Standard SY BSc IT 60 Enrolled Students list
+  // SY BSc IT 60 Enrolled Students list matching database & Storage.seedStudents()
   const ENROLLED_STUDENTS = [
-    { roll: 1, name: "Aarav Patel" }, { roll: 2, name: "Ananya Sharma" }, { roll: 3, name: "Rohan Gupta" },
-    { roll: 4, name: "Priya Nair" }, { roll: 5, name: "Aditya Verma" }, { roll: 6, name: "Sneha Kulkarni" },
-    { roll: 7, name: "Vikram Singh" }, { roll: 8, name: "Neha Joshi" }, { roll: 9, name: "Rahul Deshmukh" },
-    { roll: 10, name: "Pooja Mehta" }, { roll: 11, name: "Kunal Shah" }, { roll: 12, name: "Ritu Mishra" },
-    { roll: 13, name: "Siddharth Rao" }, { roll: 14, name: "Divya Bhat" }, { roll: 15, name: "Varun Chopra" },
-    { roll: 16, name: "Tanvi Iyer" }, { roll: 17, name: "Gaurav Sen" }, { roll: 18, name: "Ishita Roy" },
-    { roll: 19, name: "Mayur Patil" }, { roll: 20, name: "Kavita Reddy" }, { roll: 21, name: "Alok Tiwari" },
-    { roll: 22, name: "Swati Pandey" }, { roll: 23, name: "Harsh Vardhan" }, { roll: 24, name: "Deepa Menon" },
-    { roll: 25, name: "Nikhil Shinde" }, { roll: 26, name: "Shruti Saxena" }, { roll: 27, name: "Prateek Dubey" },
-    { roll: 28, name: "Anjali Pillai" }, { roll: 29, name: "Akash Jha" }, { roll: 30, name: "Meera Nambiar" },
-    { roll: 31, name: "Saurabh More" }, { roll: 32, name: "Preeti Hegde" }, { roll: 33, name: "Omkar Jadhav" },
-    { roll: 34, name: "Bhavna Jain" }, { roll: 35, name: "Ashwin Bhatt" }, { roll: 36, name: "Komal Sethi" },
-    { roll: 37, name: "Yash Gaikwad" }, { roll: 38, name: "Mansi Dixit" }, { roll: 39, name: "Tejas Sawant" },
-    { roll: 40, name: "Namrata Bose" }, { roll: 41, name: "Abhishek Das" }, { roll: 42, name: "Payal Ghosh" },
-    { roll: 43, name: "Sanket Tambe" }, { roll: 44, name: "Rashmi Kamat" }, { roll: 45, name: "Vikas Chauhan" },
-    { roll: 46, name: "Monika Rawat" }, { roll: 47, name: "Sameer Wagh" }, { roll: 48, name: "Archana Soni" },
-    { roll: 49, name: "Chetan Solanki" }, { roll: 50, name: "Suman Tripathi" }, { roll: 51, name: "Bhavesh Rane" },
-    { roll: 52, name: "Aarti Shukla" }, { roll: 53, name: "Rohit Mane" }, { roll: 54, name: "Kiran Waghmare" },
-    { roll: 55, name: "Dinesh Parab" }, { roll: 56, name: "Pallavi Date" }, { roll: 57, name: "Mahesh Gurav" },
-    { roll: 58, name: "Urmila Bagwe" }, { roll: 59, name: "Girish Ghag" }, { roll: 60, name: "Shalini Shirke" }
-  ];
+    'Andre Harshad Balu','Ansari Farman Lukman','Behera Shubham Binod',
+    'Chaurasiya Shivanshu Ashok','Chendvankar Tanishq Abhijit','Choursia Shraddha Madreshkumar',
+    'Dudaye Shubham Pandurang','Gupta Himanshu Laxmikant','Gupta Nikhil Ganesh',
+    'Gupta Raj Omprakash','Gurav Shreya Prakash','Jaiswal Khushi Dashrath',
+    'Jaiswal Prince Dharmendra','Kottilaparambil Suvidh Sunil','Kushwaha Vinit Vidyanand',
+    'Mishra Shashank Sureshkumar','Nesamoney Cinderella Jaiross','Pal Aryan Naveen',
+    'Pal Ashish Ramavadh','Pal Laxmi Kapildev','Pandey Sharad Umeshchandra',
+    'Rajput Prachi Narsing','Reddi Mahesh Chandranna','Sawant Narayan Manohar',
+    'Sharma Abhay Chandrika','Sharma Kartike Sunil','Shevale Pratham Dryaneshwar',
+    'Singh Aniket Rajesh','Singh Anurag Kush','Singh Aryan Sanjay',
+    'Singh Bablu Kumar Santosh Kumar','Singh Janvi Anil','Singh Noel Damer',
+    'Singh Sachi Ashutosh','Singh Sandhya Amarnath','Singh Vikash Kumar Laxman',
+    'Yadav Pooja Om Prakash','Yadav Prince Virendrakumar','Yadav Vivek Rudra',
+    'Yadav Yogank Ashok','Mishra Aditya Rajesh','Pardhe Harshit Chandrakant',
+    'Jaiswal Moksh Rajkumar','Ghadigaonkar Maithili Mahesh','Pal Sanjana Rajendra',
+    'Tiwari Pavan Awadesh','Thorat Kaustubh Ramesh','Makwana Ayushi Nilesh',
+    'Dubey Harsh Puneet','Mourya Ansh Deenanath','Morye Mihir Mangesh',
+    'Pandey Sakshi','Uttam Tripathi','Anchal Jaiswar',
+    'Harshit Tiwari','Shivam Patel','Shivansu Mishra',
+    'Abhay Yadav','Mahek Pandya','Abhishek Yadav'
+  ].map((name, i) => ({ roll: i + 1, name }));
 
   const urlParams = new URLSearchParams(window.location.search);
   const sessionId = urlParams.get('s') || urlParams.get('session') || '';
   const token = urlParams.get('t') || urlParams.get('token') || '';
 
+  const form = document.getElementById('checkin-form');
+  const authView = document.getElementById('authenticated-view');
+  const authStudentName = document.getElementById('auth-student-name');
+  const btnSubmitAuth = document.getElementById('btn-submit-authenticated');
+  const btnSwitch = document.getElementById('btn-switch-account');
   const select = document.getElementById('student-select');
+  const pinInput = document.getElementById('student-pin');
   const banner = document.getElementById('status-banner');
   const sessionDisplay = document.getElementById('session-id-display');
   const tokenDisplay = document.getElementById('token-status-display');
   const submitBtn = document.getElementById('btn-submit');
 
-  sessionDisplay.textContent = sessionId ? sessionId.slice(0, 16) + '...' : 'None (Manual Mode)';
+  sessionDisplay.textContent = sessionId ? sessionId.slice(0, 18) + '...' : 'None';
   tokenDisplay.textContent = token ? 'Active Token Attached' : 'Missing Token';
 
   // Populate student list
@@ -318,55 +346,143 @@
     select.appendChild(opt);
   });
 
-  if (!sessionId || !token) {
-    banner.className = 'status-banner error';
-    banner.innerHTML = '<strong>No Active QR Session Detected:</strong><br>Please scan the active rotating QR code projected in class using your camera.';
-    submitBtn.disabled = true;
+  // Check existing token
+  let bearerToken = sessionStorage.getItem('attendify:student_token') || localStorage.getItem('attendify:student_token');
+  let currentStudent = null;
+
+  async function checkExistingAuth() {
+    if (!bearerToken) return;
+    try {
+      const res = await fetch('/api/student/available-classes', {
+        headers: { 'Authorization': `Bearer ${bearerToken}` }
+      });
+      if (res.ok) {
+        // Authenticated! Find student from stored profile or roll
+        const savedRollNum = parseInt(localStorage.getItem('attendify:student_roll'), 10);
+        const stu = ENROLLED_STUDENTS.find(s => s.roll === savedRollNum);
+        currentStudent = stu || { roll: savedRollNum || 1, name: 'Enrolled Student' };
+        authStudentName.textContent = `Roll #${currentStudent.roll} — ${currentStudent.name}`;
+        form.style.display = 'none';
+        authView.style.display = 'block';
+      } else {
+        bearerToken = null;
+        sessionStorage.removeItem('attendify:student_token');
+        localStorage.removeItem('attendify:student_token');
+      }
+    } catch {}
   }
 
-  document.getElementById('checkin-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const roll = parseInt(select.value, 10);
-    if (!roll) return;
+  checkExistingAuth();
 
-    const student = ENROLLED_STUDENTS.find(s => s.roll === roll);
-    if (!student) return;
+  btnSwitch.addEventListener('click', () => {
+    bearerToken = null;
+    sessionStorage.removeItem('attendify:student_token');
+    localStorage.removeItem('attendify:student_token');
+    authView.style.display = 'none';
+    form.style.display = 'block';
+  });
 
-    if (document.getElementById('remember-me').checked) {
-      localStorage.setItem('attendify:student_roll', String(roll));
-    }
-
+  if (!sessionId || !token) {
+    banner.className = 'status-banner error';
+    banner.innerHTML = '<strong>No Active QR Session Detected:</strong><br>Please scan the live rotating QR code projected in class with your camera.';
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span>Verifying token with server...</span>';
+    btnSubmitAuth.disabled = true;
+  }
+
+  // Handle Authenticated 1-Click Submission
+  btnSubmitAuth.addEventListener('click', async () => {
+    if (!sessionId || !token || !bearerToken) return;
+    btnSubmitAuth.disabled = true;
+    btnSubmitAuth.innerHTML = '<span>Verifying token with server...</span>';
     banner.style.display = 'none';
 
     try {
-      const res = await fetch('/api/qr/session/checkin', {
+      const res = await fetch('/api/student/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId,
-          token,
-          studentId: 'stu_' + roll,
-          rollNumber: roll,
-          studentName: student.name
-        })
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${bearerToken}`
+        },
+        body: JSON.stringify({ sessionId, token })
       });
-
       const data = await res.json();
       if (data.success) {
         banner.className = 'status-banner success';
-        banner.innerHTML = `<strong>✓ Check-In Verified &amp; Recorded!</strong><br>Roll #${String(roll).padStart(2, '0')} (${student.name}) marked Present.<br><span style="font-size:11px; opacity:0.85;">Server Timestamp: ${new Date(data.checkedInAt).toLocaleTimeString()}</span>`;
-        submitBtn.innerHTML = '<span>✓ Attendance Confirmed</span>';
+        banner.innerHTML = `<strong>✓ Check-In Confirmed &amp; Recorded!</strong><br>Your attendance has been cryptographically validated by the server.<br><span style="font-size:11px; opacity:0.85;">Timestamp: ${new Date(data.verifiedAt || Date.now()).toLocaleTimeString()}</span>`;
+        btnSubmitAuth.innerHTML = '<span>✓ Attendance Confirmed</span>';
       } else {
         banner.className = 'status-banner error';
         banner.innerHTML = `<strong>Check-In Rejected:</strong><br>${data.message || data.error}`;
+        btnSubmitAuth.disabled = false;
+        btnSubmitAuth.innerHTML = '<span>Try Again</span>';
+      }
+    } catch (err) {
+      banner.className = 'status-banner error';
+      banner.innerHTML = '<strong>Attendance verification is temporarily unavailable.</strong><br>Please try again or check your campus network connection.';
+      btnSubmitAuth.disabled = false;
+      btnSubmitAuth.innerHTML = '<span>Try Again</span>';
+    }
+  });
+
+  // Handle Form Submission with PIN
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const roll = parseInt(select.value, 10);
+    const pin = pinInput.value.trim();
+    if (!roll || !pin) return;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Authenticating identity...</span>';
+    banner.style.display = 'none';
+
+    try {
+      // 1. Authenticate with server to obtain cryptographic bearer token
+      const loginRes = await fetch('/api/student/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rollNumber: roll, pin })
+      });
+      const loginData = await loginRes.json();
+      if (!loginData.success || !loginData.token) {
+        banner.className = 'status-banner error';
+        banner.innerHTML = `<strong>Authentication Failed:</strong><br>${loginData.message || 'Incorrect PIN for this roll number.'}`;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Verify Identity &amp; Confirm Attendance</span>';
+        return;
+      }
+
+      bearerToken = loginData.token;
+      if (document.getElementById('remember-me').checked) {
+        localStorage.setItem('attendify:student_token', bearerToken);
+        localStorage.setItem('attendify:student_roll', String(roll));
+      }
+      sessionStorage.setItem('attendify:student_token', bearerToken);
+
+      // 2. Submit attendance using authenticated server session
+      submitBtn.innerHTML = '<span>Validating QR token...</span>';
+      const submitRes = await fetch('/api/student/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${bearerToken}`
+        },
+        body: JSON.stringify({ sessionId, token })
+      });
+
+      const submitData = await submitRes.json();
+      if (submitData.success) {
+        banner.className = 'status-banner success';
+        banner.innerHTML = `<strong>✓ Check-In Confirmed &amp; Recorded!</strong><br>Roll #${String(roll).padStart(2, '0')} (${loginData.student.name}) marked Present.<br><span style="font-size:11px; opacity:0.85;">Server Timestamp: ${new Date(submitData.verifiedAt || Date.now()).toLocaleTimeString()}</span>`;
+        submitBtn.innerHTML = '<span>✓ Attendance Confirmed</span>';
+      } else {
+        banner.className = 'status-banner error';
+        banner.innerHTML = `<strong>Check-In Rejected:</strong><br>${submitData.message || submitData.error}`;
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<span>Try Again</span>';
       }
     } catch (err) {
       banner.className = 'status-banner error';
-      banner.innerHTML = '<strong>Connection Error:</strong><br>Unable to contact attendance server. Please ensure you are connected to the campus network.';
+      banner.innerHTML = '<strong>Attendance verification is temporarily unavailable.</strong><br>Please try again or check server connectivity.';
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<span>Try Again</span>';
     }

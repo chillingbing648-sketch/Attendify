@@ -128,44 +128,20 @@ const QRAttendanceView = (() => {
           return;
         }
       } catch (e) {
-        console.warn('Backend start failed, falling back to simulated mode:', e);
+        console.error('Backend start failed:', e);
       }
     }
 
-    // Fallback: Local Client Simulated Mode
-    const now = Date.now();
-    const mockToken = Array.from(window.crypto.getRandomValues(new Uint8Array(20)))
-      .map(b => b.toString(16).padStart(2, '0')).join('');
-    activeSession = {
-      id: 'qr_local_' + now,
-      subjectId: selectedSubjectId,
-      sessionType: selectedSessionType,
-      date: selectedDate,
-      startTime: selectedStartTime,
-      experimentTitle,
-      durationMinutes,
-      rotationIntervalSec,
-      createdAt: now,
-      expiresAt: now + durationMinutes * 60 * 1000,
-      token: mockToken,
-      tokenExpiresAt: now + rotationIntervalSec * 1000,
-      status: 'active'
-    };
-    auditLogs.push({
-      event: 'SESSION_STARTED',
-      timestamp: new Date().toISOString(),
-      details: 'Session started (Local Simulated Mode)'
-    });
-    scheduleNextRotation();
-    startTimers();
+    // Strict Rule: Never simulate attendance when server is offline
+    serverAvailable = false;
+    UI.toast('Attendance verification is temporarily unavailable. Please start the backend server (node server.js) and try again.', 'error', 4500);
     render();
-    UI.toast('QR Attendance started in local simulation mode', 'info', 2000);
   }
 
   async function rotateTokenNow() {
     if (!activeSession || activeSession.status !== 'active') return;
 
-    if (serverAvailable && !activeSession.id.startsWith('qr_local_')) {
+    if (serverAvailable) {
       try {
         const res = await fetch('/api/qr/session/rotate', {
           method: 'POST',
@@ -185,18 +161,8 @@ const QRAttendanceView = (() => {
       }
     }
 
-    // Local Fallback Rotation
-    const now = Date.now();
-    activeSession.token = Array.from(window.crypto.getRandomValues(new Uint8Array(20)))
-      .map(b => b.toString(16).padStart(2, '0')).join('');
-    activeSession.tokenExpiresAt = now + activeSession.rotationIntervalSec * 1000;
-    auditLogs.push({
-      event: 'TOKEN_ROTATED',
-      timestamp: new Date().toISOString(),
-      details: 'Token rotated locally'
-    });
-    scheduleNextRotation();
-    updateQRDisplay();
+    // Strict Rule: Do not generate insecure local tokens
+    UI.toast('Attendance verification is temporarily unavailable. Please check server connectivity.', 'warn', 3000);
   }
 
   function scheduleNextRotation() {
@@ -360,11 +326,11 @@ const QRAttendanceView = (() => {
             </span>
             ${serverAvailable ? `
               <span class="badge badge-safe" style="font-size:10.5px; padding:2px 7px;" title="Connected to trusted server-side crypto validation">
-                🔒 BACKEND VERIFIED
+                🔒 SERVER CONNECTED
               </span>
             ` : `
-              <span class="badge badge-warn" style="font-size:10.5px; padding:2px 7px;" title="Running in client demo mode; start node server.js for server validation">
-                ⚠️ DEMO SIMULATION
+              <span class="badge badge-danger" style="font-size:10.5px; padding:2px 7px;" title="Backend service unavailable. Start node server.js to enable QR verification.">
+                ⚠️ SERVER UNAVAILABLE
               </span>
             `}
           </div>
@@ -383,7 +349,7 @@ const QRAttendanceView = (() => {
               ${UI.icon('checkCircle')} End & Review Session
             </button>
           ` : `
-            <button class="btn btn-primary btn-sm" id="btn-start-qr-session">
+            <button class="btn btn-primary btn-sm" id="btn-start-qr-session" ${!serverAvailable ? 'disabled style="opacity:0.6; cursor:not-allowed;" title="Attendance verification is temporarily unavailable. Start node server.js."' : ''}>
               ${UI.icon('qrcode')} Start QR Session
             </button>
           `}
@@ -817,7 +783,7 @@ const QRAttendanceView = (() => {
             const roll = parseInt(itemBtn.dataset.roll, 10);
             const name = itemBtn.dataset.name;
 
-            if (serverAvailable && !activeSession.id.startsWith('qr_local_')) {
+            if (serverAvailable) {
               try {
                 const res = await fetch('/api/qr/session/checkin', {
                   method: 'POST',
@@ -835,18 +801,16 @@ const QRAttendanceView = (() => {
                   const rec = studentCheckinMap.get(sid);
                   if (rec) { rec.status = 'present'; rec.timestamp = data.checkedInAt; }
                   UI.toast(`Verified Roll #${roll} (${name}) via server`, 'success', 1500);
+                  updateActivityRoster();
                 } else {
-                  UI.toast(`Check-in rejected: ${data.message || data.error}`, 'error', 2500);
+                  UI.toast(`Check-in rejected: ${data.message || data.error}`, 'error', 3000);
                 }
-              } catch {
-                toggleStudentStatus(sid);
+              } catch (err) {
+                UI.toast('Attendance verification is temporarily unavailable. Please try again.', 'error', 3000);
               }
             } else {
-              const rec = studentCheckinMap.get(sid);
-              if (rec) { rec.status = 'present'; rec.timestamp = new Date().toISOString(); }
-              UI.toast(`Marked Roll #${roll} (${name}) Present (Local)`, 'success', 1500);
+              UI.toast('Attendance verification is temporarily unavailable. Please start backend server.', 'error', 3000);
             }
-            updateActivityRoster();
             close();
           });
         });
