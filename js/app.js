@@ -69,40 +69,45 @@ const App = (() => {
     root.innerHTML = `
       <div class="sidebar-scrim" id="sidebar-scrim"></div>
       <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand" id="sidebar-brand-btn" role="button" tabindex="0" title="Go to Dashboard">
-          <div class="brand-mark" aria-label="Attendify Logo">
-            <svg viewBox="0 0 64 64" width="36" height="36" fill="none" class="brand-logo-svg">
-              <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#attSideBg)"/>
-              <rect x="2" y="2" width="60" height="60" rx="16" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/>
-              <path d="M19 47L29.5 17.2C30.4 14.6 33.6 14.6 34.5 17.2L45 47" stroke="url(#attSidePlum)" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M22 35L29.5 41.5L46 22" stroke="url(#attSideCheck)" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="32" cy="14.5" r="2.2" fill="#FFFFFF" opacity="0.95"/>
-              <defs>
-                <linearGradient id="attSideBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stop-color="#2D304A"/>
-                  <stop offset="100%" stop-color="#191A2B"/>
-                </linearGradient>
-                <linearGradient id="attSidePlum" x1="16" y1="14" x2="48" y2="50" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stop-color="#B8A9F8"/>
-                  <stop offset="100%" stop-color="#6F5EB2"/>
-                </linearGradient>
-                <linearGradient id="attSideCheck" x1="20" y1="36" x2="46" y2="28" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stop-color="#2CD5A4"/>
-                  <stop offset="100%" stop-color="#178568"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <div class="brand-info">
-            <div class="brand-name-wrap">
-              <span class="brand-name">Attendify</span>
-              <span class="brand-badge">ACADEMIC</span>
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-clickable" id="sidebar-brand-btn" role="button" tabindex="0" title="Go to Dashboard">
+            <div class="brand-mark" aria-label="Attendify Logo">
+              <svg viewBox="0 0 64 64" width="36" height="36" fill="none" class="brand-logo-svg">
+                <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#attSideBg)"/>
+                <rect x="2" y="2" width="60" height="60" rx="16" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/>
+                <path d="M19 47L29.5 17.2C30.4 14.6 33.6 14.6 34.5 17.2L45 47" stroke="url(#attSidePlum)" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 35L29.5 41.5L46 22" stroke="url(#attSideCheck)" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="32" cy="14.5" r="2.2" fill="#FFFFFF" opacity="0.95"/>
+                <defs>
+                  <linearGradient id="attSideBg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#2D304A"/>
+                    <stop offset="100%" stop-color="#191A2B"/>
+                  </linearGradient>
+                  <linearGradient id="attSidePlum" x1="16" y1="14" x2="48" y2="50" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#B8A9F8"/>
+                    <stop offset="100%" stop-color="#6F5EB2"/>
+                  </linearGradient>
+                  <linearGradient id="attSideCheck" x1="20" y1="36" x2="46" y2="28" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#2CD5A4"/>
+                    <stop offset="100%" stop-color="#178568"/>
+                  </linearGradient>
+                </defs>
+              </svg>
             </div>
-            <div class="brand-class-wrap">
-              <span class="brand-status-dot"></span>
-              <span class="brand-class">${Utils.escapeHTML(settings.className || 'SY BSc IT')} · 60 Students</span>
+            <div class="brand-info">
+              <div class="brand-name-wrap">
+                <span class="brand-name">Attendify</span>
+                <span class="brand-badge">ACADEMIC</span>
+              </div>
+              <div class="brand-class-wrap">
+                <span class="brand-status-dot"></span>
+                <span class="brand-class">${Utils.escapeHTML(settings.className || 'SY BSc IT')} · 60 Students</span>
+              </div>
             </div>
           </div>
+          <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Close navigation menu" title="Close navigation menu">
+            ${UI.icon('x')}
+          </button>
         </div>
 
         <nav class="sidebar-nav" aria-label="Main navigation">
@@ -162,8 +167,8 @@ const App = (() => {
 
           <div class="topbar-right">
             <!-- Student Portal Link -->
-            <a href="student.html" target="_blank" class="btn btn-outline btn-sm" style="height:32px; font-size:11.5px; display:inline-flex; align-items:center; gap:5px; text-decoration:none;" title="Open Separate Student Portal">
-              🎓 Student Portal ↗
+            <a href="student.html" target="_blank" class="btn btn-outline btn-sm topbar-student-portal-btn" style="height:32px; font-size:11.5px; display:inline-flex; align-items:center; gap:5px; text-decoration:none;" title="Open Separate Student Portal">
+              <span>🎓</span><span class="topbar-portal-text">Student Portal ↗</span>
             </a>
 
             <!-- Global Search Trigger -->
@@ -245,6 +250,9 @@ const App = (() => {
     });
     document.getElementById('sidebar-scrim').addEventListener('click', closeMobileSidebar);
 
+    const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+    if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeMobileSidebar);
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeMobileSidebar();
     });
@@ -307,7 +315,7 @@ const App = (() => {
         <p style="font-size:var(--fs-sm); color:var(--ink-secondary); line-height:1.5;">
           Select the attendance category you wish to record for the SY BSc IT batch:
         </p>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:4px;">
+        <div class="modal-choice-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:4px;">
           <button class="btn btn-outline" id="modal-choice-lecture" style="height:auto; padding:16px 14px; display:flex; flex-direction:column; align-items:flex-start; text-align:left; gap:6px; border-color:var(--border-strong);">
             <div style="display:flex; align-items:center; gap:8px;">
               <div class="session-category-icon icon-lecture">${UI.icon('bookOpen')}</div>

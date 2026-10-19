@@ -78,8 +78,8 @@ const HistoryView = (() => {
       </div>
 
       <!-- History Table (Prompt 13: Date | Subject | Type | Present | Absent | Late | % | Status | Actions) -->
-      <div class="table-wrap">
-        <table class="data-table workbench-table">
+      <div class="table-wrap history-table-wrap">
+        <table class="data-table workbench-table history-data-table">
           <thead>
             <tr>
               <th style="width: 110px;">Date</th>
@@ -107,29 +107,29 @@ const HistoryView = (() => {
               const isSafe = stats.status === 'safe';
               return `
                 <tr>
-                  <td>
+                  <td data-label="Date">
                     <strong>${Utils.formatDate(sess.date)}</strong>
                     <div style="font-size:11px; color:var(--ink-tertiary); font-variant-numeric:tabular-nums;">${sess.startTime || '09:00'}</div>
                   </td>
-                  <td>
+                  <td data-label="Subject">
                     <div style="font-weight:600; color:var(--ink);">${sub ? Utils.escapeHTML(sub.name) : 'Unknown Subject'}</div>
                     ${sess.experimentTitle ? `<div style="font-size:11px; color:var(--ink-secondary); font-style:italic;">${Utils.escapeHTML(sess.experimentTitle)}</div>` : ''}
                   </td>
-                  <td>
+                  <td data-label="Type">
                     <span class="badge ${isPractical ? 'badge-safe' : 'badge-neutral'}">
                       ${isPractical ? 'PRACTICAL' : 'LECTURE'}
                     </span>
                   </td>
-                  <td style="text-align:center;"><span style="color:var(--safe); font-weight:650;">${stats.present}</span></td>
-                  <td style="text-align:center;"><span style="color:var(--critical); font-weight:650;">${stats.absent}</span></td>
-                  <td style="text-align:center;"><span style="color:var(--warn); font-weight:650;">${stats.late}</span></td>
-                  <td style="text-align:center;">
+                  <td data-label="Present" style="text-align:center;"><span style="color:var(--safe); font-weight:650;">${stats.present}</span></td>
+                  <td data-label="Absent" style="text-align:center;"><span style="color:var(--critical); font-weight:650;">${stats.absent}</span></td>
+                  <td data-label="Late" style="text-align:center;"><span style="color:var(--warn); font-weight:650;">${stats.late}</span></td>
+                  <td data-label="Turnout %" style="text-align:center;">
                     <strong style="font-variant-numeric: tabular-nums;">${stats.pct}%</strong>
                   </td>
-                  <td style="text-align:center;">
+                  <td data-label="Status" style="text-align:center;">
                     <span class="badge ${isSafe ? 'badge-safe' : 'badge-critical'}">${Utils.statusLabel(stats.status)}</span>
                   </td>
-                  <td style="text-align: right;">
+                  <td data-label="Actions" style="text-align: right;">
                     <div style="display:inline-flex; gap:4px;">
                       <button class="btn btn-ghost btn-sm view-session-btn" data-id="${sess.id}">View</button>
                       <button class="btn btn-outline btn-sm edit-session-btn" data-id="${sess.id}">Edit</button>

@@ -79,7 +79,7 @@ const Timetable = (() => {
         </div>
 
         <div class="table-wrap">
-          <table class="data-table">
+          <table class="data-table timetable-data-table">
             <thead>
               <tr>
                 <th style="width: 120px;">Time Slot</th>
@@ -102,19 +102,19 @@ const Timetable = (() => {
                 const isPractical = slot.type === 'practical';
                 return `
                   <tr>
-                    <td><strong style="font-variant-numeric: tabular-nums;">${slot.start} – ${slot.end}</strong></td>
-                    <td>
+                    <td data-label="Time Slot"><strong style="font-variant-numeric: tabular-nums;">${slot.start} – ${slot.end}</strong></td>
+                    <td data-label="Subject">
                       <div style="font-weight:600; color:var(--ink);">${sub ? Utils.escapeHTML(sub.name) : 'Subject'}</div>
                       <div style="font-size:11px; color:var(--ink-secondary);">${sub ? sub.teacher || 'Faculty' : ''}</div>
                     </td>
-                    <td>
+                    <td data-label="Type">
                       <span class="badge ${isPractical ? 'badge-safe' : 'badge-neutral'}">
                         ${isPractical ? 'PRACTICAL' : 'LECTURE'}
                       </span>
                     </td>
-                    <td>${slot.room || '—'}</td>
-                    <td style="text-align:center;"><span class="badge badge-warn">Pending</span></td>
-                    <td style="text-align: right;">
+                    <td data-label="Room / Lab">${slot.room || '—'}</td>
+                    <td data-label="Status" style="text-align:center;"><span class="badge badge-warn">Pending</span></td>
+                    <td data-label="Action" style="text-align: right;">
                       <button class="btn btn-primary btn-sm" style="${isPractical ? 'background:var(--practical); border-color:var(--practical);' : ''}" onclick="App.navigateToMarkSlot('${slot.subjectId}', '${slot.start}', '${isPractical ? 'practical' : 'lecture'}')">
                         ${UI.icon('plus')} Mark Attendance
                       </button>
@@ -138,7 +138,7 @@ const Timetable = (() => {
           </div>
 
           <div class="table-wrap">
-            <table class="data-table">
+            <table class="data-table timetable-data-table">
               <thead>
                 <tr>
                   <th style="width: 120px;">Time Slot</th>
@@ -156,24 +156,24 @@ const Timetable = (() => {
                   const isPractical = slot.type === 'practical';
                   return `
                     <tr>
-                      <td><strong style="font-variant-numeric: tabular-nums;">${slot.start} – ${slot.end}</strong></td>
-                      <td>
+                      <td data-label="Time Slot"><strong style="font-variant-numeric: tabular-nums;">${slot.start} – ${slot.end}</strong></td>
+                      <td data-label="Subject">
                         <div style="font-weight:600; color:var(--ink);">${sub ? Utils.escapeHTML(sub.name) : 'Subject'}</div>
                         ${session.experimentTitle ? `<div style="font-size:11px; color:var(--ink-secondary); font-style:italic;">${Utils.escapeHTML(session.experimentTitle)}</div>` : ''}
                       </td>
-                      <td>
+                      <td data-label="Type">
                         <span class="badge ${isPractical ? 'badge-safe' : 'badge-neutral'}">
                           ${isPractical ? 'PRACTICAL' : 'LECTURE'}
                         </span>
                       </td>
-                      <td style="text-align:center;">
+                      <td data-label="Turnout" style="text-align:center;">
                         <span style="color:var(--safe); font-weight:700;">${stats.present} P</span> · 
                         <span style="color:var(--critical); font-weight:700;">${stats.absent} A</span>
                       </td>
-                      <td style="text-align:center;">
+                      <td data-label="Attendance %" style="text-align:center;">
                         <span class="badge ${stats.status === 'safe' ? 'badge-safe' : 'badge-critical'}">${stats.pct}%</span>
                       </td>
-                      <td style="text-align: right;">
+                      <td data-label="Action" style="text-align: right;">
                         <button class="btn btn-outline btn-sm" onclick="App.navigateToMarkSession('${session.id}')">
                           Edit Session
                         </button>
@@ -197,7 +197,7 @@ const Timetable = (() => {
         </div>
 
         <div class="table-wrap">
-          <table class="data-table">
+          <table class="data-table timetable-data-table">
             <thead>
               <tr>
                 <th style="width: 110px;">Day</th>
@@ -214,19 +214,19 @@ const Timetable = (() => {
                 const isPractical = slot.type === 'practical';
                 return `
                   <tr>
-                    <td><strong>${DAYS[slot.day] || 'Day'}</strong></td>
-                    <td><span style="font-variant-numeric: tabular-nums;">${slot.start} – ${slot.end}</span></td>
-                    <td>
+                    <td data-label="Day"><strong>${DAYS[slot.day] || 'Day'}</strong></td>
+                    <td data-label="Time"><span style="font-variant-numeric: tabular-nums;">${slot.start} – ${slot.end}</span></td>
+                    <td data-label="Subject">
                       <strong>${sub ? Utils.escapeHTML(sub.name) : 'Subject'}</strong>
                       <div style="font-size:11px; color:var(--ink-secondary);">${sub ? sub.teacher || '' : ''}</div>
                     </td>
-                    <td>
+                    <td data-label="Type">
                       <span class="badge ${isPractical ? 'badge-safe' : 'badge-neutral'}">
                         ${isPractical ? 'PRACTICAL' : 'LECTURE'}
                       </span>
                     </td>
-                    <td>${slot.room || '—'}</td>
-                    <td style="text-align: right;">
+                    <td data-label="Room / Lab">${slot.room || '—'}</td>
+                    <td data-label="Action" style="text-align: right;">
                       <button class="btn btn-ghost btn-sm" onclick="App.navigateToMarkSlot('${slot.subjectId}', '${slot.start}', '${slot.type || 'theory'}')">
                         Launch Register
                       </button>

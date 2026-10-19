@@ -465,7 +465,7 @@ const QRAttendanceView = (() => {
     const counts = getCounts();
 
     return `
-      <div style="display:grid; grid-template-columns: 360px 1fr; gap: 20px; align-items:start;">
+      <div class="qr-workspace-grid" style="display:grid; grid-template-columns: 360px 1fr; gap: 20px; align-items:start;">
 
         <!-- LEFT: Live Rotating QR Showcase -->
         <div class="card" style="padding:22px; background:var(--surface); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; text-align:center;">
@@ -512,7 +512,7 @@ const QRAttendanceView = (() => {
         <!-- RIGHT: Real-Time Roster & Headcount Activity -->
         <div style="display:flex; flex-direction:column; gap:16px;">
           <!-- 4 Summary Counter Cards -->
-          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px;">
+          <div class="qr-summary-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px;">
             <div class="card" style="padding:12px 14px; background:var(--surface); border:1px solid var(--border);">
               <div style="font-size:11px; font-weight:700; color:var(--ink-secondary); text-transform:uppercase;">Enrolled</div>
               <div style="font-size:24px; font-weight:700; color:var(--ink); font-family:var(--font-data);" class="data-num">${counts.total}</div>

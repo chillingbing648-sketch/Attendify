@@ -192,6 +192,23 @@
     border-radius: 50%;
     background: var(--safe);
   }
+
+  @media (max-width: 480px) {
+    body {
+      padding: max(16px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    }
+    .checkin-card {
+      padding: 22px 16px;
+    }
+    .btn {
+      height: 48px;
+      font-size: 15px;
+    }
+    select, input {
+      height: 46px;
+      font-size: 15px;
+    }
+  }
 </style>
 </head>
 <body>

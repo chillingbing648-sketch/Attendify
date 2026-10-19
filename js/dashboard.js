@@ -257,8 +257,8 @@ const Dashboard = (() => {
           <button class="btn btn-outline btn-sm" onclick="App.navigateTo('students')">View All Students</button>
         </div>
 
-        <div class="table-wrap">
-          <table class="data-table">
+        <div class="table-wrap defaulters-table-wrap">
+          <table class="data-table dashboard-defaulters-table">
             <thead>
               <tr>
                 <th style="width: 75px;">Roll No</th>
@@ -282,8 +282,8 @@ const Dashboard = (() => {
                 const needed = Utils.classesNeededToRecover(d.present + d.late, d.total, 75);
                 return `
                   <tr>
-                    <td><span class="roll-cell">#${d.student.rollNumber < 10 ? '0' + d.student.rollNumber : d.student.rollNumber}</span></td>
-                    <td>
+                    <td data-label="Roll No"><span class="roll-cell">#${d.student.rollNumber < 10 ? '0' + d.student.rollNumber : d.student.rollNumber}</span></td>
+                    <td data-label="Student">
                       <div style="display:flex; align-items:center; gap:10px;">
                         <div class="student-avatar" style="${Utils.getAvatarStyle(d.student.rollNumber)}" aria-hidden="true">${Utils.getInitials(d.student.name)}</div>
                         <div>
@@ -292,16 +292,16 @@ const Dashboard = (() => {
                         </div>
                       </div>
                     </td>
-                    <td style="color:var(--safe); font-weight:700; text-align:center;">${d.present + d.late}</td>
-                    <td style="color:var(--critical); font-weight:700; text-align:center;">${d.absent}</td>
-                    <td style="text-align:center;"><strong style="color:var(--critical); font-variant-numeric: tabular-nums;">${d.pct}%</strong></td>
-                    <td style="text-align:center;"><span class="badge ${d.pct < 65 ? 'badge-critical' : 'badge-warn'}">${Utils.statusLabel(d.status)}</span></td>
-                    <td style="text-align:center;">
+                    <td data-label="Present" style="color:var(--safe); font-weight:700; text-align:center;">${d.present + d.late}</td>
+                    <td data-label="Absent" style="color:var(--critical); font-weight:700; text-align:center;">${d.absent}</td>
+                    <td data-label="Attendance %" style="text-align:center;"><strong style="color:var(--critical); font-variant-numeric: tabular-nums;">${d.pct}%</strong></td>
+                    <td data-label="Status" style="text-align:center;"><span class="badge ${d.pct < 65 ? 'badge-critical' : 'badge-warn'}">${Utils.statusLabel(d.status)}</span></td>
+                    <td data-label="Classes to Safe" style="text-align:center;">
                       <span class="badge badge-neutral" title="Need ${needed} consecutive attended classes to reach 75% safe attendance">
                         +${needed} consecutive
                       </span>
                     </td>
-                    <td style="text-align: right;">
+                    <td data-label="Action" style="text-align: right;">
                       <button class="btn btn-secondary btn-sm" onclick="StudentsView.openStudentDetail('${d.student.id}')">Profile</button>
                     </td>
                   </tr>
@@ -324,8 +324,8 @@ const Dashboard = (() => {
           </div>
         </div>
 
-        <div class="table-wrap">
-          <table class="data-table">
+        <div class="table-wrap recent-table-wrap">
+          <table class="data-table dashboard-recent-table">
             <thead>
               <tr>
                 <th style="width: 110px;">Date</th>
@@ -351,31 +351,31 @@ const Dashboard = (() => {
                 const isPractical = sess.type === 'practical';
                 return `
                   <tr>
-                    <td><strong>${Utils.formatDate(sess.date)}</strong></td>
-                    <td>
+                    <td data-label="Date"><strong>${Utils.formatDate(sess.date)}</strong></td>
+                    <td data-label="Subject">
                       <div style="font-weight:600; color:var(--ink);">${sub ? Utils.escapeHTML(sub.name) : 'Subject'}</div>
                       ${sess.experimentTitle ? `<div style="font-size:11px; color:var(--ink-secondary); font-style:italic;">${Utils.escapeHTML(sess.experimentTitle)}</div>` : ''}
                     </td>
-                    <td><span style="color:var(--ink-secondary); font-variant-numeric: tabular-nums;">${sess.startTime || '09:00'}</span></td>
-                    <td>
+                    <td data-label="Time"><span style="color:var(--ink-secondary); font-variant-numeric: tabular-nums;">${sess.startTime || '09:00'}</span></td>
+                    <td data-label="Type">
                       <span class="badge ${isPractical ? 'badge-safe' : 'badge-neutral'}">
                         ${isPractical ? 'PRACTICAL' : 'LECTURE'}
                       </span>
                     </td>
-                    <td style="text-align:center;">
+                    <td data-label="Headcount" style="text-align:center;">
                       <span style="font-size:11.5px; font-weight:700; font-variant-numeric:tabular-nums;">
                         <span style="color:var(--safe);">${sStats.present} P</span> · 
                         <span style="color:var(--critical);">${sStats.absent} A</span> · 
                         <span style="color:var(--warn);">${sStats.late} L</span>
                       </span>
                     </td>
-                    <td style="text-align:center;">
+                    <td data-label="Attendance %" style="text-align:center;">
                       <span class="badge ${sStats.status === 'safe' ? 'badge-safe' : 'badge-critical'}">${sStats.pct}%</span>
                     </td>
-                    <td style="text-align:center;">
+                    <td data-label="Status" style="text-align:center;">
                       <span class="badge badge-safe">Completed</span>
                     </td>
-                    <td style="text-align: right;">
+                    <td data-label="Actions" style="text-align: right;">
                       <div style="display:inline-flex; gap:4px;">
                         <button class="btn btn-ghost btn-sm" onclick="HistoryView.openSessionDetailModal('${sess.id}')" title="View Student Breakdown">Breakdown</button>
                         <button class="btn btn-outline btn-sm" onclick="App.navigateToMarkSession('${sess.id}')" title="Edit Register">Edit</button>

@@ -507,11 +507,23 @@
   .banner.info { display: block; background: var(--surface-subtle); color: var(--accent); border: 1px solid rgba(81, 69, 138, 0.25); }
 
   @media (max-width: 640px) {
-    .portal-nav { padding: 0 16px; }
-    .portal-container { padding: 20px 12px 36px; }
+    .portal-nav {
+      padding: max(0px, env(safe-area-inset-top)) 16px 0;
+      height: calc(60px + env(safe-area-inset-top));
+    }
+    .portal-container {
+      padding: 20px 12px max(36px, calc(16px + env(safe-area-inset-bottom)));
+    }
     .card { padding: 18px 16px; }
     .class-top { flex-direction: column; align-items: flex-start; }
     .stat-val { font-size: 24px; }
+    .btn { min-height: 44px; }
+    .form-group input, .form-group select { height: 44px; font-size: 15px; }
+  }
+  @media (max-width: 480px) {
+    .badge-portal { display: none; }
+    .portal-nav { padding: 0 12px; }
+    .nav-controls { gap: 6px; }
   }
 </style>
 </head>

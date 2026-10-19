@@ -396,7 +396,7 @@ const RapidRollView = (() => {
     const initials = Utils.getInitials(student.name);
 
     return `
-      <div style="display:grid; grid-template-columns: 1fr 320px; gap:20px; align-items:start;">
+      <div class="rapid-card-layout" style="display:grid; grid-template-columns: 1fr 320px; gap:20px; align-items:start;">
         <!-- Left: Massive Interactive Student Flashcard -->
         <div class="card" style="padding:28px 32px; background:var(--surface); border:1px solid var(--border); box-shadow:var(--shadow-sm); position:relative; overflow:hidden;">
           <!-- Top subtle badge -->
@@ -413,15 +413,15 @@ const RapidRollView = (() => {
           </div>
 
           <!-- Student Profile Focus -->
-          <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
-            <div class="student-avatar" style="${avatarStyle}; width:72px; height:72px; font-size:24px; font-weight:700; border-radius:var(--r-xl); box-shadow:var(--shadow-xs);">
+          <div class="rapid-student-profile" style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
+            <div class="student-avatar" style="${avatarStyle}; width:72px; height:72px; font-size:24px; font-weight:700; border-radius:var(--r-xl); box-shadow:var(--shadow-xs); flex-shrink:0;">
               ${initials}
             </div>
             <div>
               <h2 style="font-size:24px; font-weight:700; color:var(--ink); line-height:1.2; letter-spacing:-0.02em;">
                 ${Utils.escapeHTML(student.name)}
               </h2>
-              <div style="font-size:13.5px; color:var(--ink-secondary); margin-top:4px; display:flex; align-items:center; gap:8px;">
+              <div style="font-size:13.5px; color:var(--ink-secondary); margin-top:4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                 <span>SY BSc IT</span>
                 <span>•</span>
                 <span>Attended: <strong>${stats.attended}</strong> / ${stats.total} sessions</span>
@@ -445,7 +445,7 @@ const RapidRollView = (() => {
           </div>
 
           <!-- Big Action Buttons (Touch + Keyboard Friendly) -->
-          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:14px; margin-bottom:20px;">
+          <div class="rapid-focus-actions" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:14px; margin-bottom:20px;">
             <button class="btn btn-primary" id="btn-mark-present-focus" style="height:52px; font-size:15px; font-weight:700; background:var(--safe); border-color:var(--safe); box-shadow:0 2px 8px rgba(23, 133, 104, 0.25);">
               ${UI.icon('check')}
               <span>Present [P / Space]</span>
@@ -461,7 +461,7 @@ const RapidRollView = (() => {
           </div>
 
           <!-- Navigation Arrow Footer -->
-          <div style="display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border);">
+          <div class="rapid-nav-footer" style="display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border); flex-wrap:wrap; gap:10px;">
             <button class="btn btn-outline btn-sm" id="btn-prev-student" ${currentIndex === 0 ? 'disabled' : ''}>
               ${UI.icon('arrowLeft')} Previous Student [←]
             </button>
@@ -475,7 +475,7 @@ const RapidRollView = (() => {
         </div>
 
         <!-- Right: Mini Roster Jump List -->
-        <div class="card" style="padding:16px; background:var(--surface); border:1px solid var(--border); max-height:480px; display:flex; flex-direction:column;">
+        <div class="card rapid-jump-card" style="padding:16px; background:var(--surface); border:1px solid var(--border); max-height:480px; display:flex; flex-direction:column;">
           <div style="font-size:12px; font-weight:700; color:var(--ink-secondary); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
             <span>Class Roster Jump</span>
             <span style="font-size:11px; font-weight:500; color:var(--ink-tertiary);">Click any to view</span>
@@ -517,7 +517,7 @@ const RapidRollView = (() => {
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap:10px;">
+        <div class="rapid-seating-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap:10px;">
           ${students.map(s => {
             const st = studentStatusMap[s.id] || 'unmarked';
             const avatarStyle = Utils.getAvatarStyle(s.rollNumber);

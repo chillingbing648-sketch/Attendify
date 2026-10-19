@@ -1,8 +1,8 @@
 /* ============================================================
    ATTENDIFY — responsive.css
-   Apple × Academic SaaS Responsive Experience
-   Fluid Breakpoints: 360px, 480px, 680px, 860px, 1024px, 1280px, 1440px+
-   Native Mobile Card Presentation for Student Directory
+   Apple × Academic SaaS Mobile & Multi-Device Optimization
+   Breakpoints: 320px, 360px, 480px, 520px, 680px, 860px, 1024px, 1280px, 1440px+
+   Native Mobile Card Presentation & Strict Touch Target Compliance (>= 44px)
    ============================================================ */
 
 /* 1440px+ Extra-Wide Workstations */
@@ -40,9 +40,9 @@
     grid-template-columns: 1fr;
   }
   .status-btn {
-    width: 36px;
-    height: 30px;
-    font-size: 12px;
+    min-width: 40px;
+    height: 34px;
+    font-size: 13px;
   }
 }
 
@@ -50,6 +50,10 @@
 @media (max-width: 860px) {
   .app-shell {
     flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
   }
 
   .sidebar {
@@ -57,20 +61,28 @@
     top: 0;
     bottom: 0;
     left: 0;
-    width: 270px;
+    width: 280px;
+    max-width: 85vw;
     transform: translateX(-100%);
     box-shadow: var(--shadow-popover);
     z-index: 50;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
 
   .sidebar.open {
     transform: translateX(0);
   }
 
+  .sidebar-close-btn {
+    display: inline-flex !important;
+  }
+
   .sidebar-scrim {
     position: fixed;
     inset: 0;
-    background: rgba(22, 23, 38, 0.48);
+    background: rgba(22, 23, 38, 0.55);
+    backdrop-filter: blur(2px);
     z-index: 45;
     opacity: 0;
     pointer-events: none;
@@ -82,12 +94,23 @@
     pointer-events: auto;
   }
 
+  .topbar {
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+
   .topbar-menu-btn {
     display: inline-flex;
+    min-width: 42px;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
   }
 
   .view-scroll {
-    padding: 18px 18px 40px 18px;
+    padding: 16px 16px max(34px, calc(20px + env(safe-area-inset-bottom))) 16px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .topbar-center {
@@ -100,6 +123,11 @@
 
   .topbar-search-trigger {
     padding: 0 10px;
+    min-width: 40px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .topbar-date {
@@ -111,6 +139,12 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     justify-content: flex-start;
+  }
+
+  .segmented-item {
+    min-height: 38px;
+    padding: 6px 14px;
+    flex-shrink: 0;
   }
 
   /* Today's Lecture + Practical grid stacks cleanly on mobile */
@@ -157,6 +191,7 @@
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+    padding-bottom: max(14px, calc(10px + env(safe-area-inset-bottom)));
   }
 
   .register-footer .btn {
@@ -178,12 +213,18 @@
   }
 
   /* Rapid Roll Studio Responsive Adaptations */
+  .rapid-card-layout,
   #rapid-mode-container > div[style*="grid-template-columns: 1fr 320px"],
   #rapid-mode-container > div[style*="grid-template-columns:1fr 320px"] {
     grid-template-columns: 1fr !important;
   }
 
+  .rapid-jump-card {
+    max-height: 320px !important;
+  }
+
   /* QR Attendance Studio Responsive Adaptations */
+  .qr-workspace-grid,
   #view-qr-attendance div[style*="grid-template-columns: 360px 1fr"],
   #view-qr-attendance div[style*="grid-template-columns:360px 1fr"] {
     grid-template-columns: 1fr !important;
@@ -191,34 +232,65 @@
 }
 
 /* ============================================================
-   RESPONSIVE STUDENTS DIRECTORY MOBILE CARD PRESENTATION (<= 680px)
-   Transforms desktop table into native spacious mobile cards
+   RESPONSIVE TABLE CARD PRESENTATIONS (<= 680px)
+   Transforms wide desktop tables into native spacious mobile cards:
+   - Students Directory (.students-data-table)
+   - Attendance History (.history-data-table)
+   - Dashboard Defaulters (.dashboard-defaulters-table)
+   - Dashboard Recent Sessions (.dashboard-recent-table)
+   - Timetable Schedules (.timetable-data-table)
    ============================================================ */
 @media (max-width: 680px) {
-  .students-table-wrap {
+  /* Generic mobile table card resets */
+  .students-table-wrap,
+  .history-table-wrap,
+  .defaulters-table-wrap,
+  .recent-table-wrap {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
-  }
-
-  .students-data-table {
-    border-collapse: separate !important;
-    border-spacing: 0 12px !important;
-  }
-
-  .students-data-table thead {
-    display: none;
+    overflow-x: visible !important;
   }
 
   .students-data-table,
-  .students-data-table tbody,
-  .students-data-table tr {
+  .history-data-table,
+  .dashboard-defaulters-table,
+  .dashboard-recent-table,
+  .timetable-data-table {
+    border-collapse: separate !important;
+    border-spacing: 0 12px !important;
     display: block;
     width: 100%;
   }
 
-  .students-data-table tr {
+  .students-data-table thead,
+  .history-data-table thead,
+  .dashboard-defaulters-table thead,
+  .dashboard-recent-table thead,
+  .timetable-data-table thead {
+    display: none !important;
+  }
+
+  .students-data-table tbody,
+  .students-data-table tr,
+  .history-data-table tbody,
+  .history-data-table tr,
+  .dashboard-defaulters-table tbody,
+  .dashboard-defaulters-table tr,
+  .dashboard-recent-table tbody,
+  .dashboard-recent-table tr,
+  .timetable-data-table tbody,
+  .timetable-data-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .students-data-table tr,
+  .history-data-table tr,
+  .dashboard-defaulters-table tr,
+  .dashboard-recent-table tr,
+  .timetable-data-table tr {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-xl);
@@ -229,61 +301,127 @@
     transition: transform var(--t-fast), box-shadow var(--t-fast);
   }
 
-  .students-data-table tr:hover {
+  .students-data-table tr:hover,
+  .history-data-table tr:hover,
+  .dashboard-defaulters-table tr:hover,
+  .dashboard-recent-table tr:hover,
+  .timetable-data-table tr:hover {
     box-shadow: var(--shadow-sm);
     border-color: var(--border-strong);
   }
 
-  .students-data-table td {
+  .students-data-table td,
+  .history-data-table td,
+  .dashboard-defaulters-table td,
+  .dashboard-recent-table td,
+  .timetable-data-table td {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 7px 0 !important;
+    padding: 8px 0 !important;
     border-bottom: 1px solid var(--border-subtle) !important;
+    text-align: right !important;
   }
 
-  .students-data-table td::before {
+  .students-data-table td::before,
+  .history-data-table td::before,
+  .dashboard-defaulters-table td::before,
+  .dashboard-recent-table td::before,
+  .timetable-data-table td::before {
     content: attr(data-label);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--ink-secondary);
+    text-align: left;
+    margin-right: 12px;
+    flex-shrink: 0;
   }
 
-  .students-data-table td:first-child {
+  .students-data-table td:first-child,
+  .history-data-table td:first-child,
+  .dashboard-defaulters-table td:first-child,
+  .dashboard-recent-table td:first-child,
+  .timetable-data-table td:first-child {
     padding-top: 0 !important;
   }
 
-  .students-data-table td:last-child {
+  .students-data-table td:last-child,
+  .history-data-table td:last-child,
+  .dashboard-defaulters-table td:last-child,
+  .dashboard-recent-table td:last-child,
+  .timetable-data-table td:last-child {
     border-bottom: none !important;
     padding-bottom: 0 !important;
     padding-top: 12px !important;
     justify-content: flex-end;
   }
 
-  .students-data-table td:last-child::before {
+  .students-data-table td:last-child::before,
+  .history-data-table td:last-child::before,
+  .dashboard-defaulters-table td:last-child::before,
+  .dashboard-recent-table td:last-child::before,
+  .timetable-data-table td:last-child::before {
     display: none;
+  }
+
+  /* Rapid Roll seating grid fits cleanly on smartphones */
+  .rapid-seating-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+  }
+
+  /* QR Attendance 4-card metric grid adapts to 2 columns */
+  .qr-summary-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
 /* Tablet touch-friendly status buttons */
 @media (min-width: 641px) and (max-width: 768px) {
   .status-btn {
-    width: 38px;
-    height: 32px;
-    font-size: 12.5px;
+    min-width: 42px;
+    height: 36px;
+    font-size: 13px;
   }
 }
 
 /* Smartphone screens (<= 520px) */
 @media (max-width: 520px) {
   .topbar {
-    padding: 0 14px;
+    padding: 0 12px;
+  }
+
+  .topbar-breadcrumb-link,
+  .topbar-breadcrumb-sep {
+    display: none;
+  }
+
+  .topbar-breadcrumb {
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+
+  .topbar-portal-text {
+    display: none;
+  }
+
+  .topbar-student-portal-btn {
+    padding: 0 8px !important;
+    height: 36px !important;
+  }
+
+  .topbar-right {
+    gap: 6px;
+  }
+
+  .topbar-right .icon-btn {
+    min-width: 38px;
+    min-height: 38px;
   }
 
   .view-scroll {
-    padding: 14px 14px 34px 14px;
+    padding: 12px 12px max(34px, calc(16px + env(safe-area-inset-bottom))) 12px;
   }
 
   .stat-grid {
@@ -293,7 +431,7 @@
   .view-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 14px;
+    gap: 12px;
   }
 
   .view-header-actions {
@@ -305,22 +443,87 @@
 
   .view-header-actions .btn {
     width: 100%;
-    height: 38px;
+    height: 42px;
+    min-height: 42px;
   }
 
   .document-meta-strip {
     grid-template-columns: 1fr;
   }
 
+  /* Dialogs & Modals on narrow mobile */
   .modal-card, .modal {
     max-width: calc(100vw - 20px) !important;
+    max-height: calc(100dvh - 32px) !important;
+    overflow-y: auto !important;
     margin: 10px auto;
   }
 
+  .modal-choice-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Rapid Roll Studio focus action buttons */
+  .rapid-focus-actions {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .rapid-focus-actions .btn {
+    height: 48px !important;
+    min-height: 48px !important;
+  }
+
+  .rapid-student-profile {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .rapid-student-profile .student-avatar {
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 20px !important;
+  }
+
+  .rapid-nav-footer {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .rapid-nav-footer .btn {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  /* Mark Attendance Status Buttons: High Comfort Touch Target (>= 44px) */
   .status-btn {
-    width: 38px;
-    height: 32px;
-    font-size: 12px;
+    min-width: 44px !important;
+    min-height: 42px !important;
+    height: 42px !important;
+    padding: 0 12px !important;
+    font-size: 13.5px !important;
+    font-weight: 750 !important;
+  }
+
+  .status-btn-group {
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  /* Today's session rows adapt cleanly */
+  .today-session-row {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .today-session-stats {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 8px;
   }
 
   .table-wrap {
@@ -336,6 +539,10 @@
 
 /* Ultra-compact screens (<= 360px) */
 @media (max-width: 360px) {
+  .topbar {
+    padding: 0 8px;
+  }
+
   .topbar-breadcrumb {
     font-size: 12px;
   }
@@ -345,19 +552,25 @@
   }
 
   .pill {
-    padding: 2px 8px;
-    font-size: 10.5px;
+    padding: 3px 8px;
+    font-size: 11px;
   }
 
   .status-btn {
-    width: 32px;
-    height: 28px;
-    font-size: 11px;
+    min-width: 42px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 0 8px !important;
+    font-size: 12.5px !important;
   }
 
   .data-table th,
   .data-table td {
-    padding: 8px 12px;
+    padding: 8px 10px;
     font-size: 12px;
+  }
+
+  .qr-summary-grid {
+    grid-template-columns: 1fr !important;
   }
 }
